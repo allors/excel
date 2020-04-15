@@ -20,7 +20,7 @@ using static Nuke.Common.Tools.Xunit.XunitTasks;
 [UnsetVisualStudioEnvironmentVariables]
 class Build : NukeBuild
 {
-    public static int Main() => Execute<Build>(x => x.Tests);
+    public static int Main() => Execute<Build>(x => x.Ci);
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
@@ -76,5 +76,9 @@ class Build : NukeBuild
                  .SetWorkingDirectory(workingDirectory)
                  .AddTargetAssemblies(assembly));
        });
+
+
+    Target Ci => _ => _
+      .DependsOn(Tests);
 
 }
