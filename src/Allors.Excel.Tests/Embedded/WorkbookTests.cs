@@ -31,7 +31,7 @@ namespace Allors.Excel.Tests.Embedded
             this.application.Quit();
         }
 
-        [Fact]
+        [Fact(Skip ="Azure vmimage has no office installed")]
         public async void OnNew()
         {
             var program = new Mock<IProgram>();
