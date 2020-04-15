@@ -43,7 +43,7 @@ jobs:
       inputs:
         command: push
         packagesToPush: '$(Build.SourcesDirectory)/**/*.nupkg;$(Build.SourcesDirectory)/**/*.snupkg;!$(Build.SourcesDirectory)/**/*.symbols.nupkg'
-        publishVstsFeed: 'Documents/Documents'
+        publishVstsFeed: 'Excel/Excel'
         allowPackageConflicts: true
 
 trigger:

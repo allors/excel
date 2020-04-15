@@ -54,16 +54,13 @@ class Build : NukeBuild
         .DependsOn(Restore)
         .Executes(() =>
         {
-            foreach (var project in Solution.Projects.Where(v => !v.Name.Equals("_build")))
-            {
-                MSBuild(s => s
-                    .SetTargetPath(project)
-                    .SetTargets("Compile")
-                    .SetConfiguration(Configuration)
-                    .SetAssemblyVersion(GitVersion.AssemblySemVer)
-                    .SetFileVersion(GitVersion.AssemblySemFileVer)
-                    .SetInformationalVersion(GitVersion.InformationalVersion));
-            }
+            MSBuild(s => s
+                .SetTargetPath(SourceDirectory / "Allors.Excel.Tests" / "Allors.Excel.Tests.csproj")
+                .SetTargets("Rebuild")
+                .SetConfiguration(Configuration)
+                .SetAssemblyVersion(GitVersion.AssemblySemVer)
+                .SetFileVersion(GitVersion.AssemblySemFileVer)
+                .SetInformationalVersion(GitVersion.InformationalVersion));
 
         });
 
