@@ -10,6 +10,21 @@ jobs:
   steps:
     - task: PowerShell@2
       inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "Add Excel PFX file to the certificate store."
+
+          $pfxpath = '$(Build.SourcesDirectory)/src/ExcelAddIn.Interop/ExcelAddIn.Interop_TemporaryKey.pfx'
+          
+          Add-Type -AssemblyName System.Security
+          $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
+          $cert.Import($pfxpath, "", [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]"PersistKeySet")
+          $store = new-object system.security.cryptography.X509Certificates.X509Store -argumentlist "MY", CurrentUser
+          $store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]"ReadWrite")
+          $store.Add($cert)
+          $store.Close()
+    - task: PowerShell@2
+      inputs:
         targetType: 'filePath'
         filePath: 'build.ps1'
         arguments: '-configuration $(buildConfiguration) -target Ci'
