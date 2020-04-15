@@ -1,11 +1,31 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Title>Allors Excel Headless</Title>
+    <Authors>allors</Authors>
+    <Company>Allors bvba</Company>
+    <Copyright>(c) Allors bvba</Copyright>
+    <Description>The headless implementation for Allors Excel.</Description>
+    <PackageProjectUrl>https://github.com/Allors/Documents</PackageProjectUrl>
+    <PackageDescription>Use the headless implementation of the virtual dom for testing.</PackageDescription>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+    <PackageTags>excel;virtual;dom;document object model;speed;optimization;performance;headless;unit tests;e2e tests;tests;</PackageTags>
+    <RepositoryUrl>https://github.com/Allors/Excel.git</RepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Allors.Excel\Allors.Excel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="icon.png" Pack="true" PackagePath="" />
   </ItemGroup>
 
 </Project>

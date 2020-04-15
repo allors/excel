@@ -1,7 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Title>Allors Excel</Title>
+    <Authors>allors</Authors>
+    <Company>Allors bvba</Company>
+    <Copyright>(c) Allors bvba</Copyright>
+    <Description>Virtual Document Object Model for Excel.</Description>
+    <PackageProjectUrl>https://github.com/Allors/Documents</PackageProjectUrl>
+    <PackageDescription>Speed up access to excel by using a virtual DOM.</PackageDescription>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+    <PackageTags>excel;virtual;dom;document object model;speed;optimization;performance</PackageTags>
+    <RepositoryUrl>https://github.com/Allors/Excel.git</RepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="icon.png" Pack="true" PackagePath="" />
+  </ItemGroup>
 
 </Project>
