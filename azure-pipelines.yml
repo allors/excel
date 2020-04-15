@@ -1,0 +1,40 @@
+# ASP.NET Core
+# Build and test ASP.NET Core projects targeting .NET Core.
+# Add steps that run tests, create a NuGet package, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+jobs:
+- job: Windows
+  pool:
+    vmImage: 'windows-latest'
+  steps:
+    - task: PowerShell@2
+      inputs:
+        targetType: 'filePath'
+        filePath: 'build.ps1'
+        arguments: '-configuration $(buildConfiguration) -target Ci'
+        failOnStderr: true
+      displayName: 'Build'
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'VSTest'
+        testResultsFiles: '*.trx'
+        searchFolder: '$(Build.SourcesDirectory)/artifacts/tests'
+      displayName: 'Publish Test results'
+    - task: NuGetAuthenticate@0
+      displayName: 'NuGet Authenticate'
+    - task: NuGetCommand@2
+      displayName: 'NuGet push'
+      inputs:
+        command: push
+        packagesToPush: '$(Build.SourcesDirectory)/**/*.nupkg;$(Build.SourcesDirectory)/**/*.snupkg;!$(Build.SourcesDirectory)/**/*.symbols.nupkg'
+        publishVstsFeed: 'Documents/Documents'
+        allowPackageConflicts: true
+
+trigger:
+- master
+- feature/*
+
+variables:
+  buildConfiguration: 'Release'
+
