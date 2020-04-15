@@ -78,10 +78,11 @@ class Build : NukeBuild
                  .SetFramework("net461")
                  .SetWorkingDirectory(workingDirectory)
                  .AddTargetAssemblies(assembly)
-                 .SetResultReport(Xunit2ResultFormat.Xml, ArtifactsDirectory / "tests" / "results.xml")) ;
+                 .SetResultReport(Xunit2ResultFormat.Xml, ArtifactsDirectory / "tests" / "results.xml"));
        });
 
     Target Pack => _ => _
+       .After(Tests)
        .DependsOn(Compile)
        .Executes(() =>
        {
@@ -92,8 +93,6 @@ class Build : NukeBuild
                DotNetPack(s => s
                      .SetProject(Solution.GetProject(project))
                      .SetConfiguration(Configuration)
-                     .EnableNoBuild()
-                     .EnableNoRestore()
                      .SetVersion(GitVersion.NuGetVersionV2)
                      .SetOutputDirectory(ArtifactsDirectory / "nuget"));
            }
