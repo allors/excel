@@ -10,11 +10,13 @@ using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Tools.MSBuild;
 using Nuke.Common.Tools.Xunit;
 using Nuke.Common.Utilities.Collections;
+using Nuke.Common.Tools.DotNet;
 using static Nuke.Common.EnvironmentInfo;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.MSBuild.MSBuildTasks;
 using static Nuke.Common.Tools.Xunit.XunitTasks;
+using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
 [CheckBuildProjectConfigurations]
 [UnsetVisualStudioEnvironmentVariables]
@@ -52,33 +54,53 @@ class Build : NukeBuild
         .DependsOn(Restore)
         .Executes(() =>
         {
-            MSBuild(s => s
-                .SetTargetPath(Solution)
-                .SetTargets("Compile")
-                .SetConfiguration(Configuration)
-                .SetAssemblyVersion(GitVersion.AssemblySemVer)
-                .SetFileVersion(GitVersion.AssemblySemFileVer)
-                .SetInformationalVersion(GitVersion.InformationalVersion)
-                .SetMaxCpuCount(Environment.ProcessorCount)
-                .SetNodeReuse(IsLocalBuild));
+            foreach (var project in Solution.Projects.Where(v => !v.Name.Equals("_build")))
+            {
+                MSBuild(s => s
+                    .SetTargetPath(project)
+                    .SetTargets("Compile")
+                    .SetConfiguration(Configuration)
+                    .SetAssemblyVersion(GitVersion.AssemblySemVer)
+                    .SetFileVersion(GitVersion.AssemblySemFileVer)
+                    .SetInformationalVersion(GitVersion.InformationalVersion));
+            }
+
         });
 
     Target Tests => _ => _
        .DependsOn(Compile)
        .Executes(() =>
        {
-           //System.InvalidOperationException: Unknown test framework: could not find xunit.dll(v1) or xunit.execution.*.dll(v2)
            var assembly = (AbsolutePath)GlobFiles(SourceDirectory, "**/Allors.Excel.Tests.dll").First();
            var workingDirectory = assembly.Parent;
 
            Xunit2(v => v
                  .SetFramework("net461")
                  .SetWorkingDirectory(workingDirectory)
-                 .AddTargetAssemblies(assembly));
+                 .AddTargetAssemblies(assembly)
+                 .SetResultReport(Xunit2ResultFormat.Xml, ArtifactsDirectory / "tests" / "results.xml")) ;
+       });
+
+    Target Pack => _ => _
+       .DependsOn(Compile)
+       .Executes(() =>
+       {
+           var projects = new[] { "Allors.Excel", "Allors.Excel.Headless", "Allors.Excel.Interop" };
+
+           foreach (var project in projects)
+           {
+               DotNetPack(s => s
+                     .SetProject(Solution.GetProject(project))
+                     .SetConfiguration(Configuration)
+                     .EnableNoBuild()
+                     .EnableNoRestore()
+                     .SetVersion(GitVersion.NuGetVersionV2)
+                     .SetOutputDirectory(ArtifactsDirectory / "nuget"));
+           }
        });
 
 
     Target Ci => _ => _
-      .DependsOn(Tests);
+      .DependsOn(Pack, Tests);
 
 }

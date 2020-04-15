@@ -17,8 +17,8 @@ jobs:
       displayName: 'Build'
     - task: PublishTestResults@2
       inputs:
-        testResultsFormat: 'VSTest'
-        testResultsFiles: '*.trx'
+        testResultsFormat: 'xunit'
+        testResultsFiles: '*.xml'
         searchFolder: '$(Build.SourcesDirectory)/artifacts/tests'
       displayName: 'Publish Test results'
     - task: NuGetAuthenticate@0
