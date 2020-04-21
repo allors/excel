@@ -4,6 +4,7 @@
 // </copyright>
 
 using System;
+using System.Drawing;
 using System.Threading.Tasks;
 
 namespace Allors.Excel
@@ -32,5 +33,9 @@ namespace Allors.Excel
         Task Flush();
 
         Task RefreshPivotTables(string newRange);
+
+        void AddPicture(string uri, Rectangle rectangle);       
+
+        Rectangle GetRectangle(string namedRange);
     }
 }

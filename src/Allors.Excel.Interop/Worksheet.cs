@@ -8,9 +8,11 @@ namespace Allors.Excel.Embedded
     using System;
     using System.Collections.Generic;
     using System.Drawing;
+    using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
     using Allors.Excel;
+    using Microsoft.Office.Core;
     using Microsoft.Office.Interop.Excel;
     using Polly;
     using InteropWorksheet = Microsoft.Office.Interop.Excel.Worksheet;
@@ -196,26 +198,69 @@ namespace Allors.Excel.Embedded
 
         public async Task Flush()
         {
-            this.RenderNumberFormat(this.DirtyNumberFormatCells);
-            this.DirtyNumberFormatCells = new HashSet<Cell>();
+            var calculation = this.Workbook.InteropWorkbook.Application.Calculation;
+            if (calculation != XlCalculation.xlCalculationManual)
+            {
+                this.Workbook.InteropWorkbook.Application.Calculation = XlCalculation.xlCalculationManual;
+            }
 
-            this.RenderValue(this.DirtyValueCells);
-            this.DirtyValueCells = new HashSet<Cell>();
+            this.Workbook.InteropWorkbook.Application.ScreenUpdating = false;
+            this.Workbook.InteropWorkbook.Application.EnableEvents = false;
+            this.Workbook.InteropWorkbook.Application.DisplayStatusBar = false;
+            this.Workbook.InteropWorkbook.Application.PrintCommunication = false;
 
-            this.RenderFormula(this.DirtyFormulaCells);
-            this.DirtyFormulaCells = new HashSet<Cell>();
+            var enableFormatConditionsCalculation = this.InteropWorksheet.EnableFormatConditionsCalculation;
 
-            this.RenderComments(this.DirtyCommentCells);
-            this.DirtyCommentCells = new HashSet<Cell>();
+            if (enableFormatConditionsCalculation)
+            {
+                this.InteropWorksheet.EnableFormatConditionsCalculation = false;
+            }
 
-            this.RenderStyle(this.DirtyStyleCells);
-            this.DirtyStyleCells = new HashSet<Cell>();
+            try
+            {
+                this.RenderNumberFormat(this.DirtyNumberFormatCells);
+                this.DirtyNumberFormatCells = new HashSet<Cell>();
 
-            this.SetOptions(this.DirtyOptionCells);
-            this.DirtyOptionCells = new HashSet<Cell>();
+                this.RenderValue(this.DirtyValueCells);
+                this.DirtyValueCells = new HashSet<Cell>();
 
-            this.UpdateRows(this.DirtyRows);
-            this.DirtyRows = new HashSet<Row>();
+                this.RenderFormula(this.DirtyFormulaCells);
+                this.DirtyFormulaCells = new HashSet<Cell>();
+
+                this.RenderComments(this.DirtyCommentCells);
+                this.DirtyCommentCells = new HashSet<Cell>();
+
+                this.RenderStyle(this.DirtyStyleCells);
+                this.DirtyStyleCells = new HashSet<Cell>();
+
+                this.SetOptions(this.DirtyOptionCells);
+                this.DirtyOptionCells = new HashSet<Cell>();
+
+                this.UpdateRows(this.DirtyRows);
+                this.DirtyRows = new HashSet<Row>();
+            }
+            finally
+            {
+                this.Workbook.InteropWorkbook.Application.Calculation = calculation;
+                this.Workbook.InteropWorkbook.Application.ScreenUpdating = true;
+                this.Workbook.InteropWorkbook.Application.EnableEvents = true;
+                this.Workbook.InteropWorkbook.Application.DisplayStatusBar = true;
+                this.Workbook.InteropWorkbook.Application.PrintCommunication = true;
+
+                this.InteropWorksheet.EnableFormatConditionsCalculation = enableFormatConditionsCalculation;
+
+                try
+                {
+                    // Recalculate when required. Formulas need to be resolved.
+                    if (calculation == XlCalculation.xlCalculationAutomatic)
+                    {
+                        this.InteropWorksheet.Calculate();
+                    }
+                }
+                catch
+                {
+                }
+            }
 
             await Task.CompletedTask;
         }
@@ -411,7 +456,7 @@ namespace Allors.Excel.Embedded
                         }
                         else
                         {
-                            range.Interior.ColorIndex = XlColorIndex.xlColorIndexAutomatic;
+                            range.Interior.ColorIndex = Microsoft.Office.Interop.Excel.XlColorIndex.xlColorIndexAutomatic;
                         }
                     });
                 });
@@ -583,6 +628,44 @@ namespace Allors.Excel.Embedded
              .Execute(method);
         }
 
+        /// <summary>
+        /// Adds a Picture on the specified rectangle. <seealso cref="GetRectangle(string)"/>
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="location"></param>
+        /// <param name="size"></param>
+        public void AddPicture(string fileName, System.Drawing.Rectangle rectangle)
+        {
+            this.InteropWorksheet.Shapes.AddPicture(fileName, MsoTriState.msoFalse, MsoTriState.msoTrue, rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
 
+            try
+            {
+                File.Delete(fileName);
+            }
+            catch
+            {
+                // left blank: delete temp file may fail.
+            }
+        }              
+
+        /// <summary>
+        /// Gets the Rectangle of a namedRange (uses the Range.MergeArea as reference). 
+        /// NamedRange must exist on Workbook.
+        /// </summary>
+        /// <param name="namedRange"></param>
+        /// <returns></returns>
+        public System.Drawing.Rectangle GetRectangle(string namedRange)
+        {
+            Name name = this.Workbook.InteropWorkbook.Names.Item(namedRange);                    
+
+            var area = name.RefersToRange.MergeArea;
+
+            int left = Convert.ToInt32(area.Left);
+            int top = Convert.ToInt32(area.Top);
+            int width = Convert.ToInt32(area.Width);
+            int height = Convert.ToInt32(area.Height);
+
+            return new System.Drawing.Rectangle(left, top, width, height);
+        }
     }
 }

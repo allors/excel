@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Threading.Tasks;
 
 namespace Allors.Excel.Headless
@@ -105,7 +106,19 @@ namespace Allors.Excel.Headless
 
         public async Task RefreshPivotTables(string newRange)
         {
+            // strictly ui
             await Task.CompletedTask;
+        }
+
+        public void AddPicture(string uri, Rectangle rectangle)
+        {
+            // strictly ui
+        }
+
+        public Rectangle GetRectangle(string namedRange)
+        {
+            // strictly ui
+            return Rectangle.Empty;
         }
     }
 }
