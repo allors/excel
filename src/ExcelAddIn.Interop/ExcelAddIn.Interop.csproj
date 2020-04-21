@@ -192,6 +192,7 @@
     can be found.
   -->
   <ItemGroup>
+    <Compile Include="Office.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

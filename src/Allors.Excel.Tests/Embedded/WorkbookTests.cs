@@ -35,7 +35,9 @@ namespace Allors.Excel.Tests.Embedded
         public async void OnNew()
         {
             var program = new Mock<IProgram>();
-            var addIn = new AddIn(application, program.Object);
+            var office = new Mock<IOffice>();
+
+            var addIn = new AddIn(application, program.Object, office.Object);
 
             application.Workbooks.Add();
 

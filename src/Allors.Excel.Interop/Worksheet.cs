@@ -12,7 +12,6 @@ namespace Allors.Excel.Embedded
     using System.Linq;
     using System.Threading.Tasks;
     using Allors.Excel;
-    using Microsoft.Office.Core;
     using Microsoft.Office.Interop.Excel;
     using Polly;
     using InteropWorksheet = Microsoft.Office.Interop.Excel.Worksheet;
@@ -636,7 +635,7 @@ namespace Allors.Excel.Embedded
         /// <param name="size"></param>
         public void AddPicture(string fileName, System.Drawing.Rectangle rectangle)
         {
-            this.InteropWorksheet.Shapes.AddPicture(fileName, MsoTriState.msoFalse, MsoTriState.msoTrue, rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
+            this.Workbook.AddIn.Office.AddPicture(this.InteropWorksheet, fileName, rectangle);
 
             try
             {

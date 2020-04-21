@@ -13,6 +13,7 @@ using AppEvents_Event = Microsoft.Office.Interop.Excel.AppEvents_Event;
 using InteropWorkbook = Microsoft.Office.Interop.Excel.Workbook;
 using InteropWorksheet = Microsoft.Office.Interop.Excel.Worksheet;
 using System.Threading.Tasks;
+using ExcelAddIn.Interop;
 
 namespace ExcelAddInLocal
 {
@@ -25,7 +26,10 @@ namespace ExcelAddInLocal
         {
             this.serviceLocator = new ServiceLocator();
             var program = new Program(serviceLocator);
-            this.addIn = new AddIn(this.Application, program);
+
+            var office = new Office(this);
+
+            this.addIn = new AddIn(this.Application, program, office);
             this.Ribbon.AddIn = this.addIn;
             await program.OnStart(addIn);
         });

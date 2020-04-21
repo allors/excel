@@ -16,10 +16,12 @@ namespace Allors.Excel.Embedded
     {
         private readonly Dictionary<InteropWorkbook, Workbook> workbookByInteropWorkbook;
 
-        public AddIn(InteropApplication application, IProgram program)
+        public AddIn(InteropApplication application, IProgram program, IOffice office)
         {
             this.Application = application;
             this.Program = program;
+            this.Office = office;
+
             this.workbookByInteropWorkbook = new Dictionary<InteropWorkbook, Workbook>();
 
             ((AppEvents_Event)this.Application).NewWorkbook += async interopWorkbook =>
@@ -95,6 +97,7 @@ namespace Allors.Excel.Embedded
         public InteropApplication Application { get; }
 
         public IProgram Program { get; }
+        public IOffice Office { get; }
 
         public IReadOnlyDictionary<InteropWorkbook, Workbook> WorkbookByInteropWorkbook => workbookByInteropWorkbook;
 
