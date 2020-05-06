@@ -37,5 +37,14 @@ namespace Allors.Excel
         void AddPicture(string uri, Rectangle rectangle);       
 
         Rectangle GetRectangle(string namedRange);
+
+        Range[] GetNamedRanges();
+
+        /// <summary>
+        /// Adds a NamedRange scoped to the Worksheet
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="range"></param>
+        void SetNamedRange(string name, Range range);
     }
 }

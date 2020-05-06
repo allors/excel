@@ -33,9 +33,7 @@ namespace Allors.Excel.Embedded
                 hidden = value;
                 this.Worksheet.AddDirtyRow(this);
             }
-        }
-
-        int IRow.Index { get; }
+        }     
 
         public int CompareTo(Row other)
         {

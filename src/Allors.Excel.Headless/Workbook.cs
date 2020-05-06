@@ -76,5 +76,10 @@ namespace Allors.Excel.Headless
         {
             throw new System.NotImplementedException();
         }
+
+        public void SetNamedRange(string name, Range range)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

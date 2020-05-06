@@ -120,5 +120,15 @@ namespace Allors.Excel.Headless
             // strictly ui
             return Rectangle.Empty;
         }
+
+        public Range[] GetNamedRanges()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetNamedRange(string name, Range range)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

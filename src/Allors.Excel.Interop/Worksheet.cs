@@ -666,5 +666,69 @@ namespace Allors.Excel.Embedded
 
             return new System.Drawing.Rectangle(left, top, width, height);
         }
+
+        public Excel.Range[] GetNamedRanges()
+        {
+            var ranges = new List<Excel.Range>();
+
+            foreach (Microsoft.Office.Interop.Excel.Name namedRange in this.InteropWorksheet.Names)
+            {
+                try
+                {
+                    var refersToRange = namedRange.RefersToRange;
+                    if (refersToRange != null)
+                    {
+                        ranges.Add(new Excel.Range(refersToRange.Row - 1, refersToRange.Column - 1, refersToRange.Rows.Count, refersToRange.Columns.Count, worksheet: this,  name: namedRange.Name));
+                    }
+                }
+                catch
+                {
+                    // RefersToRange can throw exception
+                }
+            }
+
+            return ranges.ToArray();
+        }
+
+        /// <summary>
+        /// Adds a NamedRange that has its scope on the Worksheet.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="range"></param>
+        public void SetNamedRange(string name, Excel.Range range)
+        {
+            if (!string.IsNullOrWhiteSpace(name) && range != null)
+            {
+                try
+                {
+
+                    var interopWorksheet = ((Worksheet)range.Worksheet).InteropWorksheet;
+
+                    if (interopWorksheet != null)
+                    {
+                        var topLeft = interopWorksheet.Cells[range.Row + 1, range.Column + 1];
+                        var bottomRight = interopWorksheet.Cells[range.Row + range.Rows, range.Column + range.Columns];
+
+                        var refersTo = interopWorksheet.Range[topLeft, bottomRight];
+
+                        // When it does not exist, add it, else we update the range.
+                        if (interopWorksheet.Names
+                            .Cast<Microsoft.Office.Interop.Excel.Name>()
+                            .Any(v => string.Equals(v.Name, name)))
+                        {
+                            interopWorksheet.Names.Item(name).RefersTo = refersTo;
+                        }
+                        else
+                        {
+                            interopWorksheet.Names.Add(name, refersTo);
+                        }
+                    }
+                }
+                catch
+                {
+                    // can throw exception, we dont care.
+                }
+            }
+        }
     }
 }

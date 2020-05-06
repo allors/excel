@@ -20,5 +20,12 @@ namespace Allors.Excel
         IWorksheet Copy(IWorksheet source, IWorksheet beforeWorksheet);
 
         Range[] GetNamedRanges();
+
+        /// <summary>
+        /// Adds a NamedRange scoped to the Workbook
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="range"></param>
+        void SetNamedRange(string name, Range range);
     }
 }
