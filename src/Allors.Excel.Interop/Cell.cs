@@ -33,11 +33,11 @@ namespace Allors.Excel.Embedded
 
         IRow ICell.Row => this.Row;
 
-        public Row Row { get; }
+        public Row Row { get; internal set; }
 
         IColumn ICell.Column => this.Column;
 
-        public Column Column { get; }
+        public Column Column { get; internal set; }
 
         object ICell.Value { get => this.Value; set => this.Value = value; }
 

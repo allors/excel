@@ -130,5 +130,25 @@ namespace Allors.Excel.Headless
         {
             throw new NotImplementedException();
         }
+
+        public void InsertRows(int startRowIndex, int numberOfRows)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteRows(int startRowIndex, int numberOfRows)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void InsertColumns(int startColumnIndex, int numberOfColumns)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteColumns(int startColumnIndex, int numberOfColumns)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

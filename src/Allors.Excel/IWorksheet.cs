@@ -46,5 +46,13 @@ namespace Allors.Excel
         /// <param name="name"></param>
         /// <param name="range"></param>
         void SetNamedRange(string name, Range range);
+
+        void InsertRows(int startRowIndex, int numberOfRows);
+
+        void DeleteRows(int startRowIndex, int numberOfRows);
+
+        void InsertColumns(int startColumnIndex, int numberOfColumns);
+
+        void DeleteColumns(int startColumnIndex, int numberOfColumns);
     }
 }

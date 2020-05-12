@@ -120,18 +120,18 @@ namespace Application
 
             await sheet.Flush();
 
-            sheet.CellsChanged += (sender, v) =>
-            {
-                foreach (var cell in v.Cells)
-                {
-                    cell.Style = this.ChangedCellStyle;
-                }
+            //sheet.CellsChanged += (sender, v) =>
+            //{
+            //    foreach (var cell in v.Cells)
+            //    {
+            //        cell.Style = this.ChangedCellStyle;
+            //    }
 
-                ((IWorksheet)sender).Flush();
+            //    ((IWorksheet)sender).Flush();
 
-                string message = $"Cells changed: {string.Join(",", v.Cells.Select(w => $"{w.Row}:{w.Column}"))}";
-                this.ServiceLocator.Alerter.Alert(message);
-            };
+            //    string message = $"Cells changed: {string.Join(",", v.Cells.Select(w => $"{w.Row}:{w.Column}"))}";
+            //    this.ServiceLocator.Alerter.Alert(message);
+            //};
         }
 
         public Style CanNotWriteCellStyle { get; set; }

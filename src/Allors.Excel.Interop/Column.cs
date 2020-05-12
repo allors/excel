@@ -17,7 +17,7 @@ namespace Allors.Excel.Embedded
 
         public IWorksheet Worksheet { get; }
 
-        public int Index { get; }
+        public int Index { get; internal set; }
 
         public int CompareTo(Column other)
         {

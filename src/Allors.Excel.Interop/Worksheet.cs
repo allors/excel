@@ -35,9 +35,9 @@ namespace Allors.Excel.Embedded
 
     public class Worksheet : IEmbeddedWorksheet
     {
-        private readonly Dictionary<int, Row> rowByIndex;
+        private Dictionary<int, Row> rowByIndex;
 
-        private readonly Dictionary<int, Column> columnByIndex;
+        private Dictionary<int, Column> columnByIndex;
         private bool isActive;
 
         public Worksheet(Workbook workbook, InteropWorksheet interopWorksheet)
@@ -111,6 +111,8 @@ namespace Allors.Excel.Embedded
         private HashSet<Cell> DirtyFormulaCells { get; set; }
 
         private HashSet<Row> DirtyRows { get; set; }
+
+        public bool PreventChangeEvent { get; private set; }
 
         public async Task RefreshPivotTables(string sourceDataRange = null)
         {
@@ -195,7 +197,7 @@ namespace Allors.Excel.Embedded
             return column;
         }
 
-        public async Task Flush()
+        private Tuple<XlCalculation, bool> DisableExcel()
         {
             var calculation = this.Workbook.InteropWorkbook.Application.Calculation;
             if (calculation != XlCalculation.xlCalculationManual)
@@ -214,6 +216,35 @@ namespace Allors.Excel.Embedded
             {
                 this.InteropWorksheet.EnableFormatConditionsCalculation = false;
             }
+
+            return Tuple.Create(calculation,  enableFormatConditionsCalculation);
+        }
+
+        private void EnableExcel(Tuple<XlCalculation, bool> tuple)
+        {
+            this.Workbook.InteropWorkbook.Application.Calculation = tuple.Item1;
+            this.Workbook.InteropWorkbook.Application.ScreenUpdating = true;
+            this.Workbook.InteropWorkbook.Application.EnableEvents = true;
+            this.Workbook.InteropWorkbook.Application.DisplayStatusBar = true;
+            this.Workbook.InteropWorkbook.Application.PrintCommunication = true;
+
+            this.InteropWorksheet.EnableFormatConditionsCalculation = tuple.Item2;
+
+            try
+            {
+                // Recalculate when required. Formulas need to be resolved.
+                if (tuple.Item1 == XlCalculation.xlCalculationAutomatic)
+                {
+                    this.InteropWorksheet.Calculate();
+                }
+            }
+            catch
+            {
+            }
+        }
+        public async Task Flush()
+        {
+            var tuple = this.DisableExcel();
 
             try
             {
@@ -240,25 +271,7 @@ namespace Allors.Excel.Embedded
             }
             finally
             {
-                this.Workbook.InteropWorkbook.Application.Calculation = calculation;
-                this.Workbook.InteropWorkbook.Application.ScreenUpdating = true;
-                this.Workbook.InteropWorkbook.Application.EnableEvents = true;
-                this.Workbook.InteropWorkbook.Application.DisplayStatusBar = true;
-                this.Workbook.InteropWorkbook.Application.PrintCommunication = true;
-
-                this.InteropWorksheet.EnableFormatConditionsCalculation = enableFormatConditionsCalculation;
-
-                try
-                {
-                    // Recalculate when required. Formulas need to be resolved.
-                    if (calculation == XlCalculation.xlCalculationAutomatic)
-                    {
-                        this.InteropWorksheet.Calculate();
-                    }
-                }
-                catch
-                {
-                }
+                this.EnableExcel(tuple);
             }
 
             await Task.CompletedTask;
@@ -301,6 +314,11 @@ namespace Allors.Excel.Embedded
 
         private void InteropWorksheet_Change(Microsoft.Office.Interop.Excel.Range target)
         {
+            if (this.PreventChangeEvent)
+            {
+                return;
+            }
+
             List<Cell> cells = null;
             foreach (Microsoft.Office.Interop.Excel.Range targetCell in target.Cells)
             {
@@ -645,7 +663,7 @@ namespace Allors.Excel.Embedded
             {
                 // left blank: delete temp file may fail.
             }
-        }              
+        }
 
         /// <summary>
         /// Gets the Rectangle of a namedRange (uses the Range.MergeArea as reference). 
@@ -655,7 +673,7 @@ namespace Allors.Excel.Embedded
         /// <returns></returns>
         public System.Drawing.Rectangle GetRectangle(string namedRange)
         {
-            Name name = this.Workbook.InteropWorkbook.Names.Item(namedRange);                    
+            Name name = this.Workbook.InteropWorkbook.Names.Item(namedRange);
 
             var area = name.RefersToRange.MergeArea;
 
@@ -678,7 +696,7 @@ namespace Allors.Excel.Embedded
                     var refersToRange = namedRange.RefersToRange;
                     if (refersToRange != null)
                     {
-                        ranges.Add(new Excel.Range(refersToRange.Row - 1, refersToRange.Column - 1, refersToRange.Rows.Count, refersToRange.Columns.Count, worksheet: this,  name: namedRange.Name));
+                        ranges.Add(new Excel.Range(refersToRange.Row - 1, refersToRange.Column - 1, refersToRange.Rows.Count, refersToRange.Columns.Count, worksheet: this, name: namedRange.Name));
                     }
                 }
                 catch
@@ -701,7 +719,6 @@ namespace Allors.Excel.Embedded
             {
                 try
                 {
-
                     var interopWorksheet = ((Worksheet)range.Worksheet).InteropWorksheet;
 
                     if (interopWorksheet != null)
@@ -727,6 +744,224 @@ namespace Allors.Excel.Embedded
                 catch
                 {
                     // can throw exception, we dont care.
+                }
+            }
+        }
+
+        public void InsertRows(int startRowIndex, int numberOfRows)
+        {
+            if (startRowIndex >= 0 && numberOfRows > 0)
+            {
+                this.PreventChangeEvent = true;
+
+                try
+                {
+                    Microsoft.Office.Interop.Excel.Range rows = this.InteropWorksheet.Range[$"{startRowIndex + 2}:{startRowIndex + numberOfRows + 1}"];
+
+                    this.WaitAndRetry(() => {
+                        var tuple = this.DisableExcel();
+                        rows.Insert(XlInsertShiftDirection.xlShiftDown);
+                        this.EnableExcel(tuple);
+                    });
+
+                    if (this.CellByRowColumn.Any()) 
+                    {
+                        // Shift all cell rows down with the numberOfRows
+                        // Shift all cell rows up with the numberOfRows
+                        // We need to set the Key in the correct format "row:column" in order to track the rights cells.
+                        // Order by descending so we will not have a duplicate key in the dictionary
+                        foreach (var item in this.CellByRowColumn
+                        .Where(kvp => kvp.Value.Row.Index > startRowIndex)
+                        .OrderByDescending(kvp => kvp.Value.Row.Index)
+                        .ToList())
+                        {
+                            // Remove the entry in the dictionary, but keep the cell.
+                            var cell = item.Value;
+                            this.CellByRowColumn.Remove(item.Key);
+
+                            // Shift rows up with the numberofrows that were deleted.
+                            cell.Row.Index += numberOfRows;
+
+                            // Add the existing cell with its new key
+                            var key = $"{cell.Row.Index}:{cell.Column.Index}";
+                            this.CellByRowColumn.Add(key, cell);
+                        }
+                    }
+                }
+                finally
+                {
+                    this.PreventChangeEvent = false;
+                }
+            }
+        }
+
+        public void DeleteRows(int startRowIndex, int numberOfRows)
+        {
+            if (startRowIndex >= 0 && numberOfRows > 0)
+            {
+                this.PreventChangeEvent = true;
+
+                try
+                {
+                    Microsoft.Office.Interop.Excel.Range rows = this.InteropWorksheet.Range[$"{startRowIndex + 1}:{startRowIndex + numberOfRows}"];
+
+                    this.WaitAndRetry(() => 
+                    {
+                        var tuple = this.DisableExcel();
+                        rows.Delete(XlDeleteShiftDirection.xlShiftUp);
+                        this.EnableExcel(tuple);
+                    });
+
+                    if (this.CellByRowColumn.Any()) 
+                    {
+                        // Delete all cells in the deleted rows.
+                        foreach (int rowIndex in Enumerable.Range(startRowIndex, numberOfRows))
+                        {
+                            foreach (var item in this.CellByRowColumn
+                              .Where(kvp => kvp.Value.Row.Index == rowIndex)
+                              .ToList())
+                            {
+                                this.CellByRowColumn.Remove(item.Key);
+                            }
+                        }
+
+                        // Shift all cell rows up with the numberOfRows
+                        // We need to set the Key in the correct format "row:column" in order to track the rights cells.
+                        foreach (var item in this.CellByRowColumn
+                            .Where(kvp => kvp.Value.Row.Index > startRowIndex)
+                            .OrderBy(kvp => kvp.Value.Row.Index)
+                            .ToList())
+                        {
+                            // Remove the entry in the dictionary, but keep the cell.
+                            var cell = item.Value;
+                            this.CellByRowColumn.Remove(item.Key);
+
+                            var rowIndex = cell.Row.Index - numberOfRows;
+
+                            // Link the cell to the new Row that already exists
+                            cell.Row = this.rowByIndex[rowIndex];
+
+                            // Add the existing cell with its new key
+                            var key = $"{cell.Row.Index}:{cell.Column.Index}";
+                            this.CellByRowColumn.Add(key, cell);
+                        }
+                    }
+                }
+                finally
+                {
+                    this.PreventChangeEvent = false;
+                }
+            }
+        }
+
+        public void InsertColumns(int startColumnIndex, int numberOfColumns)
+        {
+            if (startColumnIndex >= 0 && numberOfColumns > 0)
+            {
+                this.PreventChangeEvent = true;
+
+                try
+                {
+                    var startColumnName = ExcelColumnFromNumber(startColumnIndex + 2);
+                    var endColumnName = ExcelColumnFromNumber(startColumnIndex + 1 + numberOfColumns);
+
+                    Microsoft.Office.Interop.Excel.Range rows = this.InteropWorksheet.Range[$"{startColumnName}1:{endColumnName}1"];
+
+                    this.WaitAndRetry(() => {
+                        var tuple = this.DisableExcel();
+                        rows.EntireColumn.Insert(XlInsertShiftDirection.xlShiftToRight);
+                        this.EnableExcel(tuple);
+                    });
+
+                    if (this.CellByRowColumn.Any())
+                    {
+                        // Shift all cell columns to the right with the numberOfColumns
+                        // We need to set the Key in the correct format "row:column" in order to track the rights cells.
+                        // Order by descending so we will not have a duplicate key in the dictionary
+                        foreach (var item in this.CellByRowColumn
+                                    .Where(kvp => kvp.Value.Column.Index > startColumnIndex)
+                                    .OrderByDescending(kvp => kvp.Value.Column.Index)
+                                    .ToList())
+                        {
+                            // Remove the entry in the dictionary, but keep the cell.
+                            var cell = item.Value;
+                            this.CellByRowColumn.Remove(item.Key);
+
+                            // Shift rows up with the numberofrows that were deleted.
+                            cell.Column.Index += numberOfColumns;
+
+                            // Add the existing cell with its new key
+                            var key = $"{cell.Row.Index}:{cell.Column.Index}";
+                            this.CellByRowColumn.Add(key, cell);
+                        }
+                    }
+                }
+                finally
+                {
+                    this.PreventChangeEvent = false;
+                }
+            }
+        }
+
+        public void DeleteColumns(int startColumnIndex, int numberOfColumns)
+        {
+            if (startColumnIndex >= 0 && numberOfColumns > 0)
+            {
+                this.PreventChangeEvent = true;
+
+                try
+                {
+                    var startColumnName = ExcelColumnFromNumber(startColumnIndex + 1);
+                    var endColumnName = ExcelColumnFromNumber(startColumnIndex + numberOfColumns);
+
+                    Microsoft.Office.Interop.Excel.Range range = this.InteropWorksheet.Range[$"{startColumnName}1:{endColumnName}1"];
+
+                    this.WaitAndRetry(() => {
+                        var tuple = this.DisableExcel();
+                        range.EntireColumn.Delete(XlDeleteShiftDirection.xlShiftToLeft);
+                        this.EnableExcel(tuple);
+                    });
+
+                    if (this.CellByRowColumn.Any())
+                    {
+                        // Delete all cells in the deleted columns.
+                        foreach (int columnIndex in Enumerable.Range(startColumnIndex, numberOfColumns))
+                        {
+                            foreach (var item in this.CellByRowColumn
+                                .Where(kvp => kvp.Value.Column.Index == columnIndex)
+                                .ToList())
+                            {
+                                this.CellByRowColumn.Remove(item.Key);
+                            }
+                        }
+
+                        // Shift all cell Columns to the left with the numberOfColumns
+                        // We need to set the Key in the correct format "row:column" in order to track the rights cells.
+                        foreach (var item in this.CellByRowColumn
+                            .Where(kvp => kvp.Value.Column.Index > startColumnIndex)
+                            .OrderBy(kvp => kvp.Value.Column.Index)
+                            .ToList())
+                        {
+                            // Remove the entry in the dictionary, but keep the cell.
+                            var cell = item.Value;
+                            this.CellByRowColumn.Remove(item.Key);
+
+                            var columnIndex = cell.Column.Index - numberOfColumns;
+
+                            var column = this.columnByIndex[columnIndex];
+
+                            // Link to the correct column that already exists.
+                            cell.Column = column;
+
+                            // Add the existing cell with its new key
+                            var key = $"{cell.Row.Index}:{cell.Column.Index}";
+                            this.CellByRowColumn.Add(key, cell);
+                        }
+                    }
+                }
+                finally
+                {
+                    this.PreventChangeEvent = false;
                 }
             }
         }
