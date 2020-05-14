@@ -19,7 +19,11 @@ namespace Allors.Excel
 
         IWorksheet Copy(IWorksheet source, IWorksheet beforeWorksheet);
 
-        Range[] GetNamedRanges();
+        /// <summary>
+        /// Gets all named Ranges in this workbook scope.
+        /// </summary>
+        /// <returns></returns>
+        Range[] GetNamedRanges(string refersToSheetName = null);
 
         /// <summary>
         /// Adds a NamedRange scoped to the Workbook

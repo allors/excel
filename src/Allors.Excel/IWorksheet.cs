@@ -38,21 +38,45 @@ namespace Allors.Excel
 
         Rectangle GetRectangle(string namedRange);
 
+        /// <summary>
+        /// Gets all named Ranges in this worksheet scope.
+        /// </summary>
+        /// <returns></returns>
         Range[] GetNamedRanges();
 
         /// <summary>
-        /// Adds a NamedRange scoped to the Worksheet
+        /// Adds or updates a NamedRange scoped to the Worksheet
         /// </summary>
         /// <param name="name"></param>
         /// <param name="range"></param>
         void SetNamedRange(string name, Range range);
 
+        /// <summary>
+        /// Insert new rows in this worksheet. Rows below will be shifted down.
+        /// </summary>
+        /// <param name="startRowIndex"></param>
+        /// <param name="numberOfRows"></param>
         void InsertRows(int startRowIndex, int numberOfRows);
 
+        /// <summary>
+        /// Delete rows in this worksheet. Rows below will be shifted up.
+        /// </summary>
+        /// <param name="startRowIndex"></param>
+        /// <param name="numberOfRows"></param>
         void DeleteRows(int startRowIndex, int numberOfRows);
 
+        /// <summary>
+        /// Insert new columns in this worksheet. Columns to the right will be shifted to the right.
+        /// </summary>
+        /// <param name="startColumnIndex"></param>
+        /// <param name="numberOfColumns"></param>
         void InsertColumns(int startColumnIndex, int numberOfColumns);
 
+        /// <summary>
+        /// Delete columns in this worksheet. Columns to the right will be shifted to the left.
+        /// </summary>
+        /// <param name="startColumnIndex"></param>
+        /// <param name="numberOfColumns"></param>
         void DeleteColumns(int startColumnIndex, int numberOfColumns);
     }
 }

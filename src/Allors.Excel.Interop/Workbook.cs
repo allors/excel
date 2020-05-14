@@ -144,7 +144,7 @@ namespace Allors.Excel.Embedded
         /// Return a Zero-Based Row, Column NamedRanges
         /// </summary>
         /// <returns></returns>
-        public Excel.Range[] GetNamedRanges()
+        public Excel.Range[] GetNamedRanges(string refersToSheetName = null)
         {
             var ranges = new List<Excel.Range>();
 
@@ -154,13 +154,13 @@ namespace Allors.Excel.Embedded
                 {
                     var refersToRange = namedRange.RefersToRange;
                     if (refersToRange != null)
-                    {
-                        if (this.worksheetByInteropWorksheet.TryGetValue(refersToRange.Worksheet, out Worksheet iworkSheet))
-                        {
-                            //
-                        }
+                    {                   
+                        var iworkSheet = this.worksheetByInteropWorksheet.FirstOrDefault(v => string.Equals(v.Key.Name, refersToRange.Worksheet.Name)).Value;
 
-                        ranges.Add(new Excel.Range(refersToRange.Row - 1, refersToRange.Column - 1, refersToRange.Rows.Count, refersToRange.Columns.Count, worksheet: iworkSheet, name: namedRange.Name));
+                        if(string.IsNullOrEmpty(refersToSheetName) || refersToSheetName.Equals(iworkSheet?.Name, StringComparison.OrdinalIgnoreCase))
+                        {
+                            ranges.Add(new Excel.Range(refersToRange.Row - 1, refersToRange.Column - 1, refersToRange.Rows.Count, refersToRange.Columns.Count, worksheet: iworkSheet, name: namedRange.Name));
+                        }
                     }
                 }
                 catch(Exception ex)

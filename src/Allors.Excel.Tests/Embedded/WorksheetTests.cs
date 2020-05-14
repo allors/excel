@@ -13,28 +13,9 @@ using InteropWorkbook = Microsoft.Office.Interop.Excel.Workbook;
 
 namespace Allors.Excel.Tests.Embedded
 {
-    public class WorksheetTests : IDisposable
+    public class WorksheetTests : InteropTest
     {
-        private InteropApplication application;
-
-        public WorksheetTests()
-        {
-            this.application = new InteropApplication { Visible = true };
-        }
-
-        public void Dispose()
-        {
-            foreach (InteropWorkbook workbook in this.application.Workbooks)
-            {
-                workbook.Close(false);
-            }
-
-            this.application.Quit();
-        }       
-
-
-        [Fact(Skip = "Azure vmimage has no office installed")]
-        //[Fact]
+        [Fact(Skip = skipReason)]
         public async void InsertRows()
         {
             var program = new Mock<IProgram>();
@@ -80,8 +61,7 @@ namespace Allors.Excel.Tests.Embedded
             Assert.True(Convert.ToString(cell.Value) == "Cell A4");
         }
 
-        [Fact(Skip = "Azure vmimage has no office installed")]
-        //[Fact]
+        [Fact(Skip = skipReason)]
         public async void DeleteRows()
         {
             var program = new Mock<IProgram>();
@@ -121,8 +101,7 @@ namespace Allors.Excel.Tests.Embedded
             Assert.True(Convert.ToString(cell.Value) == "Cell A6");
         }
 
-        [Fact(Skip = "Azure vmimage has no office installed")]
-        //[Fact]
+        [Fact(Skip = skipReason)]
         public async void InsertColumn()
         {
             var program = new Mock<IProgram>();
@@ -164,8 +143,7 @@ namespace Allors.Excel.Tests.Embedded
             Assert.True(Convert.ToString(cell.Value) == "Cell B0");
         }
 
-        [Fact(Skip = "Azure vmimage has no office installed")]
-        //[Fact]
+        [Fact(Skip = skipReason)]
         public async void InsertColumns()
         {
             var program = new Mock<IProgram>();
@@ -210,8 +188,7 @@ namespace Allors.Excel.Tests.Embedded
             Assert.True(Convert.ToString(cell.Value) == "Cell B0");
         }
 
-        [Fact(Skip = "Azure vmimage has no office installed")]
-        //[Fact]
+        [Fact(Skip = skipReason)]
         public async void DeleteColumn()
         {
             var program = new Mock<IProgram>();
@@ -268,8 +245,7 @@ namespace Allors.Excel.Tests.Embedded
             Assert.True(Convert.ToString(cell.Value) == "Cell D1");
         }
 
-        [Fact(Skip = "Azure vmimage has no office installed")]
-        //[Fact]
+        [Fact(Skip = skipReason)]
         public async void DeleteColumns()
         {
             var program = new Mock<IProgram>();

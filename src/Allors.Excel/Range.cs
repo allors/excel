@@ -9,6 +9,12 @@ namespace Allors.Excel
 {
     public class Range
     {
+        public override string ToString()
+        {
+            return $"{this.Worksheet?.Name ?? "null"}!{this.Name ?? "null"} (row:{this.Row}, col:{this.Column}, rows:{this.Rows}, cols:{this.Columns})";
+        }
+
+
         public Range(int row, int column, int? rows = null, int? columns = null, IWorksheet worksheet = null, string name = null)
         {
             this.Row = row;
@@ -26,14 +32,29 @@ namespace Allors.Excel
 
         public IWorksheet Worksheet { get; }
 
+        /// <summary>
+        /// Gets the name of the Range
+        /// </summary>
         public string Name { get; }
 
+        /// <summary>
+        /// Gets the start row index of the Range
+        /// </summary>
         public int Row { get; }
 
+        /// <summary>
+        /// Gets the start column index of the Range
+        /// </summary>
         public int Column { get; }
 
+        /// <summary>
+        /// Gets the number of rows in the Range
+        /// </summary>
         public int? Rows { get; }
 
+        /// <summary>
+        /// Gets the number of columns in the Range
+        /// </summary>
         public int? Columns { get; }
     }
 }

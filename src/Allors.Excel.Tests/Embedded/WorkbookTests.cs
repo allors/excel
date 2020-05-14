@@ -4,6 +4,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using Allors.Excel.Embedded;
 using Moq;
@@ -12,28 +13,10 @@ using InteropApplication = Microsoft.Office.Interop.Excel.Application;
 using InteropWorkbook = Microsoft.Office.Interop.Excel.Workbook;
 
 namespace Allors.Excel.Tests.Embedded
-{
-    public class WorkbookTests : IDisposable
+{   
+    public class WorkbookTests : InteropTest
     {
-        private InteropApplication application;
-
-        public WorkbookTests()
-        {
-            this.application = new InteropApplication { Visible = true };
-        }
-
-        public void Dispose()
-        {
-            foreach (InteropWorkbook workbook in this.application.Workbooks)
-            {
-                workbook.Close(false);
-            }
-
-            this.application.Quit();
-        }
-
-        [Fact(Skip ="Azure vmimage has no office installed")]
-        //[Fact]
+        [Fact(Skip=skipReason)]
         public async void OnNew()
         {
             var program = new Mock<IProgram>();
@@ -48,8 +31,7 @@ namespace Allors.Excel.Tests.Embedded
             await System.Threading.Tasks.Task.CompletedTask;
         }
 
-        [Fact(Skip = "Azure vmimage has no office installed")]
-        //[Fact]
+        [Fact(Skip = skipReason)]
         public void SetNamedRangeWorkbook() 
         {
             var program = new Mock<IProgram>();
@@ -76,8 +58,7 @@ namespace Allors.Excel.Tests.Embedded
             Assert.DoesNotContain(namedRanges, v => string.Equals(v.Name, "MY.NAMEDRANGE"));
         }
 
-        [Fact(Skip = "Azure vmimage has no office installed")]
-        //[Fact]
+        [Fact(Skip = skipReason)]
         public void SetNamedRangeWorksheet()
         {
             var program = new Mock<IProgram>();
@@ -102,10 +83,9 @@ namespace Allors.Excel.Tests.Embedded
             namedRanges = workbook.GetNamedRanges();
 
             Assert.DoesNotContain(namedRanges, v => string.Equals(v.Name, "MY.NAMEDRANGE"));
-        }
+        }       
 
-        [Fact(Skip = "Azure vmimage has no office installed")]
-        //[Fact]
+        [Fact(Skip = skipReason)]
         public void UpdateNamedRangeWorkbook()
         {
             var program = new Mock<IProgram>();
@@ -139,8 +119,9 @@ namespace Allors.Excel.Tests.Embedded
             Assert.Equal(4, namedRange.Columns);
         }
 
-        [Fact(Skip = "Azure vmimage has no office installed")]
-        //[Fact]
+        
+
+        [Fact(Skip = skipReason)]
         public void UpdateNamedRangeWorksheet()
         {
             var program = new Mock<IProgram>();
@@ -171,6 +152,29 @@ namespace Allors.Excel.Tests.Embedded
             Assert.Equal(10, namedRange.Column);
             Assert.Equal(2, namedRange.Rows);
             Assert.Equal(4, namedRange.Columns);
+        }
+
+        [Fact(Skip = skipReason)]
+        public void GetNamedRangeWorkbookForWorksheet()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Mock<IOffice>();
+
+            var addIn = new AddIn(application, program.Object, office.Object);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            var iWorksheet = workbook.Worksheets.FirstOrDefault(v => v.Name == "2");
+
+            Range range = new Range(4, 5, 1, 10, iWorksheet);
+
+            workbook.SetNamedRange("MY.NAMEDRANGE", range);
+
+            var namedRanges = workbook.GetNamedRanges("2");
+
+            Assert.Contains(namedRanges, v => string.Equals(v.Name, "MY.NAMEDRANGE"));
         }
     }
 }

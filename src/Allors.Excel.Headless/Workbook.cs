@@ -67,7 +67,7 @@ namespace Allors.Excel.Headless
             this.IsActive = true;
         }
 
-        public Range[] GetNamedRanges()
+        public Excel.Range[] GetNamedRanges(string refersToSheetName = null)
         {
             return this.NamedRanges.ToArray();
         }
