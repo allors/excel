@@ -964,6 +964,6 @@ namespace Allors.Excel.Embedded
                     this.PreventChangeEvent = false;
                 }
             }
-        }
+        }       
     }
 }

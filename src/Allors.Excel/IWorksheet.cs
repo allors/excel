@@ -19,7 +19,10 @@ namespace Allors.Excel
 
         string Name { get; set; }
 
-        bool IsActive { get; }
+        /// <summary>
+        /// Gets or sets the active worksheet.
+        /// </summary>
+        bool IsActive { get; set; }
 
         IRow Row(int index);
 
@@ -77,6 +80,6 @@ namespace Allors.Excel
         /// </summary>
         /// <param name="startColumnIndex"></param>
         /// <param name="numberOfColumns"></param>
-        void DeleteColumns(int startColumnIndex, int numberOfColumns);
+        void DeleteColumns(int startColumnIndex, int numberOfColumns);      
     }
 }

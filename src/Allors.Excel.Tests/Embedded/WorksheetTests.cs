@@ -297,5 +297,30 @@ namespace Allors.Excel.Tests.Embedded
             cell = iWorksheet[1, 1];
             Assert.True(Convert.ToString(cell.Value) == "Cell D1");
         }
+
+        [Fact(Skip = skipReason)]
+        public async void SetIsActiveWorksheet()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Mock<IOffice>();
+            ICell cell = null;
+
+            var addIn = new AddIn(application, program.Object, office.Object);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            var sheet1 = workbook.Worksheets[0];
+            var sheet2 = workbook.Worksheets[1];
+
+            sheet1.IsActive = true;
+            Assert.True(sheet1.IsActive);
+            Assert.False(sheet2.IsActive);
+
+            sheet2.IsActive = true;
+            Assert.True(sheet2.IsActive);
+            Assert.False(sheet1.IsActive);
+        }      
     }
 }

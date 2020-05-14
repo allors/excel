@@ -34,7 +34,7 @@ namespace Allors.Excel.Headless
 
         public string Name { get; set; }
 
-        public bool IsActive { get; private set; }
+        public bool IsActive { get; set; }
         
         public Dictionary<string, Cell> CellByRowColumn { get; }
 
