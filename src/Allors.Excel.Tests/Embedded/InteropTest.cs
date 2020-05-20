@@ -10,8 +10,8 @@ namespace Allors.Excel.Tests.Embedded
 {
     public class InteropTest : IDisposable
     {
-        //protected const string skipReason = "Azure vmimage has no office installed";
-        protected const string skipReason = null;
+        protected const string skipReason = "Azure vmimage has no office installed";
+        //protected const string skipReason = null;
 
         protected InteropApplication application;
 
