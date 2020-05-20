@@ -150,5 +150,25 @@ namespace Allors.Excel.Headless
         {
             throw new NotImplementedException();
         }
+
+        public Range GetRange(string cell1, string cell2 = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Range GetUsedRange()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Range GetUsedRange(string column)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Range GetUsedRange(int row)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -161,6 +161,19 @@ namespace Allors.Excel.Embedded
             return columnString;
         }
 
+        public static int ExcelColumnFromLetter(string column)
+        {
+            int retVal = 0;
+            string col = column.ToUpper();
+            for (int iChar = col.Length - 1; iChar >= 0; iChar--)
+            {
+                char colPiece = col[iChar];
+                int colNum = colPiece - 64;
+                retVal = retVal + colNum * (int)Math.Pow(26, col.Length - (iChar + 1));
+            }
+            return retVal;
+        }
+
         IRow IWorksheet.Row(int index) => this.Row(index);
 
         IColumn IWorksheet.Column(int index) => this.Column(index);
@@ -964,6 +977,154 @@ namespace Allors.Excel.Embedded
                     this.PreventChangeEvent = false;
                 }
             }
-        }       
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cell1">The name of the range in A1-style notation - "A1" - "A1:C5", "A", "A:C"</param>
+        /// <param name="cell2">The cell in the lower-right corner of the range</param>
+        /// <returns></returns>
+        public Excel.Range GetRange(string cell1, string cell2 = null)
+        {
+            if (string.IsNullOrWhiteSpace(cell1) && cell2 == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                Microsoft.Office.Interop.Excel.Range interopRange;
+                if (cell2 == null)
+                {
+                    interopRange = this.InteropWorksheet.Range[cell1];
+                }
+                else
+                {
+                    interopRange = this.InteropWorksheet.Range[cell1, cell2];
+                }
+
+
+                return new Excel.Range(interopRange.Row - 1, interopRange.Column - 1, interopRange.Rows.Count, interopRange.Columns.Count, this);
+            }
+            catch
+            {
+                return null;
+            }
+
+                    
+        }
+
+        public Excel.Range GetUsedRange()
+        {
+            var range = this.InteropWorksheet.UsedRange;
+
+            return new Excel.Range(range.Row - 1, range.Column - 1, range.Rows.Count, range.Columns.Count, this);
+        }
+
+        public Excel.Range GetUsedRange(int row)
+        {
+            if (row < 0 || row >= this.InteropWorksheet.UsedRange.Row + this.InteropWorksheet.UsedRange.Rows.Count)
+            {
+                return null;
+            }
+
+            var rowRange = (Microsoft.Office.Interop.Excel.Range)this.InteropWorksheet.Rows[row+1];
+
+            var endColumnIndex = this.InteropWorksheet.UsedRange.Column + this.InteropWorksheet.UsedRange.Columns.Count - 1;
+            var quit = false;
+
+            do
+            {
+                var cell = (Microsoft.Office.Interop.Excel.Range)this.InteropWorksheet.Cells[rowRange.Row, endColumnIndex];
+
+                if (cell.Value2 == null)
+                {
+                    endColumnIndex--;
+                }
+                else
+                {
+                    quit = true;
+                }
+            }
+            while (!quit && endColumnIndex >= rowRange.Column); // do not read passed the left of the rowRange.Column
+
+            var beginColumnIndex = rowRange.Column;
+            quit = false;
+
+            do
+            {
+                var cell = (Microsoft.Office.Interop.Excel.Range)this.InteropWorksheet.Cells[rowRange.Row, beginColumnIndex];
+
+                if (cell.Value2 == null)
+                {
+                    beginColumnIndex++;
+                }
+                else
+                {
+                    quit = true;
+                }
+            }
+            while (!quit && beginColumnIndex <= endColumnIndex);
+
+            // B..D => 3 Columns B,C,D
+            // 3 = 1 + 4 - 2
+            var columnCount = 1 + endColumnIndex - beginColumnIndex;
+
+            return new Excel.Range(rowRange.Row - 1, beginColumnIndex - 1, rowRange.Rows.Count, columnCount, this);
+        }
+
+        public Excel.Range GetUsedRange(string column)
+        {
+            if (string.IsNullOrWhiteSpace(column))
+            {
+                return null;
+            }
+
+            var columnIndex = ExcelColumnFromLetter(column);
+            var columnRange = (Microsoft.Office.Interop.Excel.Range)this.InteropWorksheet.Columns[columnIndex];
+
+            var beginRowIndex = columnRange.Row;
+            var maxRows = this.InteropWorksheet.UsedRange.Rows.Count;
+            var quit = false;
+
+            do
+            {
+                var cell = (Microsoft.Office.Interop.Excel.Range)this.InteropWorksheet.Cells[beginRowIndex, columnRange.Column];
+
+                if (cell.Value2 == null)
+                {
+                    beginRowIndex++;
+                }
+                else
+                {
+                    quit = true;
+                }
+            }
+            while (!quit || beginRowIndex >= maxRows);
+
+
+            var endRowIndex = this.InteropWorksheet.UsedRange.Row + this.InteropWorksheet.UsedRange.Rows.Count - 1;
+            quit = false;
+
+            do
+            {
+                var cell = (Microsoft.Office.Interop.Excel.Range)this.InteropWorksheet.Cells[endRowIndex, columnRange.Column];
+
+                if (cell.Value2 == null)
+                {
+                    endRowIndex--;
+                }
+                else
+                {
+                    quit = true;
+                }
+            }
+            while (!quit && endRowIndex >= columnRange.Row); // do not read passed the top of the columnRange.Row
+
+            var rowCount = 1 + endRowIndex - beginRowIndex;
+
+            return new Excel.Range(beginRowIndex - 1, columnRange.Column - 1, rowCount, columnRange.Columns.Count, this);         
+        }
     }
 }

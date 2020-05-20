@@ -80,6 +80,24 @@ namespace Allors.Excel
         /// </summary>
         /// <param name="startColumnIndex"></param>
         /// <param name="numberOfColumns"></param>
-        void DeleteColumns(int startColumnIndex, int numberOfColumns);      
+        void DeleteColumns(int startColumnIndex, int numberOfColumns);
+
+        Range GetRange(string cell1, string cell2 = null);
+
+        Range GetUsedRange();
+
+        /// <summary>
+        /// column equals the excel columns A,B,C, ...
+        /// </summary>
+        /// <param name="column"></param>
+        /// <returns></returns>
+        Range GetUsedRange(string column);
+
+        /// <summary>
+        /// row equals the zero-based index of excel rows (so 1 less than the excel rowindex)
+        /// </summary>
+        /// <param name="row"></param>
+        /// <returns></returns>
+        Range GetUsedRange(int row);
     }
 }

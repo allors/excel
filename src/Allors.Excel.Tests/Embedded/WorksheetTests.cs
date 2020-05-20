@@ -321,6 +321,277 @@ namespace Allors.Excel.Tests.Embedded
             sheet2.IsActive = true;
             Assert.True(sheet2.IsActive);
             Assert.False(sheet1.IsActive);
-        }      
+        }
+
+        [Fact(Skip = skipReason)]
+        public void GetRange()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Mock<IOffice>();
+           
+            var addIn = new AddIn(application, program.Object, office.Object);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            var sheet1 = workbook.Worksheets[0];
+
+            var range = sheet1.GetRange(null);
+            Assert.Null(range);
+
+            range = sheet1.GetRange("");
+            Assert.Null(range);
+
+            range = sheet1.GetRange("  ");
+            Assert.Null(range);
+
+            range = sheet1.GetRange("-1");
+            Assert.Null(range);
+
+            range = sheet1.GetRange("BLABLA");
+            Assert.Null(range);
+
+            range = sheet1.GetRange("A1");
+
+            Assert.Equal(0, range.Row);
+            Assert.Equal(1, range.Rows);
+
+            Assert.Equal(0, range.Column);
+            Assert.Equal(1, range.Columns);
+
+            range = sheet1.GetRange("A1:C5");
+
+            Assert.Equal(0, range.Row);
+            Assert.Equal(5, range.Rows);
+
+            Assert.Equal(0, range.Column);
+            Assert.Equal(3, range.Columns);
+
+            range = sheet1.GetRange("A1", "C5");
+
+            Assert.Equal(0, range.Row);
+            Assert.Equal(5, range.Rows);
+
+            Assert.Equal(0, range.Column);
+            Assert.Equal(3, range.Columns);
+
+            range = sheet1.GetRange("A:A");
+
+            Assert.Equal(0, range.Row);
+            Assert.Equal(1048576, range.Rows);
+
+            Assert.Equal(0, range.Column);
+            Assert.Equal(1, range.Columns);
+
+            range = sheet1.GetRange("A:C");
+
+            Assert.Equal(0, range.Row);
+            Assert.Equal(1048576, range.Rows);
+
+            Assert.Equal(0, range.Column);
+            Assert.Equal(3, range.Columns);
+
+            range = sheet1.GetRange("A:A", "C:C");
+
+            Assert.Equal(0, range.Row);
+            Assert.Equal(1048576, range.Rows);
+
+            Assert.Equal(0, range.Column);
+            Assert.Equal(3, range.Columns);
+
+            range = sheet1.GetRange("C3", "D4");
+
+            Assert.Equal(2, range.Row);
+            Assert.Equal(2, range.Rows);
+
+            Assert.Equal(2, range.Column);
+            Assert.Equal(2, range.Columns);
+
+        }
+
+        [Fact(Skip = skipReason)]
+        public async void GetUsedRange()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Mock<IOffice>();
+
+            var addIn = new AddIn(application, program.Object, office.Object);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            var sheet1 = workbook.Worksheets[1];
+
+            var range = sheet1.GetUsedRange();
+            Assert.Equal(0, range.Row);
+            Assert.Equal(50, range.Rows);
+
+            Assert.Equal(0, range.Column);
+            Assert.Equal(15, range.Columns);
+
+            // for Column
+            range = sheet1.GetUsedRange("B");
+            Assert.Equal(0, range.Row);
+            Assert.Equal(50, range.Rows);
+
+            Assert.Equal(1, range.Column);
+            Assert.Equal(1, range.Columns);
+
+            range = sheet1.GetUsedRange("L");
+            Assert.Equal(2, range.Row);
+            Assert.Equal(1, range.Rows);
+
+            Assert.Equal(11, range.Column);
+            Assert.Equal(1, range.Columns);
+
+            // for Row
+            range = sheet1.GetUsedRange(0);
+            Assert.Equal(0, range.Row);
+            Assert.Equal(1, range.Rows);
+
+            Assert.Equal(0, range.Column);
+            Assert.Equal(10, range.Columns);
+
+            range = sheet1.GetUsedRange(2);
+            Assert.Equal(2, range.Row);
+            Assert.Equal(1, range.Rows);
+            Assert.Equal(0, range.Column);
+            Assert.Equal(12, range.Columns);
+
+            range = sheet1.GetUsedRange(3);
+            Assert.Equal(3, range.Row);
+            Assert.Equal(1, range.Rows);
+            Assert.Equal(0, range.Column);
+            Assert.Equal(15, range.Columns);
+
+            // Zero based row index
+            sheet1[50, 2].Value = "x";
+            sheet1[50, 3].Value = "y";
+            sheet1[50, 4].Value = "z";
+
+            await sheet1.Flush().ConfigureAwait(false);
+
+            range = sheet1.GetUsedRange(50);
+            Assert.Equal(50, range.Row);
+            Assert.Equal(1, range.Rows);
+
+            Assert.Equal(2, range.Column);
+            Assert.Equal(3, range.Columns);
+        }
+
+        [Fact(Skip = skipReason)]
+        public async void GetUsedRangeColumn()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Mock<IOffice>();
+
+            var addIn = new AddIn(application, program.Object, office.Object);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            var sheet1 = workbook.Worksheets[1];
+
+            var range = sheet1.GetUsedRange();
+            Assert.Equal(0, range.Row);
+            Assert.Equal(50, range.Rows);
+
+            Assert.Equal(0, range.Column);
+            Assert.Equal(15, range.Columns);
+
+            // for Column
+            range = sheet1.GetUsedRange("B");
+            Assert.Equal(0, range.Row);
+            Assert.Equal(50, range.Rows);
+
+            Assert.Equal(1, range.Column);
+            Assert.Equal(1, range.Columns);
+
+            range = sheet1.GetUsedRange("L");
+            Assert.Equal(2, range.Row);
+            Assert.Equal(1, range.Rows);
+
+            Assert.Equal(11, range.Column);
+            Assert.Equal(1, range.Columns);                      
+          
+            sheet1[50, 30].Value = "x";
+            sheet1[51, 30].Value = "y";
+            sheet1[52, 30].Value = "z";
+
+            await sheet1.Flush().ConfigureAwait(false);
+
+            var columnName = Worksheet.ExcelColumnFromNumber(31);
+
+            range = sheet1.GetUsedRange(columnName);
+            Assert.Equal(50, range.Row);
+            Assert.Equal(3, range.Rows);
+
+            Assert.Equal(30, range.Column);
+            Assert.Equal(1, range.Columns);
+
+            // Blank line is still counted as a row
+            sheet1[54, 30].Value = "aa";
+
+            await sheet1.Flush().ConfigureAwait(false);
+
+            range = sheet1.GetUsedRange(columnName);
+            Assert.Equal(50, range.Row);
+            Assert.Equal(5, range.Rows);
+
+            Assert.Equal(30, range.Column);
+            Assert.Equal(1, range.Columns);
+        }
+
+        [Fact(Skip = skipReason)]
+        public async void GetUsedRangeRow()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Mock<IOffice>();
+
+            var addIn = new AddIn(application, program.Object, office.Object);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            var sheet1 = workbook.Worksheets[1];                       
+
+            // for Row
+            var range = sheet1.GetUsedRange(0);
+            Assert.Equal(0, range.Row);
+            Assert.Equal(1, range.Rows);
+
+            Assert.Equal(0, range.Column);
+            Assert.Equal(10, range.Columns);
+
+            range = sheet1.GetUsedRange(2);
+            Assert.Equal(2, range.Row);
+            Assert.Equal(1, range.Rows);
+            Assert.Equal(0, range.Column);
+            Assert.Equal(12, range.Columns);
+
+            range = sheet1.GetUsedRange(3);
+            Assert.Equal(3, range.Row);
+            Assert.Equal(1, range.Rows);
+            Assert.Equal(0, range.Column);
+            Assert.Equal(15, range.Columns);
+
+            // Zero based row index
+            sheet1[50, 2].Value = "x";
+            sheet1[50, 3].Value = "y";
+            sheet1[50, 4].Value = "z";
+
+            await sheet1.Flush().ConfigureAwait(false);
+
+            range = sheet1.GetUsedRange(50);
+            Assert.Equal(50, range.Row);
+            Assert.Equal(1, range.Rows);
+
+            Assert.Equal(2, range.Column);
+            Assert.Equal(3, range.Columns);
+        }
     }
 }
