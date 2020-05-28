@@ -3,6 +3,9 @@
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
+using System;
+using System.Globalization;
+
 namespace Allors.Excel.Embedded
 {
     public class Cell : ICell
@@ -57,6 +60,8 @@ namespace Allors.Excel.Embedded
                 }
             }
         }
+
+        public string ValueAsString => Convert.ToString(this.Value, CultureInfo.CurrentCulture);
 
         public string Formula
         {

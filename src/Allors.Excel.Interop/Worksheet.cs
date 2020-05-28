@@ -114,6 +114,22 @@ namespace Allors.Excel.Embedded
 
         public bool PreventChangeEvent { get; private set; }
 
+        public bool IsVisible
+        {
+            get => this.InteropWorksheet.Visible == XlSheetVisibility.xlSheetVisible;
+            set
+            {
+                if (value)
+                {
+                    this.InteropWorksheet.Visible = XlSheetVisibility.xlSheetVisible;
+                }
+                else
+                {
+                    this.InteropWorksheet.Visible = XlSheetVisibility.xlSheetHidden;
+                }
+            }
+        }
+
         public async Task RefreshPivotTables(string sourceDataRange = null)
         {
             var pivotTables = (PivotTables)this.InteropWorksheet.PivotTables();

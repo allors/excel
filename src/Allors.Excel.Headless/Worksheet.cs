@@ -37,6 +37,11 @@ namespace Allors.Excel.Headless
         public bool IsActive { get; set; }
         
         public Dictionary<string, Cell> CellByRowColumn { get; }
+        public bool IsVisible 
+        { 
+            get => throw new NotImplementedException(); 
+            set => throw new NotImplementedException(); 
+        }
 
         public ICell this[int row, int column]
         {

@@ -4,6 +4,7 @@
 // </copyright>
 
 using System;
+using System.Globalization;
 
 namespace Allors.Excel.Headless
 {
@@ -43,6 +44,8 @@ namespace Allors.Excel.Headless
         public bool HideInCellDropdown { get; set; }
 
         public string Formula { get; set; }
+
+        public string ValueAsString => Convert.ToString(this.Value, CultureInfo.CurrentCulture);
 
         public void Clear()
         {

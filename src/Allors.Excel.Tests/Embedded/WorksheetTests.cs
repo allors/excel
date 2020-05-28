@@ -5,7 +5,9 @@
 
 using System;
 using System.Linq;
+using System.Reflection;
 using Allors.Excel.Embedded;
+using Application;
 using Moq;
 using Xunit;
 using InteropApplication = Microsoft.Office.Interop.Excel.Application;
@@ -15,6 +17,50 @@ namespace Allors.Excel.Tests.Embedded
 {
     public class WorksheetTests : InteropTest
     {
+
+        [Fact(Skip = skipReason)]
+        public async void IsVisible()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Mock<IOffice>();           
+
+            var addIn = new AddIn(application, program.Object, office.Object);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            Assert.Equal(2, workbook.Worksheets.Length);
+
+            var worksheet = workbook.Worksheets.First();
+            Assert.True(worksheet.IsVisible);
+
+            worksheet.IsVisible = false;
+
+            Assert.False(worksheet.IsVisible);
+
+            worksheet.IsVisible = true;
+
+            Assert.True(worksheet.IsVisible);
+        }
+
+
+        [Fact(Skip = skipReason)]
+        public async void AddWorkbook()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Mock<IOffice>();
+
+            var addIn = new AddIn(application, program.Object, office.Object);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            Assert.Equal(2, workbook.Worksheets.Length);
+
+        }
+
         [Fact(Skip = skipReason)]
         public async void InsertRows()
         {
@@ -41,16 +87,16 @@ namespace Allors.Excel.Tests.Embedded
             iWorksheet.InsertRows(3, 1);
 
             cell = iWorksheet[0, 0];
-            Assert.True(Convert.ToString(cell.Value) == "Cell A0");
+            Assert.True(cell.ValueAsString == "Cell A0");
 
             cell = iWorksheet[1, 0];
-            Assert.True(Convert.ToString(cell.Value) == "Cell A1");
+            Assert.True(cell.ValueAsString == "Cell A1");
 
             cell = iWorksheet[2, 0];
-            Assert.True(Convert.ToString(cell.Value) == "Cell A2");
+            Assert.True(cell.ValueAsString == "Cell A2");
 
             cell = iWorksheet[3, 0];
-            Assert.True(Convert.ToString(cell.Value) == "Cell A3");
+            Assert.True(cell.ValueAsString == "Cell A3");
 
             // newly inserted cell has no value
             cell = iWorksheet[4, 0];
@@ -58,7 +104,7 @@ namespace Allors.Excel.Tests.Embedded
 
             // shifted cell 1 down. The cell that was at row 4 is now in Row 5
             cell = iWorksheet[5, 0];
-            Assert.True(Convert.ToString(cell.Value) == "Cell A4");
+            Assert.True(cell.ValueAsString == "Cell A4");
         }
 
         [Fact(Skip = skipReason)]

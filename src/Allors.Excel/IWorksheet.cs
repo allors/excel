@@ -99,5 +99,7 @@ namespace Allors.Excel
         /// <param name="row"></param>
         /// <returns></returns>
         Range GetUsedRange(int row);
+
+        bool IsVisible { get; set; }
     }
 }

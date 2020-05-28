@@ -117,7 +117,7 @@ namespace Application
             });
             binder.Set(5, 12, binding);
 
-
+           
             await sheet.Flush();
 
             //sheet.CellsChanged += (sender, v) =>

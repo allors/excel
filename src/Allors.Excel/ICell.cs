@@ -15,6 +15,8 @@ namespace Allors.Excel
 
         object Value { get; set; }
 
+        string ValueAsString { get; }
+
         string Formula { get; set; }
 
         Range Options { get; set; }
