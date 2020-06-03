@@ -165,5 +165,7 @@ namespace Allors.Excel.Embedded
             this.Style = null;
             this.NumberFormat = null;
         }
+
+        public object Tag { get; set; }
     }
 }

@@ -3,6 +3,8 @@
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
+using System.Dynamic;
+
 namespace Allors.Excel
 {
     public interface ICell
@@ -34,5 +36,7 @@ namespace Allors.Excel
         IValueConverter ValueConverter { get; set; }
 
         void Clear();
+
+        object Tag { get; set; }
     }
 }

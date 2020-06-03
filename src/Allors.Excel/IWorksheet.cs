@@ -5,6 +5,7 @@
 
 using System;
 using System.Drawing;
+using System.Dynamic;
 using System.Threading.Tasks;
 
 namespace Allors.Excel
@@ -101,5 +102,15 @@ namespace Allors.Excel
         Range GetUsedRange(int row);
 
         bool IsVisible { get; set; }
+               
+        /// <summary>
+        /// </summary>
+        /// <param name="range"></param>
+        void FreezePanes(Excel.Range range);
+
+        void UnfreezePanes();
+
+        bool HasFreezePanes { get; }
+
     }
 }

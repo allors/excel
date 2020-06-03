@@ -144,7 +144,7 @@ namespace Application
         {
         }
 
-        public async Task OnNew(IWorksheet worksheet)
+        public void OnNew(IWorksheet worksheet)
         {
             worksheet.Name = "1";
         }

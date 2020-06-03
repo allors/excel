@@ -39,6 +39,7 @@ namespace Allors.Excel.Embedded
 
         private Dictionary<int, Column> columnByIndex;
         private bool isActive;
+        private Excel.Range FreezeRange { get; set; }
 
         public Worksheet(Workbook workbook, InteropWorksheet interopWorksheet)
         {
@@ -1142,5 +1143,81 @@ namespace Allors.Excel.Embedded
 
             return new Excel.Range(beginRowIndex - 1, columnRange.Column - 1, rowCount, columnRange.Columns.Count, this);         
         }
+
+        /// <inheritdoc/>
+        /// <summary>
+        /// When range.Row = 0 and range.Column = -1, then topRow in frozen
+        /// When range.Row = -1 and range.Column = 0 then leftColumn in  frozen
+        /// When range.Row > 0 and range.Column > 0, then that cell is the topleft position for the freezepanes
+        /// </summary>
+        public void FreezePanes(Excel.Range range)
+        {
+            this.InteropWorksheet.Application.ScreenUpdating = true;
+            this.InteropWorksheet.Activate();
+
+            this.InteropWorksheet.Application.ActiveWindow.FreezePanes = false;
+
+            if(range.Row > 0 && range.Column > 0)
+            {
+                this.InteropWorksheet.Application.ActiveWindow.SplitRow = range.Row;
+                this.InteropWorksheet.Application.ActiveWindow.SplitColumn = range.Column;
+            }
+            else
+            {
+                var row = 0;
+                if (range.Row > -1)
+                {
+                    row = range.Row + 1;
+                }
+
+                this.InteropWorksheet.Application.ActiveWindow.SplitRow = row;
+
+                var column = 0;
+                if (range.Column > -1)
+                {
+                    column = range.Column + 1;
+                }
+                this.InteropWorksheet.Application.ActiveWindow.SplitColumn = column;
+            }
+
+           
+
+            //// TopRow
+            //if (range.Row == 0)
+            //{
+            //    this.InteropWorksheet.Application.ActiveWindow.SplitRow = 1;
+            //    this.InteropWorksheet.Application.ActiveWindow.SplitColumn = 0;
+
+            //}
+            //// FirstColumn
+            //else if (range.Column == 0)
+            //{
+            //    this.InteropWorksheet.Application.ActiveWindow.SplitRow = 0;
+            //    this.InteropWorksheet.Application.ActiveWindow.SplitColumn = 1;
+            //}
+            //else
+            //{
+               
+            //}
+            
+            this.InteropWorksheet.Application.ActiveWindow.FreezePanes = true;           
+
+            this.FreezeRange = range;
+        }
+
+        public void UnfreezePanes()
+        {
+            this.InteropWorksheet.Application.ScreenUpdating = true;
+            this.InteropWorksheet.Activate();
+
+            this.InteropWorksheet.Application.ActiveWindow.SplitRow = 0;
+            this.InteropWorksheet.Application.ActiveWindow.SplitColumn = 0;
+            this.InteropWorksheet.Application.ActiveWindow.FreezePanes = false;
+
+            this.FreezeRange = null;
+        }
+
+        public bool HasFreezePanes => this.FreezeRange != null;
+
     }
 }

@@ -37,7 +37,7 @@ namespace Allors.Excel.Embedded
                 await this.Program.OnNew(workbook);
                 foreach (var worksheet in worksheets)
                 {
-                    await program.OnNew(worksheet);
+                    program.OnNew(worksheet);
                 }
             };
 
@@ -54,7 +54,7 @@ namespace Allors.Excel.Embedded
                 await this.Program.OnNew(workbook);
                 foreach (var worksheet in worksheets)
                 {
-                    await program.OnNew(worksheet);
+                    program.OnNew(worksheet);
                 }
             };
 

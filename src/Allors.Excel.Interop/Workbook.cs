@@ -7,6 +7,7 @@ namespace Allors.Excel.Embedded
 {
     using Allors.Excel;
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
@@ -30,44 +31,64 @@ namespace Allors.Excel.Embedded
 
         public InteropWorkbook InteropWorkbook { get; }
 
-      
+
+        /// <summary>
+        /// When index = 0 => add new worksheet before the active worksheet
+        /// When index =< #sheets => add new worksheet before the index worksheet
+        /// When index > #sheets => add new worksheet after the last worksheet
+        /// When before != null  => add new worksheet before that worksheet
+        /// When after != null  => add new worksheet after that worksheet
+        /// When all params are null => add new worksheet after the last worksheet
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="before"></param>
+        /// <param name="after"></param>
+        /// <returns></returns>
         public IWorksheet AddWorksheet(int? index, IWorksheet before = null, IWorksheet after = null)
         {
             InteropWorksheet interopWorksheet;
 
-            if (index.HasValue && index.Value == 0)
+            try
             {
-                interopWorksheet = (InteropWorksheet)this.InteropWorkbook.Sheets.Add();
-            }
-            else
-            {
-                if (before != null)
+                this.AddIn.Application.WorkbookNewSheet -= this.ApplicationOnWorkbookNewSheet;
+
+                if (index.HasValue && index.Value == 0)
                 {
-                    interopWorksheet = (InteropWorksheet)this.InteropWorkbook.Sheets.Add(((Worksheet)before).InteropWorksheet);
-                }
-                else if (after != null)
-                {
-                    interopWorksheet = (InteropWorksheet)this.InteropWorkbook.Sheets.Add(null, ((Worksheet)after).InteropWorksheet);
+                    interopWorksheet = (InteropWorksheet)this.InteropWorkbook.Sheets.Add();
                 }
                 else
                 {
-                    var sortedWorksheets = this.worksheetByInteropWorksheet.OrderBy(v => v.Value.Index).Select(v => v.Key).ToArray();
-                    InteropWorksheet append = null;
-                    if (sortedWorksheets.Any())
+                    if (before != null)
                     {
-                        if (!index.HasValue || index > sortedWorksheets.Length - 1)
-                        {
-                            index = sortedWorksheets.Length - 1;
-                        }
+                        interopWorksheet = (InteropWorksheet)this.InteropWorkbook.Sheets.Add(((Worksheet)before).InteropWorksheet, Missing.Value);
 
-                        append = sortedWorksheets[index.Value];
                     }
-
-                    interopWorksheet = (InteropWorksheet)this.InteropWorkbook.Sheets.Add(Missing.Value, append, Missing.Value, Missing.Value);
+                    else if (after != null)
+                    {
+                        interopWorksheet = (InteropWorksheet)this.InteropWorkbook.Sheets.Add(Missing.Value, ((Worksheet)after).InteropWorksheet);
+                    }
+                    else
+                    {
+                        if (!index.HasValue || index > this.InteropWorkbook.Sheets.Count - 1)
+                        {
+                            index = this.InteropWorkbook.Sheets.Count;
+                            var insertAfter = this.worksheetByInteropWorksheet.Keys.FirstOrDefault(v => v.Index == index);
+                            interopWorksheet = (InteropWorksheet)this.InteropWorkbook.Sheets.Add(Missing.Value, insertAfter);
+                        }
+                        else
+                        {
+                            var insertBefore = this.worksheetByInteropWorksheet.Keys.FirstOrDefault(v => v.Index == index);
+                            interopWorksheet = (InteropWorksheet)this.InteropWorkbook.Sheets.Add(insertBefore);
+                        }                        
+                    }
                 }
-            }
 
-            return this.worksheetByInteropWorksheet[interopWorksheet];
+                return this.TryAdd(interopWorksheet);
+            }
+            finally
+            {
+                this.AddIn.Application.WorkbookNewSheet += this.ApplicationOnWorkbookNewSheet;
+            }                     
         }
 
         public IWorksheet Copy(IWorksheet sourceWorksheet, IWorksheet beforeWorksheet)
@@ -88,6 +109,9 @@ namespace Allors.Excel.Embedded
 
         public IWorksheet[] Worksheets => this.worksheetByInteropWorksheet.Values.Cast<IWorksheet>().ToArray();
 
+        public Worksheet[] WorksheetsByIndex => this.worksheetByInteropWorksheet.Values.Cast<Worksheet>().OrderBy(v => v.Index).ToArray();
+
+
         public bool IsActive { get; internal set; }
 
         public void Close(bool? saveChanges = null, string fileName = null)
@@ -97,35 +121,32 @@ namespace Allors.Excel.Embedded
 
         public Worksheet New(InteropWorksheet interopWorksheet)
         {
-            var worksheet = new Worksheet(this, interopWorksheet);
-            this.worksheetByInteropWorksheet.Add(interopWorksheet, worksheet);
-            
-            return worksheet;
+            return this.TryAdd(interopWorksheet);
         }
-
-        private void Workbook_Activate()
-        {
-            throw new NotImplementedException();
-        }
-
-        private async void ApplicationOnWorkbookNewSheet(InteropWorkbook wb, object sh)
+             
+        private void ApplicationOnWorkbookNewSheet(InteropWorkbook wb, object sh)
         {
             if (sh is InteropWorksheet interopWorksheet)
             {
-                if (!this.worksheetByInteropWorksheet.TryGetValue(interopWorksheet, out var worksheet))
-                {
-                    worksheet = new Worksheet(this, interopWorksheet);
-                    this.worksheetByInteropWorksheet.Add(interopWorksheet, worksheet);
-                }
+                Worksheet worksheet = this.TryAdd(interopWorksheet);
 
                 interopWorksheet.BeforeDelete += async () => await this.AddIn.Program.OnBeforeDelete(worksheet);
-
-                await this.AddIn.Program.OnNew(worksheet);
             }
             else
             {
                 Console.WriteLine("Not a InteropWorksheet");
             }
+        }
+
+        private Worksheet TryAdd(InteropWorksheet interopWorksheet)
+        {
+            if (!this.worksheetByInteropWorksheet.TryGetValue(interopWorksheet, out var worksheet))
+            {
+                worksheet = new Worksheet(this, interopWorksheet);
+                this.worksheetByInteropWorksheet.Add(interopWorksheet, worksheet);
+            }
+
+            return worksheet;
         }
 
         private void ApplicationOnSheetBeforeDelete(object sh)

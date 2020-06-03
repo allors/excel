@@ -43,6 +43,8 @@ namespace Allors.Excel.Headless
             set => throw new NotImplementedException(); 
         }
 
+        public bool HasFreezePanes => throw new NotImplementedException();
+
         public ICell this[int row, int column]
         {
             get
@@ -175,5 +177,16 @@ namespace Allors.Excel.Headless
         {
             throw new NotImplementedException();
         }
+
+        public void FreezePanes(Range range)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UnfreezePanes()
+        {
+            throw new NotImplementedException();
+        }
+       
     }
 }

@@ -51,7 +51,9 @@ namespace Allors.Excel.Headless
         {
             this.Value = string.Empty;
             this.NumberFormat = null;
-            this.Style = null;
+            this.Style = null;            
         }
+
+        public object Tag { get; set; }
     }
 }

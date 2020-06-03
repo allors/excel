@@ -4,8 +4,10 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using Allors.Excel.Embedded;
 using Application;
 using Moq;
@@ -17,6 +19,291 @@ namespace Allors.Excel.Tests.Embedded
 {
     public class WorksheetTests : InteropTest
     {
+        [Fact(Skip = skipReason)]
+        public async void FreezePanes()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Mock<IOffice>();
+
+            var addIn = new AddIn(application, program.Object, office.Object);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            Assert.Equal(2, workbook.Worksheets.Length);
+
+            var sheet1 = workbook.Worksheets.First();
+            var sheet2 = workbook.Worksheets.Last();
+
+            // Cell B2 is topLeft
+            var range = new Range(1, 1, 0, 0, sheet1);
+            sheet1.FreezePanes(range);
+
+            Assert.True(sheet1.HasFreezePanes);
+            Assert.False(sheet2.HasFreezePanes);
+
+            sheet1.UnfreezePanes();
+
+            Assert.False(sheet1.HasFreezePanes);
+            Assert.False(sheet2.HasFreezePanes);
+
+            // First Row
+            range = new Range(0, -1, 1, 1);
+            sheet1.FreezePanes(range);
+
+            Assert.True(sheet1.HasFreezePanes);
+            Assert.False(sheet2.HasFreezePanes);
+
+            // First Column
+            range = new Range(-1, 0, 1, 1);
+            sheet1.FreezePanes(range);
+
+            Assert.True(sheet1.HasFreezePanes);
+            Assert.False(sheet2.HasFreezePanes);
+
+            // Entire Row 5
+            range = new Range(5, -1, 0, 0, sheet1);
+            sheet1.FreezePanes(range);
+
+            Assert.True(sheet1.HasFreezePanes);
+            Assert.False(sheet2.HasFreezePanes);
+
+            sheet1.UnfreezePanes();
+
+            Assert.False(sheet1.HasFreezePanes);
+            Assert.False(sheet2.HasFreezePanes);
+
+            // Entire Column 5
+            range = new Range(-1, 5, 0, 0, sheet1);
+            sheet1.FreezePanes(range);
+
+            Assert.True(sheet1.HasFreezePanes);
+            Assert.False(sheet2.HasFreezePanes);
+
+            sheet1.UnfreezePanes();
+
+            Assert.False(sheet1.HasFreezePanes);
+            Assert.False(sheet2.HasFreezePanes);
+
+            for (int row = 0; row < 15; row++)
+            {
+                range = new Range(row, -1, 0, 0, sheet1);
+                sheet1.FreezePanes(range);
+
+                Thread.Sleep(200);
+            }
+
+            for (int column = 0; column < 15; column++)
+            {
+                range = new Range(-1, column, 0, 0, sheet1);
+                sheet1.FreezePanes(range);
+
+                Thread.Sleep(200);
+            }
+        }
+
+        [Fact(Skip = skipReason)]
+        public async void AddWorksheetsBeforeAndAfter()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Mock<IOffice>();
+
+            var addIn = new AddIn(application, program.Object, office.Object);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            Assert.Equal(2, workbook.Worksheets.Length);
+
+            var sheet1 = workbook.Worksheets.First();
+            var sheet2 = workbook.Worksheets.Last();
+            Assert.Equal("2", sheet2.Name);
+
+            // 1  | 2
+
+            // Add before "1"
+            var worksheet = (Worksheet)workbook.AddWorksheet(null, sheet1, null);
+            worksheet.Name = "#3";
+
+            // Expected order => #3 | 1  | 2
+            Assert.Equal(3, workbook.Worksheets.Length);
+            Assert.Equal(3, ((Workbook)workbook).WorksheetsByIndex.Length);
+            Assert.Equal(1, worksheet.Index);
+
+            var worksheetsByIndex = ((Workbook)workbook).WorksheetsByIndex;
+            Assert.Equal("#3", worksheetsByIndex[0].Name);
+            Assert.Equal("1", worksheetsByIndex[1].Name);
+            Assert.Equal("2", worksheetsByIndex[2].Name);
+
+            // Add before "2"
+            worksheet = (Worksheet)workbook.AddWorksheet(null, sheet2, null);
+            worksheet.Name = "#4";
+
+            // Expected order => #3 | 1  | #4 | 2
+            worksheetsByIndex = ((Workbook)workbook).WorksheetsByIndex;
+            Assert.Equal(4, workbook.Worksheets.Length);
+            Assert.Equal(4, ((Workbook)workbook).WorksheetsByIndex.Length);
+            Assert.Equal(3, worksheet.Index);
+            Assert.Equal("#3", worksheetsByIndex[0].Name);
+            Assert.Equal("1", worksheetsByIndex[1].Name);
+            Assert.Equal("#4", worksheetsByIndex[2].Name);
+            Assert.Equal("2", worksheetsByIndex[3].Name);
+
+            // Add after "1"
+            worksheet = (Worksheet)workbook.AddWorksheet(null, null, sheet1);
+            worksheet.Name = "#5";
+
+            // Expected order => #3 | 1 | #5 | #4 | 2
+            worksheetsByIndex = ((Workbook)workbook).WorksheetsByIndex;
+            Assert.Equal(5, workbook.Worksheets.Length);
+            Assert.Equal(5, ((Workbook)workbook).WorksheetsByIndex.Length);
+            Assert.Equal(3, worksheet.Index);
+            Assert.Equal("#3", worksheetsByIndex[0].Name);
+            Assert.Equal("1", worksheetsByIndex[1].Name);
+            Assert.Equal("#5", worksheetsByIndex[2].Name);
+            Assert.Equal("#4", worksheetsByIndex[3].Name);
+            Assert.Equal("2", worksheetsByIndex[4].Name);
+
+            // Add after "2"
+            worksheet = (Worksheet)workbook.AddWorksheet(null, null, sheet2);
+            worksheet.Name = "#6";
+
+            // Expected order => #3 | 1 | #5 | #4 | 2 | #6
+            worksheetsByIndex = ((Workbook)workbook).WorksheetsByIndex;
+            Assert.Equal(6, workbook.Worksheets.Length);
+            Assert.Equal(6, ((Workbook)workbook).WorksheetsByIndex.Length);
+            Assert.Equal(6, worksheet.Index);
+            Assert.Equal("#3", worksheetsByIndex[0].Name);
+            Assert.Equal("1", worksheetsByIndex[1].Name);
+            Assert.Equal("#5", worksheetsByIndex[2].Name);
+            Assert.Equal("#4", worksheetsByIndex[3].Name);
+            Assert.Equal("2", worksheetsByIndex[4].Name);
+            Assert.Equal("#6", worksheetsByIndex[5].Name);
+        }
+
+        [Fact(Skip = skipReason)]
+        public async void AddWorksheetsByIndex()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Mock<IOffice>();
+
+            var addIn = new AddIn(application, program.Object, office.Object);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            Assert.Equal(2, workbook.Worksheets.Length);
+
+            var last = workbook.Worksheets.Last();
+            Assert.Equal("2", last.Name);
+            
+            // At before index 1
+            var worksheet = (Worksheet)workbook.AddWorksheet(1);
+            var worksheetsByIndex = ((Workbook)workbook).WorksheetsByIndex;
+            Assert.Equal(3, workbook.Worksheets.Length);
+            Assert.Equal(3, worksheetsByIndex.Length);
+            Assert.Equal(1, worksheet.Index);
+            
+            // Expected order => Sheet3 | 1  | 2
+
+            Assert.Equal("Sheet3", worksheetsByIndex[0].Name);
+            Assert.Equal("1", worksheetsByIndex[1].Name);
+            Assert.Equal("2", worksheetsByIndex[2].Name);
+
+            // Add before index 2
+            worksheet = (Worksheet)workbook.AddWorksheet(2);
+            worksheetsByIndex = ((Workbook)workbook).WorksheetsByIndex;
+
+            Assert.Equal(4, workbook.Worksheets.Length);
+            Assert.Equal(4, worksheetsByIndex.Length);
+            Assert.Equal(2, worksheet.Index);
+
+            // Expected order => Sheet3 | Sheet4 | 1 | 2  !! Order is determined dynamically, so it changes after the first AddWorksheet()
+            Assert.Equal("Sheet3", worksheetsByIndex[0].Name);
+            Assert.Equal("Sheet4", worksheetsByIndex[1].Name);
+            Assert.Equal("1", worksheetsByIndex[2].Name);
+            Assert.Equal("2", worksheetsByIndex[3].Name);
+
+            // 0 Adds Before the Active Sheet (being the last added sheet here)
+            worksheet = (Worksheet)workbook.AddWorksheet(0);
+            worksheetsByIndex = ((Workbook)workbook).WorksheetsByIndex;
+
+            Assert.Equal(5, workbook.Worksheets.Length);
+            Assert.Equal(5, worksheetsByIndex.Length);
+            Assert.Equal(2, worksheet.Index);
+
+            // Expected order => Sheet3 | Sheet5 | Sheet4 | 1 | 2  !! Order is determined dynamically, so it changes after the first AddWorksheet()
+            Assert.Equal("Sheet3", worksheetsByIndex[0].Name);
+            Assert.Equal("Sheet5", worksheetsByIndex[1].Name);
+            Assert.Equal("Sheet4", worksheetsByIndex[2].Name);
+            Assert.Equal("1", worksheetsByIndex[3].Name);
+            Assert.Equal("2", worksheetsByIndex[4].Name);
+        }
+
+        [Fact(Skip = skipReason)]
+        public async void CellTagContainsCustomObject()
+        {
+            this.ExpectedContextTags = new List<ContextTag>();
+
+            var program = new Mock<IProgram>();
+            var office = new Mock<IOffice>();
+
+            var addIn = new AddIn(application, program.Object, office.Object);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            Assert.Equal(2, workbook.Worksheets.Length);
+
+            var worksheet = (Worksheet) workbook.AddWorksheet(null, null, workbook.Worksheets.Last());
+
+            worksheet.CellsChanged += Worksheet_CellsChanged;
+
+            var tag1 = new ContextTag() { Context = "Cell00" };
+            var tag2 = new ContextTag() { Context = "Cell01" };
+            this.ExpectedContextTags.Add(tag1);
+            this.ExpectedContextTags.Add(tag2);
+
+            var cell00 = worksheet[0, 0];
+            cell00.Tag = tag1;
+
+            Assert.NotEmpty(this.ExpectedContextTags);
+
+            // Change the cell will trigger the Change Event
+            this.ExpectedContextTag = tag1;
+            worksheet.InteropWorksheet.Cells[1, 1] = "i am cell00";                      
+          
+            var cell01 = worksheet[0, 1];
+            cell01.Tag = tag2;
+
+            // Change the cell will trigger the Change Event
+            this.ExpectedContextTag = tag2;
+            worksheet.InteropWorksheet.Cells[1, 2] = "i am cell01";          
+
+            Assert.Empty(this.ExpectedContextTags);
+        }
+
+        private ContextTag ExpectedContextTag;
+        private List<ContextTag> ExpectedContextTags;
+
+        private class ContextTag
+        {
+            public string Context { get; set; }
+        }
+
+        private void Worksheet_CellsChanged(object sender, CellChangedEvent e)
+        {
+            var tag = (ContextTag) e.Cells[0].Tag;
+
+            Assert.Equal(this.ExpectedContextTag, tag);
+
+            this.ExpectedContextTags.Remove(tag);
+
+        }
 
         [Fact(Skip = skipReason)]
         public async void IsVisible()
