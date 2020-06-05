@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Allors.Excel.Headless
@@ -187,6 +188,20 @@ namespace Allors.Excel.Headless
         {
             throw new NotImplementedException();
         }
-       
+
+        public void SaveAsPDF(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true)
+        {
+
+        }
+
+        public void SaveAsXPS(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true)
+        {
+
+        }
+
+        public void SetPrintArea(Excel.Range range = null)
+        {
+          
+        }
     }
 }

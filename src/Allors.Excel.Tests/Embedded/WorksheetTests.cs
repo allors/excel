@@ -5,8 +5,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using Allors.Excel.Embedded;
 using Application;
@@ -19,6 +21,243 @@ namespace Allors.Excel.Tests.Embedded
 {
     public class WorksheetTests : InteropTest
     {
+        private DirectoryInfo tempDirectory;
+
+        public WorksheetTests()
+        {            
+            var dir = Path.Combine(Path.GetTempPath(), nameof(WorksheetTests));
+            tempDirectory = new DirectoryInfo(dir);
+
+            if (tempDirectory.Exists)
+            {
+                foreach (var file in tempDirectory.GetFiles())
+                {
+                    try
+                    {
+                        file.Delete();
+                    }
+                    catch
+                    {
+
+                    }
+                }
+            }           
+        }        
+
+        [Fact(Skip = skipReason)]
+        public void SaveAsPDFWithNullThrowsException()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Mock<IOffice>();
+
+            var addIn = new AddIn(application, program.Object, office.Object);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            // Sheet with content
+            var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
+
+            Assert.Throws<ArgumentNullException>(() => sheet2.SaveAsPDF(null));           
+        }
+
+        [Fact(Skip = skipReason)]
+        public void SetPrintArea()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Mock<IOffice>();
+
+            var addIn = new AddIn(application, program.Object, office.Object);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            // Sheet with content
+            var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
+
+            sheet2.SetPrintArea(new Range(5, 1, 10, 5, sheet2));
+
+            var file = new FileInfo(Path.Combine(tempDirectory.FullName, $"{nameof(sheet2)}.pdf"));
+
+            // PrintArea is set, but we do not want to use it. Prints the entire sheet
+            sheet2.SaveAsPDF(file, true, false, ignorePrintAreas: true);
+
+            // use the printArea
+            sheet2.SaveAsPDF(file, true, false, false);
+
+            Assert.True(new FileInfo(file.FullName).Exists);
+
+            // Set PrintArea to entire sheet
+            sheet2.SetPrintArea(null);
+            sheet2.SaveAsPDF(file, true, false, false);
+            Assert.True(new FileInfo(file.FullName).Exists);
+
+            sheet2.SaveAsPDF(file, true, false, ignorePrintAreas: true);
+            Assert.True(new FileInfo(file.FullName).Exists);
+
+            //sheet2.SaveAsPDF(file, true, true);
+        }
+
+        [Fact(Skip = skipReason)]
+        public void SaveAsPDF()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Mock<IOffice>();
+
+            var addIn = new AddIn(application, program.Object, office.Object);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            // Sheet with content
+            var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
+
+            var file = new FileInfo(Path.Combine(tempDirectory.FullName, $"{nameof(sheet2)}.pdf"));
+         
+            sheet2.SaveAsPDF(file);
+
+            Assert.True(new FileInfo(file.FullName).Exists);
+
+            //sheet2.SaveAsPDF(file, true, true);
+        }
+
+        [Fact(Skip = skipReason)]
+        public void SaveAsPDFThrowsComExceptionWhenEmpty()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Mock<IOffice>();
+
+            var addIn = new AddIn(application, program.Object, office.Object);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            var sheet1 = workbook.Worksheets.Single(v => v.Name == "1");
+
+            // There is nothing to print => exception
+            var file = new FileInfo(Path.Combine(tempDirectory.FullName, $"{nameof(sheet1)}.pdf"));
+            Assert.Throws<COMException>(() => sheet1.SaveAsPDF(file));
+        }
+
+
+        [Fact(Skip = skipReason)]
+        public async void SaveAsPDFThrowsExceptionWhenFileExists()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Mock<IOffice>();
+
+            var addIn = new AddIn(application, program.Object, office.Object);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];    
+          
+            var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
+
+            var file = new FileInfo(Path.Combine(tempDirectory.FullName, $"{nameof(sheet2)}.pdf"));
+
+            // First save with overwriteExistingFile
+            sheet2.SaveAsPDF(file, true);
+
+            var lastWriteTime = new FileInfo(file.FullName).LastWriteTimeUtc;
+
+            // Second save with the same name will throw an exception
+            // File exist and should not be overwritten.
+            Assert.Throws<IOException>( () =>  sheet2.SaveAsPDF(file, false));
+
+            Thread.Sleep(1000);
+
+            // Third save will overwrite existingFile
+            sheet2.SaveAsPDF(file, true);
+
+            Assert.True(new FileInfo(file.FullName).LastWriteTimeUtc > lastWriteTime);          
+
+        }
+
+        [Fact(Skip = skipReason)]
+        public void SaveAsXPS()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Mock<IOffice>();
+
+            var addIn = new AddIn(application, program.Object, office.Object);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            // Sheet with content
+            var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
+
+            var file = new FileInfo(Path.Combine(tempDirectory.FullName, $"{nameof(sheet2)}.xps"));
+
+            sheet2.SaveAsXPS(file);
+
+            Assert.True(new FileInfo(file.FullName).Exists);
+
+            //sheet2.SaveAsPDF(file, true, true);
+        }
+
+        [Fact(Skip = skipReason)]
+        public void SaveAsXPSSetsExtensiontoXPS()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Mock<IOffice>();
+
+            var addIn = new AddIn(application, program.Object, office.Object);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            // Sheet with content
+            var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
+
+            var file = new FileInfo(Path.Combine(tempDirectory.FullName, $"{nameof(sheet2)}.AAA"));
+
+            sheet2.SaveAsXPS(file);
+
+            Assert.False(new FileInfo(file.FullName).Exists);
+
+            file = new FileInfo(Path.Combine(tempDirectory.FullName, $"{nameof(sheet2)}.xps"));
+            Assert.True(new FileInfo(file.FullName).Exists);
+
+            //sheet2.SaveAsPDF(file, true, true);
+        }
+
+        [Fact(Skip = skipReason)]
+        public void SaveAsPDFSetsExtensiontoXPS()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Mock<IOffice>();
+
+            var addIn = new AddIn(application, program.Object, office.Object);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            // Sheet with content
+            var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
+
+            var file = new FileInfo(Path.Combine(tempDirectory.FullName, $"{nameof(sheet2)}.AAA"));
+
+            sheet2.SaveAsPDF(file);
+
+            Assert.False(new FileInfo(file.FullName).Exists);
+
+            file = new FileInfo(Path.Combine(tempDirectory.FullName, $"{nameof(sheet2)}.pdf"));
+            Assert.True(new FileInfo(file.FullName).Exists);
+
+            //sheet2.SaveAsPDF(file, true, true);
+        }
+
+
+
         [Fact(Skip = skipReason)]
         public async void FreezePanes()
         {

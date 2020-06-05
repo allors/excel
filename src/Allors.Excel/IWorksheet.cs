@@ -6,6 +6,7 @@
 using System;
 using System.Drawing;
 using System.Dynamic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Allors.Excel
@@ -112,5 +113,14 @@ namespace Allors.Excel
 
         bool HasFreezePanes { get; }
 
+        void SaveAsPDF(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true);
+
+        void SaveAsXPS(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true);
+
+        /// <summary>
+        /// Sets the PrintArea to the given range, or to the entire sheet when range is null.
+        /// </summary>
+        /// <param name="range"></param>
+        void SetPrintArea(Excel.Range range = null);
     }
 }

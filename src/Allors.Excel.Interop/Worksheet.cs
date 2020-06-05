@@ -7,9 +7,11 @@ namespace Allors.Excel.Embedded
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Drawing;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Threading.Tasks;
     using Allors.Excel;
     using Microsoft.Office.Interop.Excel;
@@ -1219,5 +1221,87 @@ namespace Allors.Excel.Embedded
 
         public bool HasFreezePanes => this.FreezeRange != null;
 
+        public void SaveAsXPS(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true)
+        {
+            this.SaveAs(file, XlFixedFormatType.xlTypeXPS, overwriteExistingFile, openAfterPublish, ignorePrintAreas);                  
+        }
+
+        public void SaveAsPDF(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true)
+        {
+            this.SaveAs(file, XlFixedFormatType.xlTypePDF, overwriteExistingFile, openAfterPublish, ignorePrintAreas);
+        }
+
+        /// <summary>
+        /// Save the sheet in the given formattype (0=PDF, 1=XPS) 
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="formatType"></param>
+        /// <param name="overwriteExistingFile"></param>
+        /// <param name="openAfterPublish"></param>
+        /// <param name="ignorePrintAreas"></param>
+        private void SaveAs(FileInfo file, XlFixedFormatType formatType, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true)
+        {
+            if (file == null)
+            {
+                throw new ArgumentNullException(nameof(file));
+            }
+
+            var fi = new FileInfo(file.FullName);
+
+            // In case we would overwrite an existing file
+            if (fi.Exists && !overwriteExistingFile)
+            {
+                throw new IOException($"File {file.FullName} already exists and should not be overwritten.");
+            }
+
+            if (!Directory.Exists(fi.DirectoryName))
+            {
+                Directory.CreateDirectory(fi.DirectoryName);
+            }
+
+            if (formatType == XlFixedFormatType.xlTypePDF && !string.Equals(fi.Extension, ".pdf", StringComparison.OrdinalIgnoreCase))
+            {
+               fi = new FileInfo(Path.ChangeExtension(fi.FullName, ".pdf"));
+            }
+
+            if (formatType == XlFixedFormatType.xlTypeXPS && !string.Equals(fi.Extension, ".xps", StringComparison.OrdinalIgnoreCase))
+            {
+                fi = new FileInfo(Path.ChangeExtension(fi.FullName, ".xps"));
+            }
+
+            this.InteropWorksheet
+                .ExportAsFixedFormat
+                (
+                       Type: formatType,
+                       Filename: fi.FullName,
+                       Quality: XlFixedFormatQuality.xlQualityStandard,
+                       IgnorePrintAreas: ignorePrintAreas,
+                       OpenAfterPublish: openAfterPublish
+               );
+        }
+
+
+        /// <inheritdoc/>
+        public void SetPrintArea(Excel.Range range = null)
+        {
+            // Use A1-Style reference for the printarea
+
+            var printArea = "";
+
+            if (range != null)
+            {
+                // row 3, column 5, rows 6 column 2
+                // => A1 Style = F4:H10
+                var startColumn = ExcelColumnFromNumber(range.Column + 1); // !zero-based
+                var startRow = range.Row + 1;
+
+                var endColumn = ExcelColumnFromNumber(range.Column + range.Columns.GetValueOrDefault());
+                var endRow = range.Row + range.Rows.GetValueOrDefault();
+
+                printArea = $"{startColumn}{startRow}:{endColumn}{endRow}";
+            }
+            
+            this.InteropWorksheet.PageSetup.PrintArea = printArea; 
+        }
     }
 }
