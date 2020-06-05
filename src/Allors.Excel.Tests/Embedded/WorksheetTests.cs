@@ -1187,5 +1187,23 @@ namespace Allors.Excel.Tests.Embedded
             Assert.True(rectangle.Left > 0);
            
         }
+
+        [Fact(Skip = skipReason)]
+        public void NewSheetIsActive()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Mock<IOffice>();
+
+            var addIn = new AddIn(application, program.Object, office.Object);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            var sheet1 = workbook.AddWorksheet(0);                      
+
+            Assert.True(sheet1.IsActive);
+
+        }
     }
 }

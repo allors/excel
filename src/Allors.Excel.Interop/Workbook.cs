@@ -146,6 +146,7 @@ namespace Allors.Excel.Embedded
                 this.worksheetByInteropWorksheet.Add(interopWorksheet, worksheet);
             }
 
+            worksheet.IsActive = true;
             return worksheet;
         }
 

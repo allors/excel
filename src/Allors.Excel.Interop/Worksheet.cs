@@ -82,6 +82,8 @@ namespace Allors.Excel.Embedded
             {
                 if (value)
                 {
+                    this.isActive = true;
+
                     this.InteropWorksheet.Activate();
                 }
                 else
