@@ -17,7 +17,7 @@ namespace Allors.Excel
 
         void OnClose(IWorkbook workbook, ref bool cancel);
 
-        void OnNew(IWorksheet worksheet);
+        Task OnNew(IWorksheet worksheet);
 
         Task OnBeforeDelete(IWorksheet worksheet);
 

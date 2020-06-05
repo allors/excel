@@ -30,6 +30,8 @@ namespace Application
         public async Task OnStart(IAddIn addIn)
         {
             this.AddIn = addIn;
+
+            await Task.CompletedTask;
         }
 
         public async Task OnHandle(string handle, params object[] argument)
@@ -56,6 +58,7 @@ namespace Application
 
         public async Task OnStop()
         {
+            await Task.CompletedTask;
         }
 
         public async Task OnNew(IWorkbook workbook)
@@ -144,9 +147,11 @@ namespace Application
         {
         }
 
-        public void OnNew(IWorksheet worksheet)
+        public async Task OnNew(IWorksheet worksheet)
         {
             worksheet.Name = "1";
+
+            await Task.CompletedTask;
         }
 
         public Task OnBeforeDelete(IWorksheet worksheet)
@@ -156,10 +161,12 @@ namespace Application
 
         public async Task OnLogin()
         {
+            await Task.CompletedTask;
         }
 
         public async Task OnLogout()
         {
+            await Task.CompletedTask;
         }
 
         public bool IsEnabled(string controlId, string controlTag)

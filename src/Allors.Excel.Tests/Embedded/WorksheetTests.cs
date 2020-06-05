@@ -1165,5 +1165,27 @@ namespace Allors.Excel.Tests.Embedded
             Assert.Equal(2, range.Column);
             Assert.Equal(3, range.Columns);
         }
+
+        [Fact(Skip = skipReason)]
+        public void GetRectangle()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Mock<IOffice>();
+
+            var addIn = new AddIn(application, program.Object, office.Object);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            var sheet1 = workbook.Worksheets[1];
+
+            sheet1.SetNamedRange("image", new Range(1, 1, 2, 2, sheet1));
+
+            var rectangle = sheet1.GetRectangle("image");
+
+            Assert.True(rectangle.Left > 0);
+           
+        }
     }
 }

@@ -705,16 +705,43 @@ namespace Allors.Excel.Embedded
         /// <returns></returns>
         public System.Drawing.Rectangle GetRectangle(string namedRange)
         {
-            Name name = this.Workbook.InteropWorkbook.Names.Item(namedRange);
+            Name name = null;
 
-            var area = name.RefersToRange.MergeArea;
+            try
+            {
+                // Get the Namedrange that is scoped to this worksheet
+                name = this.InteropWorksheet.Names.Item(namedRange);
+            }
+            catch
+            {
+                throw new ArgumentException("Name not found for namedRange", nameof(namedRange));
+            }
+           
 
-            int left = Convert.ToInt32(area.Left);
-            int top = Convert.ToInt32(area.Top);
-            int width = Convert.ToInt32(area.Width);
-            int height = Convert.ToInt32(area.Height);
+            // when the range is a mergedrange, then take the values from the area
+            var range = name.RefersToRange;
 
-            return new System.Drawing.Rectangle(left, top, width, height);
+            if ((bool)range.MergeCells == false)
+            {                
+                int left = Convert.ToInt32(range.Left);
+                int top = Convert.ToInt32(range.Top);
+                int width = Convert.ToInt32(range.Width);
+                int height = Convert.ToInt32(range.Height);
+
+                return new System.Drawing.Rectangle(left, top, width, height);              
+            }
+            else
+            {
+                var area = range.MergeArea;
+
+                int left = Convert.ToInt32(area.Left);
+                int top = Convert.ToInt32(area.Top);
+                int width = Convert.ToInt32(area.Width);
+                int height = Convert.ToInt32(area.Height);
+
+                return new System.Drawing.Rectangle(left, top, width, height);
+            }          
+
         }
 
         public Excel.Range[] GetNamedRanges()
@@ -750,27 +777,22 @@ namespace Allors.Excel.Embedded
             if (!string.IsNullOrWhiteSpace(name) && range != null)
             {
                 try
-                {
-                    var interopWorksheet = ((Worksheet)range.Worksheet).InteropWorksheet;
+                {  
+                    var topLeft = this.InteropWorksheet.Cells[range.Row + 1, range.Column + 1];
+                    var bottomRight = this.InteropWorksheet.Cells[range.Row + range.Rows, range.Column + range.Columns];
 
-                    if (interopWorksheet != null)
+                    var refersTo = this.InteropWorksheet.Range[topLeft, bottomRight];
+
+                    // When it does not exist, add it, else we update the range.
+                    if (this.InteropWorksheet.Names
+                        .Cast<Microsoft.Office.Interop.Excel.Name>()
+                        .Any(v => string.Equals(v.Name, name)))
                     {
-                        var topLeft = interopWorksheet.Cells[range.Row + 1, range.Column + 1];
-                        var bottomRight = interopWorksheet.Cells[range.Row + range.Rows, range.Column + range.Columns];
-
-                        var refersTo = interopWorksheet.Range[topLeft, bottomRight];
-
-                        // When it does not exist, add it, else we update the range.
-                        if (interopWorksheet.Names
-                            .Cast<Microsoft.Office.Interop.Excel.Name>()
-                            .Any(v => string.Equals(v.Name, name)))
-                        {
-                            interopWorksheet.Names.Item(name).RefersTo = refersTo;
-                        }
-                        else
-                        {
-                            interopWorksheet.Names.Add(name, refersTo);
-                        }
+                        this.InteropWorksheet.Names.Item(name).RefersTo = refersTo;
+                    }
+                    else
+                    {
+                        this.InteropWorksheet.Names.Add(name, refersTo);
                     }
                 }
                 catch
@@ -1181,26 +1203,6 @@ namespace Allors.Excel.Embedded
                 }
                 this.InteropWorksheet.Application.ActiveWindow.SplitColumn = column;
             }
-
-           
-
-            //// TopRow
-            //if (range.Row == 0)
-            //{
-            //    this.InteropWorksheet.Application.ActiveWindow.SplitRow = 1;
-            //    this.InteropWorksheet.Application.ActiveWindow.SplitColumn = 0;
-
-            //}
-            //// FirstColumn
-            //else if (range.Column == 0)
-            //{
-            //    this.InteropWorksheet.Application.ActiveWindow.SplitRow = 0;
-            //    this.InteropWorksheet.Application.ActiveWindow.SplitColumn = 1;
-            //}
-            //else
-            //{
-               
-            //}
             
             this.InteropWorksheet.Application.ActiveWindow.FreezePanes = true;           
 
