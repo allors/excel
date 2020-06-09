@@ -203,5 +203,25 @@ namespace Allors.Excel.Headless
         {
           
         }
+
+        public void SetCustomProperties(Excel.CustomProperties properties)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Excel.CustomProperties GetCustomProperties()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void HideInputMessage(ICell cell, bool clearInputMessage = false)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void HideErrorMessage(ICell cell, bool clearErrorMessage = false)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

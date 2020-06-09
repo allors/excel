@@ -4,6 +4,7 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Dynamic;
 using System.IO;
@@ -122,5 +123,16 @@ namespace Allors.Excel
         /// </summary>
         /// <param name="range"></param>
         void SetPrintArea(Excel.Range range = null);
+
+        void SetCustomProperties(CustomProperties properties);
+
+        CustomProperties GetCustomProperties();
+
+        /// <summary>
+        /// Sets the inputMessage that will be displayed when the cell is selected (aka Help text)
+        /// </summary>
+        void SetInputMessage(ICell cell, string message, string title = null, bool showInputMessage = true);
+
+        void HideInputMessage(ICell cell, bool clearInputMessage = false);
     }
 }

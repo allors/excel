@@ -37,6 +37,6 @@ namespace Allors.Excel
 
         void Clear();
 
-        object Tag { get; set; }
+        object Tag { get; set; }       
     }
 }

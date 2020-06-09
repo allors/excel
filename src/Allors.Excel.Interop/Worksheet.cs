@@ -6,13 +6,14 @@
 namespace Allors.Excel.Embedded
 {
     using System;
+    using System.CodeDom;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Drawing;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
     using System.Threading.Tasks;
+    using System.Xml.Schema;
     using Allors.Excel;
     using Microsoft.Office.Interop.Excel;
     using Polly;
@@ -1258,20 +1259,20 @@ namespace Allors.Excel.Embedded
                 throw new IOException($"File {file.FullName} already exists and should not be overwritten.");
             }
 
-            if (!Directory.Exists(fi.DirectoryName))
-            {
-                Directory.CreateDirectory(fi.DirectoryName);
-            }
-
             if (formatType == XlFixedFormatType.xlTypePDF && !string.Equals(fi.Extension, ".pdf", StringComparison.OrdinalIgnoreCase))
             {
-               fi = new FileInfo(Path.ChangeExtension(fi.FullName, ".pdf"));
+                fi = new FileInfo(Path.ChangeExtension(fi.FullName, ".pdf"));
             }
 
             if (formatType == XlFixedFormatType.xlTypeXPS && !string.Equals(fi.Extension, ".xps", StringComparison.OrdinalIgnoreCase))
             {
                 fi = new FileInfo(Path.ChangeExtension(fi.FullName, ".xps"));
             }
+
+            if (!Directory.Exists(fi.DirectoryName))
+            {
+                Directory.CreateDirectory(fi.DirectoryName);
+            }           
 
             this.InteropWorksheet
                 .ExportAsFixedFormat
@@ -1307,5 +1308,89 @@ namespace Allors.Excel.Embedded
             
             this.InteropWorksheet.PageSetup.PrintArea = printArea; 
         }
+
+        public void SetCustomProperties(Excel.CustomProperties properties)
+        {
+            CustomProperty[] cps = this.InteropWorksheet.CustomProperties.Cast<CustomProperty>().ToArray(); ;
+
+            foreach (var kvp in properties)
+            {              
+                    bool found = false;
+                    foreach (CustomProperty cp in cps)
+                    {
+                        if (string.Equals(cp.Name, kvp.Key, StringComparison.OrdinalIgnoreCase))
+                        {
+                            found = true;
+
+                            if (kvp.Value == null)
+                            {
+                                cp.Value = Excel.CustomProperties.MagicNull;
+                            }
+                            else
+                            {
+                                cp.Value = kvp.Value;
+                            }
+                        }
+                    }
+                   
+
+                    if (!found)
+                    {
+                    if (kvp.Value == null)
+                    {
+                        this.InteropWorksheet.CustomProperties.Add(kvp.Key, Excel.CustomProperties.MagicNull);
+                    }
+                    else
+                    {
+                        this.InteropWorksheet.CustomProperties.Add(kvp.Key, kvp.Value);
+                    }
+                }
+                               
+            }
+        }      
+
+        public Excel.CustomProperties GetCustomProperties()
+        {
+            var dict = new Excel.CustomProperties();
+
+            foreach(CustomProperty customProperty in this.InteropWorksheet.CustomProperties)
+            {
+                if(Excel.CustomProperties.MagicNull.Equals(customProperty.Value))
+                {
+                    dict.Add(customProperty.Name, null);
+                }
+                else
+                {
+                    dict.Add(customProperty.Name, customProperty.Value);
+                }
+            }
+
+            return dict;
+        }
+
+        public void SetInputMessage(ICell cell, string message, string title = null, bool showInputMessage = true)
+        {
+            Microsoft.Office.Interop.Excel.Range inputCell = (Microsoft.Office.Interop.Excel.Range) this.InteropWorksheet.Cells[cell.Row.Index + 1, cell.Column.Index + 1];
+
+            inputCell.Validation.Delete();
+            inputCell.Validation.Add(XlDVType.xlValidateInputOnly);
+            inputCell.Validation.ShowInput = showInputMessage;
+
+            inputCell.Validation.InputMessage = message;
+            inputCell.Validation.InputTitle = title;          
+        }
+
+        public void HideInputMessage(ICell cell, bool clearInputMessage = false)
+        {
+            Microsoft.Office.Interop.Excel.Range inputCell = (Microsoft.Office.Interop.Excel.Range)this.InteropWorksheet.Cells[cell.Row.Index + 1, cell.Column.Index + 1];     
+            
+            if(clearInputMessage)
+            {
+                inputCell.Validation.ErrorMessage = null;
+                inputCell.Validation.ErrorTitle = null;
+            }
+
+            inputCell.Validation.ShowInput = false;
+        }      
     }
 }

@@ -53,6 +53,7 @@ namespace Allors.Excel.Headless
             this.NumberFormat = null;
             this.Style = null;            
         }
+             
 
         public object Tag { get; set; }
     }

@@ -4,6 +4,7 @@
 // </copyright>
 
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -42,7 +43,102 @@ namespace Allors.Excel.Tests.Embedded
                     }
                 }
             }           
-        }        
+        }
+
+        [Fact(Skip = skipReason)]
+        public void ShowInputMessage()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Mock<IOffice>();
+
+            var addIn = new AddIn(application, program.Object, office.Object);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            // Sheet with content
+            var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
+
+            var cell = sheet2[0, 0];
+
+            sheet2.SetInputMessage(cell, "this is some help message", "title", showInputMessage: false);
+
+            sheet2.SetInputMessage(cell, "this is some help message", "title", showInputMessage: true);
+
+            cell = sheet2[1, 5];
+            sheet2.SetInputMessage(cell, "this is some other help message");
+            sheet2.HideInputMessage(cell);
+            sheet2.HideInputMessage(cell, clearInputMessage: true);
+        }
+
+        [Fact(Skip = skipReason)]
+        public void SetCustomProperties()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Mock<IOffice>();
+
+            var addIn = new AddIn(application, program.Object, office.Object);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            // Sheet with content
+            var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
+
+            var expectedDate = DateTime.Now;
+
+
+            var dict = new CustomProperties();
+            dict.Add("Showcase.IsInvoiceSheet", false);
+            dict.Add("Showcase.IsSheet2", true);
+            dict.Add("Showcase.Sheet2.Date", expectedDate);
+            dict.Add("Showcase.Sheet2.Decimal", 123.45M);
+
+            var nullableDecimal = new Nullable<decimal>(123.45M);
+            dict.Add("Showcase.Sheet2.NullableDecimal", nullableDecimal);
+
+            dict.Add("Showcase.Sheet2.Int", 12);
+
+            var nullableInt = new Nullable<int>(12);
+            dict.Add("Showcase.Sheet2.NullableInt", nullableInt);
+           
+            dict.Add("Company.Name", "Zonsoft.be");
+            dict.Add("Company.Street", "Uikhoverstraat 158");
+
+            // Duplicates will be overwritten
+            dict.Add("Company.City", "3631 Maasmechelen");
+            dict.Add("Company.City", "3631 Uikhoven");
+            
+            dict.Add("Company.Country", "BE België");
+
+            dict.Add("Showcase.Sheet2.Null", null);
+
+            sheet2.SetCustomProperties(dict);
+
+            var customProperties = sheet2.GetCustomProperties();
+
+            Assert.Equal(dict.Count, customProperties.Count);
+                        
+            Assert.False(customProperties.Get<bool>("Showcase.IsInvoiceSheet"));
+            Assert.True(customProperties.Get<bool>("Showcase.IsSheet2"));
+
+            // fractions of MS are not preserved!
+            Assert.Equal(expectedDate.Date, customProperties.Get<DateTime>("Showcase.Sheet2.Date").Date);
+            
+            Assert.Equal(12, customProperties.Get< int>("Showcase.Sheet2.Int"));
+            Assert.Equal(12, customProperties.Get< int?>("Showcase.Sheet2.NullableInt"));
+            Assert.Null(customProperties.Get<int?>("Showcase.Sheet2.Null"));
+
+            Assert.Equal(123.45M, customProperties.Get< decimal>("Showcase.Sheet2.Decimal"));
+            Assert.Equal(123.45M, customProperties.Get< decimal>("Showcase.Sheet2.NullableDecimal"));
+
+            Assert.Equal("Zonsoft.be", customProperties.Get<string>("Company.Name"));
+            Assert.Equal("BE België", customProperties.Get<string>("Company.Country"));
+            Assert.Equal("3631 Uikhoven", customProperties.Get<string>("Company.City"));
+
+        }
 
         [Fact(Skip = skipReason)]
         public void SaveAsPDFWithNullThrowsException()
