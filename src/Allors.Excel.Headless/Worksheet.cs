@@ -219,7 +219,7 @@ namespace Allors.Excel.Headless
             throw new NotImplementedException();
         }
 
-        public void HideErrorMessage(ICell cell, bool clearErrorMessage = false)
+        public void SetInputMessage(ICell cell, string message, string title = null, bool showInputMessage = true)
         {
             throw new NotImplementedException();
         }
