@@ -5,12 +5,12 @@
 
 using System;
 using System.Collections.Generic;
-using Allors.Excel.Embedded;
+using Allors.Excel.Interop;
 using Xunit;
 using System.Linq;
 using Moq;
 
-namespace Allors.Excel.Tests.Embedded
+namespace Allors.Excel.Tests.Rendering
 {
     public class ChunkTests
     {
@@ -127,7 +127,7 @@ namespace Allors.Excel.Tests.Embedded
                 "###",
             };
 
-            var worksheet = new Mock<IEmbeddedWorksheet>().Object;
+            var worksheet = new Mock<Excel.Interop.IWorksheet>().Object;
             var cells = CellsFromRaster(worksheet, raster, (v, c) => v.NumberFormat = c);
 
             var chunks = cells.Chunks((v, w) => Equals(v.NumberFormat, w.NumberFormat)).ToArray();
@@ -145,7 +145,7 @@ namespace Allors.Excel.Tests.Embedded
                 "# #",
             };
 
-            var worksheet = new Mock<IEmbeddedWorksheet>().Object;
+            var worksheet = new Mock<Excel.Interop.IWorksheet>().Object;
             var cells = CellsFromRaster(worksheet, raster, (v, c) => v.NumberFormat = c);
 
             var chunks = cells.Chunks((v, w) => Equals(v.NumberFormat, w.NumberFormat)).ToArray();
@@ -163,7 +163,7 @@ namespace Allors.Excel.Tests.Embedded
                 "###",
             };
 
-            var worksheet = new Mock<IEmbeddedWorksheet>().Object;
+            var worksheet = new Mock<Excel.Interop.IWorksheet>().Object;
             var cells = CellsFromRaster(worksheet, raster, (v, c) => v.NumberFormat = c);
 
             var chunks = cells.Chunks((v, w) => Equals(v.NumberFormat, w.NumberFormat)).ToArray();
@@ -181,7 +181,7 @@ namespace Allors.Excel.Tests.Embedded
                 "# #",
             };
 
-            var worksheet = new Mock<IEmbeddedWorksheet>().Object;
+            var worksheet = new Mock<Excel.Interop.IWorksheet>().Object;
             var cells = CellsFromRaster(worksheet, raster, (v, c) => v.NumberFormat = c);
 
             var chunks = cells.Chunks((v, w) => Equals(v.NumberFormat, w.NumberFormat)).ToArray();
@@ -199,7 +199,7 @@ namespace Allors.Excel.Tests.Embedded
                 "###",
             };
 
-            var worksheet = new Mock<IEmbeddedWorksheet>().Object;
+            var worksheet = new Mock<Excel.Interop.IWorksheet>().Object;
             var cells = CellsFromRaster(worksheet, raster, (v, c) => v.NumberFormat = c);
 
             var chunks = cells.Chunks((v, w) => Equals(v.NumberFormat, w.NumberFormat)).ToArray();
@@ -217,7 +217,7 @@ namespace Allors.Excel.Tests.Embedded
                 "###",
             };
 
-            var worksheet = new Mock<IEmbeddedWorksheet>().Object;
+            var worksheet = new Mock<Excel.Interop.IWorksheet>().Object;
             var cells = CellsFromRaster(worksheet, raster, (v, c) => v.NumberFormat = c);
 
             var chunks = cells.Chunks((v, w) => Equals(v.NumberFormat, w.NumberFormat)).ToArray();
@@ -225,7 +225,7 @@ namespace Allors.Excel.Tests.Embedded
             Assert.Equal(3, chunks.Length);
         }
 
-        private IList<Cell> CellsFromRaster(IEmbeddedWorksheet worksheet, string[] raster, Action<ICell, string> setup)
+        private IList<Cell> CellsFromRaster(Excel.Interop.IWorksheet worksheet, string[] raster, Action<ICell, string> setup)
         {
             var cells = new List<Cell>();
             for (var i = 0; i < raster.Length; i++)

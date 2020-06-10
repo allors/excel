@@ -3,14 +3,14 @@
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace Allors.Excel.Embedded
+namespace Allors.Excel.Interop
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Microsoft.Office.Interop.Excel;
     using InteropApplication = Microsoft.Office.Interop.Excel.Application;
     using InteropWorkbook = Microsoft.Office.Interop.Excel.Workbook;
     using InteropWorksheet = Microsoft.Office.Interop.Excel.Worksheet;
+    using InteropAppEvents_Event = Microsoft.Office.Interop.Excel.AppEvents_Event;
 
     public class AddIn : Excel.IAddIn
     {
@@ -24,7 +24,7 @@ namespace Allors.Excel.Embedded
 
             this.workbookByInteropWorkbook = new Dictionary<InteropWorkbook, Workbook>();
 
-            ((AppEvents_Event)this.Application).NewWorkbook += async interopWorkbook =>
+            ((InteropAppEvents_Event)this.Application).NewWorkbook += async interopWorkbook =>
             {
                 var workbook = this.New(interopWorkbook);
                 for (var i = 1; i <= interopWorkbook.Worksheets.Count; i++)
@@ -41,7 +41,7 @@ namespace Allors.Excel.Embedded
                 }
             };
 
-            ((AppEvents_Event)this.Application).WorkbookOpen += async interopWorkbook =>
+            ((InteropAppEvents_Event)this.Application).WorkbookOpen += async interopWorkbook =>
             {
                 var workbook = this.New(interopWorkbook);
                 for (var i = 1; i <= interopWorkbook.Worksheets.Count; i++)

@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Allors.Excel.Embedded
+namespace Allors.Excel.Interop
 {
     public static class Cells
     {

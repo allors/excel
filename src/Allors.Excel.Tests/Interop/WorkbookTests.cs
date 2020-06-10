@@ -3,17 +3,13 @@
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-using System;
-using System.Diagnostics;
 using System.Linq;
-using Allors.Excel.Embedded;
+using Allors.Excel.Interop;
 using Moq;
 using Xunit;
-using InteropApplication = Microsoft.Office.Interop.Excel.Application;
-using InteropWorkbook = Microsoft.Office.Interop.Excel.Workbook;
 
-namespace Allors.Excel.Tests.Embedded
-{   
+namespace Allors.Excel.Tests.Interop
+{
     public class WorkbookTests : InteropTest
     {
         [Fact(Skip=skipReason)]

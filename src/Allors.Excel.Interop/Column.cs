@@ -5,7 +5,7 @@
 
 using System;
 
-namespace Allors.Excel.Embedded
+namespace Allors.Excel.Interop
 {
     public class Column : IColumn, IComparable<Column>
     {
@@ -15,7 +15,7 @@ namespace Allors.Excel.Embedded
             Index = index;
         }
 
-        public IWorksheet Worksheet { get; }
+        public Excel.IWorksheet Worksheet { get; }
 
         public int Index { get; internal set; }
 

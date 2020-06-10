@@ -1,12 +1,9 @@
-﻿using Microsoft.Office.Interop.Excel;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using InteropWorksheet = Microsoft.Office.Interop.Excel.Worksheet;
 
-namespace Allors.Excel
+namespace Allors.Excel.Interop
 {
     public interface IOffice
     {
-        void AddPicture(Worksheet interopWorksheet, string filename, System.Drawing.Rectangle rectangle);
+        void AddPicture(InteropWorksheet interopWorksheet, string filename, System.Drawing.Rectangle rectangle);
     }
 }

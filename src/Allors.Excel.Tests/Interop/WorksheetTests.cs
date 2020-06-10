@@ -11,14 +11,15 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
-using Allors.Excel.Embedded;
+using Allors.Excel.Interop;
+using Allors.Excel.Interop;
 using Application;
 using Moq;
 using Xunit;
 using InteropApplication = Microsoft.Office.Interop.Excel.Application;
 using InteropWorkbook = Microsoft.Office.Interop.Excel.Workbook;
 
-namespace Allors.Excel.Tests.Embedded
+namespace Allors.Excel.Tests.Interop
 {
     public class WorksheetTests : InteropTest
     {
@@ -603,7 +604,7 @@ namespace Allors.Excel.Tests.Embedded
             this.ExpectedContextTags.Add(tag1);
             this.ExpectedContextTags.Add(tag2);
 
-            var cell00 = worksheet[0, 0];
+            var cell00 = worksheet[(0, 0)];
             cell00.Tag = tag1;
 
             Assert.NotEmpty(this.ExpectedContextTags);
@@ -612,7 +613,7 @@ namespace Allors.Excel.Tests.Embedded
             this.ExpectedContextTag = tag1;
             worksheet.InteropWorksheet.Cells[1, 1] = "i am cell00";                      
           
-            var cell01 = worksheet[0, 1];
+            var cell01 = worksheet[(0, 1)];
             cell01.Tag = tag2;
 
             // Change the cell will trigger the Change Event

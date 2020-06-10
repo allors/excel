@@ -6,7 +6,7 @@
 using System;
 using System.Globalization;
 
-namespace Allors.Excel.Embedded
+namespace Allors.Excel.Interop
 {
     public class Cell : ICell
     {
@@ -23,16 +23,16 @@ namespace Allors.Excel.Embedded
         private readonly IValueConverter defaultValueConverter = new DefaultValueConverter();
         private string comment;
 
-        public Cell(IEmbeddedWorksheet worksheet, Row row, Column column)
+        public Cell(IWorksheet worksheet, Row row, Column column)
         {
             Worksheet = worksheet;
             Row = row;
             Column = column;
         }
 
-        IWorksheet ICell.Worksheet => this.Worksheet;
+        Excel.IWorksheet ICell.Worksheet => this.Worksheet;
 
-        public IEmbeddedWorksheet Worksheet { get; }
+        public IWorksheet Worksheet { get; }
 
         IRow ICell.Row => this.Row;
 

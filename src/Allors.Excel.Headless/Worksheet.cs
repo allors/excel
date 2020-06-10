@@ -27,7 +27,7 @@ namespace Allors.Excel.Headless
 
             this.rowByIndex = new Dictionary<int, Row>();
             this.columnByIndex = new Dictionary<int, Column>();
-            this.CellByRowColumn = new Dictionary<string, Cell>();
+            this.CellByCoordinates = new Dictionary<(int, int), Cell>();
         }
 
         public event EventHandler<CellChangedEvent> CellsChanged;
@@ -36,25 +36,29 @@ namespace Allors.Excel.Headless
         public string Name { get; set; }
 
         public bool IsActive { get; set; }
-        
-        public Dictionary<string, Cell> CellByRowColumn { get; }
-        public bool IsVisible 
-        { 
-            get => throw new NotImplementedException(); 
-            set => throw new NotImplementedException(); 
+
+        public Dictionary<(int, int), Cell> CellByCoordinates { get; }
+
+        public bool IsVisible
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
         }
 
         public bool HasFreezePanes => throw new NotImplementedException();
 
-        public ICell this[int row, int column]
+        ICell IWorksheet.this[(int, int) coordinates] => this[coordinates];
+
+        ICell IWorksheet.this[int row, int column] => this[(row, column)];
+
+        public Cell this[(int, int) coordinates]
         {
             get
             {
-                var key = $"{row}:{column}";
-                if (!this.CellByRowColumn.TryGetValue(key, out var cell))
+                if (!this.CellByCoordinates.TryGetValue(coordinates, out var cell))
                 {
-                    cell = new Cell(this, Row(row), Column(column));
-                    this.CellByRowColumn.Add(key, cell);
+                    cell = new Cell(this, Row(coordinates.Item1), Column(coordinates.Item2));
+                    this.CellByCoordinates.Add(coordinates, cell);
                 }
 
                 return cell;
@@ -65,12 +69,12 @@ namespace Allors.Excel.Headless
 
         public Row Row(int index)
         {
-            if(index < 0)
+            if (index < 0)
             {
                 throw new ArgumentException("Index can not be negative", nameof(Row));
             }
 
-            if(!this.rowByIndex.TryGetValue(index, out var row))
+            if (!this.rowByIndex.TryGetValue(index, out var row))
             {
                 row = new Row(this, index);
                 this.rowByIndex.Add(index, row);
@@ -201,7 +205,7 @@ namespace Allors.Excel.Headless
 
         public void SetPrintArea(Excel.Range range = null)
         {
-          
+
         }
 
         public void SetCustomProperties(Excel.CustomProperties properties)

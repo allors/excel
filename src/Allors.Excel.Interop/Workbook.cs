@@ -3,16 +3,17 @@
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace Allors.Excel.Embedded
+namespace Allors.Excel.Interop
 {
     using Allors.Excel;
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
     using InteropWorkbook = Microsoft.Office.Interop.Excel.Workbook;
     using InteropWorksheet = Microsoft.Office.Interop.Excel.Worksheet;
+    using InteropName = Microsoft.Office.Interop.Excel.Name;
+    using InteropXlSheetVisibility = Microsoft.Office.Interop.Excel.XlSheetVisibility;
 
     public class Workbook : IWorkbook
     {
@@ -31,7 +32,6 @@ namespace Allors.Excel.Embedded
 
         public InteropWorkbook InteropWorkbook { get; }
 
-
         /// <summary>
         /// When index = 0 => add new worksheet before the active worksheet
         /// When index =< #sheets => add new worksheet before the index worksheet
@@ -44,7 +44,7 @@ namespace Allors.Excel.Embedded
         /// <param name="before"></param>
         /// <param name="after"></param>
         /// <returns></returns>
-        public IWorksheet AddWorksheet(int? index, IWorksheet before = null, IWorksheet after = null)
+        public Excel.IWorksheet AddWorksheet(int? index, Excel.IWorksheet before = null, Excel.IWorksheet after = null)
         {
             InteropWorksheet interopWorksheet;
 
@@ -91,7 +91,7 @@ namespace Allors.Excel.Embedded
             }                     
         }
 
-        public IWorksheet Copy(IWorksheet sourceWorksheet, IWorksheet beforeWorksheet)
+        public Excel.IWorksheet Copy(Excel.IWorksheet sourceWorksheet, Excel.IWorksheet beforeWorksheet)
         {
             var source = (Worksheet)sourceWorksheet;
             var before = (Worksheet)beforeWorksheet;
@@ -102,12 +102,12 @@ namespace Allors.Excel.Embedded
             var copied = (InteropWorksheet)this.InteropWorkbook.Sheets[index];
             var copiedWorksheet = this.New(copied);
 
-            copied.Visible = Microsoft.Office.Interop.Excel.XlSheetVisibility.xlSheetVisible;
+            copied.Visible = InteropXlSheetVisibility.xlSheetVisible;
 
             return copiedWorksheet;
         }
 
-        public IWorksheet[] Worksheets => this.worksheetByInteropWorksheet.Values.Cast<IWorksheet>().ToArray();
+        public Excel.IWorksheet[] Worksheets => this.worksheetByInteropWorksheet.Values.Cast<IWorksheet>().ToArray();
 
         public Worksheet[] WorksheetsByIndex => this.worksheetByInteropWorksheet.Values.Cast<Worksheet>().OrderBy(v => v.Index).ToArray();
 
@@ -166,11 +166,11 @@ namespace Allors.Excel.Embedded
         /// Return a Zero-Based Row, Column NamedRanges
         /// </summary>
         /// <returns></returns>
-        public Excel.Range[] GetNamedRanges(string refersToSheetName = null)
+        public Range[] GetNamedRanges(string refersToSheetName = null)
         {
             var ranges = new List<Excel.Range>();
 
-            foreach (Microsoft.Office.Interop.Excel.Name namedRange in this.InteropWorkbook.Names)
+            foreach (InteropName namedRange in this.InteropWorkbook.Names)
             {
                 try
                 {
@@ -218,7 +218,7 @@ namespace Allors.Excel.Embedded
 
                         // When it does not exist, add it, else we update the range.
                         if (this.InteropWorkbook.Names
-                                .Cast<Microsoft.Office.Interop.Excel.Name>()
+                                .Cast<InteropName>()
                                 .Any(v => string.Equals(v.Name, name)))
                         {
                             this.InteropWorkbook.Names.Item(name).RefersTo = refersTo;

@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using InteropApplication = Microsoft.Office.Interop.Excel.Application;
 using InteropWorkbook = Microsoft.Office.Interop.Excel.Workbook;
 
-namespace Allors.Excel.Tests.Embedded
+namespace Allors.Excel.Tests.Interop
 {
     public class InteropTest : IDisposable
     {
-        protected const string skipReason = "Azure vmimage has no office installed";
-        //protected const string skipReason = null;
+        //protected const string skipReason = "Azure vmimage has no office installed";
+        protected const string skipReason = null;
 
         protected InteropApplication application;
 

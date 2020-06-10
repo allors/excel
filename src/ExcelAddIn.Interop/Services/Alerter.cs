@@ -1,7 +1,7 @@
 ﻿using Application;
 using System.Windows.Forms;
 
-namespace ExcelAddInLocal
+namespace ExcelAddIn.Services
 {
     internal class Alerter : IAlerter
     {

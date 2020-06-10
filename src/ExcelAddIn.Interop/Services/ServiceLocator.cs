@@ -1,12 +1,12 @@
 ﻿using Application;
 
-namespace ExcelAddInLocal
+namespace ExcelAddIn.Services
 {
     internal class ServiceLocator : IServiceLocator
     {
         public ServiceLocator()
         {
-            this.Alerter = new Alerter();
+            Alerter = new Alerter();
         }
 
         public IAlerter Alerter { get; }

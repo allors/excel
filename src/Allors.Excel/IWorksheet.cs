@@ -36,11 +36,16 @@ namespace Allors.Excel
             get;
         }
 
+        ICell this[(int, int) coordinates]
+        {
+            get;
+        }
+
         Task Flush();
 
         Task RefreshPivotTables(string newRange);
 
-        void AddPicture(string uri, Rectangle rectangle);       
+        void AddPicture(string uri, Rectangle rectangle);
 
         Rectangle GetRectangle(string namedRange);
 
@@ -104,7 +109,7 @@ namespace Allors.Excel
         Range GetUsedRange(int row);
 
         bool IsVisible { get; set; }
-               
+
         /// <summary>
         /// </summary>
         /// <param name="range"></param>

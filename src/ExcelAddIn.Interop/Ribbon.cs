@@ -4,17 +4,14 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
-using Allors.Excel.Embedded;
+using Allors.Excel.Interop;
 using Office = Microsoft.Office.Core;
 
-namespace ExcelAddInLocal
+namespace ExcelAddIn
 {
     [ComVisible(true)]
     public class Ribbon : Office.IRibbonExtensibility
@@ -42,30 +39,30 @@ namespace ExcelAddInLocal
             set
             {
                 doSomethingLabel = value;
-                this.ribbon.Invalidate();
+                ribbon.Invalidate();
             }
         }
 
         public string GetDoSomethingLabel(Office.IRibbonControl control)
         {
-            return this.DoSomethingLabel;
+            return DoSomethingLabel;
         }
-        
+
         #endregion
 
         #region Ribbon Callbacks
 
         public async void OnClick(Office.IRibbonControl control) => await Task.Run(async () =>
         {
-            if (this.AddIn != null)
+            if (AddIn != null)
             {
-                await this.AddIn.Program.OnHandle(control.Id);
+                await AddIn.Program.OnHandle(control.Id);
             }
         });
 
         public void Ribbon_Load(Office.IRibbonUI ribbonUI)
         {
-            this.ribbon = ribbonUI;
+            ribbon = ribbonUI;
         }
 
         #endregion

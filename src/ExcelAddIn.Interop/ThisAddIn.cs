@@ -7,15 +7,16 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
-using Allors.Excel.Embedded;
+using Allors.Excel.Interop;
 using Application;
 using AppEvents_Event = Microsoft.Office.Interop.Excel.AppEvents_Event;
 using InteropWorkbook = Microsoft.Office.Interop.Excel.Workbook;
 using InteropWorksheet = Microsoft.Office.Interop.Excel.Worksheet;
 using System.Threading.Tasks;
 using ExcelAddIn.Interop;
+using ExcelAddIn.Services;
 
-namespace ExcelAddInLocal
+namespace ExcelAddIn
 {
     public partial class ThisAddIn
     {
