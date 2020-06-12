@@ -5,6 +5,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml;
 
 namespace Allors.Excel.Headless
 {
@@ -78,6 +79,46 @@ namespace Allors.Excel.Headless
         }
 
         public void SetNamedRange(string name, Range range)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void SetCustomProperties(CustomProperties properties)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void DeleteCustomProperties(CustomProperties properties)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public CustomProperties GetCustomProperties()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public bool TryGetCustomProperty(string name, ref object value)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public string SetCustomXML(XmlDocument xmlDocument)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public XmlDocument GetCustomXMLById(string id)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public bool TrySetCustomProperty(string name, dynamic value)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public bool TryDeleteCustomXMLById(string id)
         {
             throw new System.NotImplementedException();
         }

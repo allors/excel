@@ -4,6 +4,7 @@
 // </copyright>
 
 using System.Collections.Generic;
+using System.Xml;
 
 namespace Allors.Excel
 {
@@ -31,5 +32,20 @@ namespace Allors.Excel
         /// <param name="name"></param>
         /// <param name="range"></param>
         void SetNamedRange(string name, Range range);
+
+        void SetCustomProperties(Excel.CustomProperties properties);
+
+        void DeleteCustomProperties(Excel.CustomProperties properties);
+
+        Excel.CustomProperties GetCustomProperties();
+
+        bool TryGetCustomProperty(string name, ref object value);
+        bool TrySetCustomProperty(string name, dynamic value);
+
+        string SetCustomXML(XmlDocument xmlDocument);
+
+        XmlDocument GetCustomXMLById(string id);
+
+        bool TryDeleteCustomXMLById(string id);
     }
 }

@@ -12,6 +12,11 @@ namespace Allors.Excel
     public class CustomProperties : Dictionary<string, object>
     {
         public const string MagicNull = "{DDF8EA1F-C9D5-4A31-B05D-998A9E539D42}";
+        public const string MagicDecimalMaxValue = "{0DADAEFB-3770-489A-A88F-ACD2D0D722E6}";
+        public const string MagicDecimalMinValue = "{F52899DF-34E5-4C6D-BC44-E2928B4F41BE}";
+
+        public const string MagicDateTimeMaxValue = "{291674F8-34A8-48D8-98B5-CA717EA67030}";
+        public const string MagicDateTimeMinValue = "{1673E121-DCED-48AE-B7D2-908773CBE849}";
 
         public new void Add(string key, object value)
         {
@@ -29,6 +34,13 @@ namespace Allors.Excel
         {
             var value = this[key];
 
+            // From double to decimal, we will loose precision when precision is more than 6.
+            if (value is double && typeof(T) == typeof(decimal))
+            {
+                var result = Math.Round(Convert.ToDecimal(value), 6);
+                return (T)Convert.ChangeType(result, typeof(T));
+            }
+         
             if (value is T)
             {
                 return (T)value;

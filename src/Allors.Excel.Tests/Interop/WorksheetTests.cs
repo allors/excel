@@ -4,20 +4,14 @@
 // </copyright>
 
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Allors.Excel.Interop;
-using Allors.Excel.Interop;
-using Application;
 using Moq;
 using Xunit;
-using InteropApplication = Microsoft.Office.Interop.Excel.Application;
-using InteropWorkbook = Microsoft.Office.Interop.Excel.Workbook;
 
 namespace Allors.Excel.Tests.Interop
 {
