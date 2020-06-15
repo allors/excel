@@ -17,7 +17,6 @@ namespace Allors.Excel.Interop
     using System.Xml;
     using System.Runtime.InteropServices;
     using Microsoft.Office.Core;
-    using Microsoft.Office.Interop.Excel;
 
     public class Workbook : IWorkbook
     {
@@ -95,6 +94,7 @@ namespace Allors.Excel.Interop
             }                     
         }
 
+        /// <inheritdoc/>
         public Excel.IWorksheet Copy(Excel.IWorksheet sourceWorksheet, Excel.IWorksheet beforeWorksheet)
         {
             var source = (Worksheet)sourceWorksheet;
@@ -111,13 +111,16 @@ namespace Allors.Excel.Interop
             return copiedWorksheet;
         }
 
+        /// <inheritdoc/>
+
         public Excel.IWorksheet[] Worksheets => this.worksheetByInteropWorksheet.Values.Cast<IWorksheet>().ToArray();
 
         public Worksheet[] WorksheetsByIndex => this.worksheetByInteropWorksheet.Values.Cast<Worksheet>().OrderBy(v => v.Index).ToArray();
 
-
+        /// <inheritdoc/>
         public bool IsActive { get; internal set; }
 
+        /// <inheritdoc/>
         public void Close(bool? saveChanges = null, string fileName = null)
         {
             this.InteropWorkbook.Close((object)saveChanges ?? Missing.Value, (object)fileName ?? Missing.Value, Missing.Value);
@@ -127,7 +130,8 @@ namespace Allors.Excel.Interop
         {
             return this.TryAdd(interopWorksheet);
         }
-             
+
+        
         private void ApplicationOnWorkbookNewSheet(InteropWorkbook wb, object sh)
         {
             if (sh is InteropWorksheet interopWorksheet)
@@ -166,10 +170,7 @@ namespace Allors.Excel.Interop
             }
         }
 
-        /// <summary>
-        /// Return a Zero-Based Row, Column NamedRanges
-        /// </summary>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public Excel.Range[] GetNamedRanges(string refersToSheetName = null)
         {
             var ranges = new List<Excel.Range>();
@@ -189,7 +190,7 @@ namespace Allors.Excel.Interop
                         }
                     }
                 }
-                catch(Exception ex)
+                catch(Exception)
                 {
                     // RefersToRange can throw exception
                 }
@@ -199,11 +200,7 @@ namespace Allors.Excel.Interop
         }
 
 
-        /// <summary>
-        /// Adds a NamedRange that has its scope on the Workbook
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="range"></param>
+        /// <inheritdoc/>
         public void SetNamedRange(string name, Excel.Range range)
         {
             if (!string.IsNullOrWhiteSpace(name) && range != null)
@@ -240,6 +237,7 @@ namespace Allors.Excel.Interop
             }
         }
 
+        /// <inheritdoc/>
         public void SetCustomProperties(Excel.CustomProperties properties)
         {
             if (properties == null || !properties.Any())
@@ -259,6 +257,7 @@ namespace Allors.Excel.Interop
             }
         }
 
+        /// <inheritdoc/>
         public bool TrySetCustomProperty(string name, dynamic value)
         {
             if (string.IsNullOrEmpty(name))
@@ -281,6 +280,7 @@ namespace Allors.Excel.Interop
             }
         }
 
+        /// <inheritdoc/>
         public void DeleteCustomProperties(Excel.CustomProperties properties)
         {
             if (properties == null || !properties.Any())
@@ -330,6 +330,7 @@ namespace Allors.Excel.Interop
             }
         }
 
+        /// <inheritdoc/>
         public Excel.CustomProperties GetCustomProperties()
         {
             var dict = new Excel.CustomProperties();
@@ -385,6 +386,7 @@ namespace Allors.Excel.Interop
             return dict;
         }
 
+        /// <inheritdoc/>
         public bool TryGetCustomProperty(string name, ref object value)
         {
             if (string.IsNullOrEmpty(name))
@@ -437,8 +439,7 @@ namespace Allors.Excel.Interop
             }
         }
 
-       
-
+        
         private bool TryGet(object customDocumentProperties, Type typeCustomDocumentProperties, string key, ref dynamic result)
         {
             try
@@ -470,7 +471,7 @@ namespace Allors.Excel.Interop
 
                 return false;
             }
-            catch (COMException ex)
+            catch (COMException)
             {
                 return false;
             }
@@ -590,12 +591,13 @@ namespace Allors.Excel.Interop
                     }
                 }
             }
-            catch (COMException ex)
+            catch (COMException)
             {
 
             }
         }
 
+        /// <inheritdoc/>
         public string SetCustomXML(XmlDocument xmlDocument)
         {
             var xmlPart = this.InteropWorkbook.CustomXMLParts.Add(xmlDocument.OuterXml, Type.Missing);
@@ -603,6 +605,7 @@ namespace Allors.Excel.Interop
             return xmlPart.Id;
         }
 
+        /// <inheritdoc/>
         public XmlDocument GetCustomXMLById(string id)
         {
             var xmlDocument = new XmlDocument();
@@ -618,6 +621,7 @@ namespace Allors.Excel.Interop
             return null;            
         }
 
+        /// <inheritdoc/>
         public bool TryDeleteCustomXMLById(string id)
         {
             try

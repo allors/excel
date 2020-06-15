@@ -55,7 +55,7 @@ namespace Allors.Excel.Tests.Interop
             // Sheet with content
             var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
 
-            var cell = sheet2[0, 0];
+            var cell = sheet2[5, 5];
 
             sheet2.SetInputMessage(cell, "this is some help message", "title", showInputMessage: false);
 
