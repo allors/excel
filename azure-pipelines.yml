@@ -12,15 +12,15 @@ stages:
     timeoutInMinutes: 180
 
     pool:
-      vmImage: 'windows-2019'
+      vmImage: 'windows-latest'
 
     strategy:
       matrix:
         Excel32:
-          bits: ''
+          options: '--forcex86'
           target: 'CiTest'
         Excel64:
-          bits: '/64bit'
+          options: ''
           target: 'Ci'
       maxParallel: 2
 
@@ -35,8 +35,7 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          #choco install office365business
-          choco install microsoft-office-deployment $(bits)
+          choco install office365business $(options)
         failOnStderr: true
       displayName: 'Install Excel'
     - task: PowerShell@2
