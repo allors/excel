@@ -14,6 +14,9 @@ namespace Allors.Excel.Interop
     using InteropWorksheet = Microsoft.Office.Interop.Excel.Worksheet;
     using InteropName = Microsoft.Office.Interop.Excel.Name;
     using InteropXlSheetVisibility = Microsoft.Office.Interop.Excel.XlSheetVisibility;
+    using System.Xml;
+    using System.Runtime.InteropServices;
+    using Microsoft.Office.Core;
 
     public class Workbook : IWorkbook
     {
@@ -91,6 +94,7 @@ namespace Allors.Excel.Interop
             }                     
         }
 
+        /// <inheritdoc/>
         public Excel.IWorksheet Copy(Excel.IWorksheet sourceWorksheet, Excel.IWorksheet beforeWorksheet)
         {
             var source = (Worksheet)sourceWorksheet;
@@ -107,13 +111,16 @@ namespace Allors.Excel.Interop
             return copiedWorksheet;
         }
 
+        /// <inheritdoc/>
+
         public Excel.IWorksheet[] Worksheets => this.worksheetByInteropWorksheet.Values.Cast<IWorksheet>().ToArray();
 
         public Worksheet[] WorksheetsByIndex => this.worksheetByInteropWorksheet.Values.Cast<Worksheet>().OrderBy(v => v.Index).ToArray();
 
-
+        /// <inheritdoc/>
         public bool IsActive { get; internal set; }
 
+        /// <inheritdoc/>
         public void Close(bool? saveChanges = null, string fileName = null)
         {
             this.InteropWorkbook.Close((object)saveChanges ?? Missing.Value, (object)fileName ?? Missing.Value, Missing.Value);
@@ -123,7 +130,8 @@ namespace Allors.Excel.Interop
         {
             return this.TryAdd(interopWorksheet);
         }
-             
+
+        
         private void ApplicationOnWorkbookNewSheet(InteropWorkbook wb, object sh)
         {
             if (sh is InteropWorksheet interopWorksheet)
@@ -162,11 +170,8 @@ namespace Allors.Excel.Interop
             }
         }
 
-        /// <summary>
-        /// Return a Zero-Based Row, Column NamedRanges
-        /// </summary>
-        /// <returns></returns>
-        public Range[] GetNamedRanges(string refersToSheetName = null)
+        /// <inheritdoc/>
+        public Excel.Range[] GetNamedRanges(string refersToSheetName = null)
         {
             var ranges = new List<Excel.Range>();
 
@@ -185,7 +190,7 @@ namespace Allors.Excel.Interop
                         }
                     }
                 }
-                catch(Exception ex)
+                catch(Exception)
                 {
                     // RefersToRange can throw exception
                 }
@@ -195,11 +200,7 @@ namespace Allors.Excel.Interop
         }
 
 
-        /// <summary>
-        /// Adds a NamedRange that has its scope on the Workbook
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="range"></param>
+        /// <inheritdoc/>
         public void SetNamedRange(string name, Excel.Range range)
         {
             if (!string.IsNullOrWhiteSpace(name) && range != null)
@@ -234,6 +235,408 @@ namespace Allors.Excel.Interop
                     // can throw exception, we dont care.
                 }
             }
+        }
+
+        /// <inheritdoc/>
+        public void SetCustomProperties(Excel.CustomProperties properties)
+        {
+            if (properties == null || !properties.Any())
+            {
+                return;
+            }
+
+            var customDocumentProperties = this.InteropWorkbook.CustomDocumentProperties;
+            Type typeCustomDocumentProperties = customDocumentProperties.GetType();
+
+            foreach (var kvp in properties)
+            {
+                if (!string.IsNullOrWhiteSpace(kvp.Key))
+                {
+                    this.TrySet(customDocumentProperties, typeCustomDocumentProperties, kvp.Key, kvp.Value);
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public bool TrySetCustomProperty(string name, dynamic value)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return false;
+            }
+
+            var customDocumentProperties = this.InteropWorkbook.CustomDocumentProperties;
+            Type typeCustomDocumentProperties = customDocumentProperties.GetType();
+
+            try
+            {
+                this.TrySet(customDocumentProperties, typeCustomDocumentProperties, name, value);
+
+                return true;                              
+            }
+            catch (COMException)
+            {
+                return false;
+            }
+        }
+
+        /// <inheritdoc/>
+        public void DeleteCustomProperties(Excel.CustomProperties properties)
+        {
+            if (properties == null || !properties.Any())
+            {
+                return;
+            }
+
+            var customDocumentProperties = this.InteropWorkbook.CustomDocumentProperties;
+            Type typeCustomDocumentProperties = customDocumentProperties.GetType();
+
+            foreach (var kvp in properties)
+            {
+                if (!string.IsNullOrWhiteSpace(kvp.Key))
+                {
+                    try
+                    {
+                        var nrProps = typeCustomDocumentProperties.InvokeMember("Count",
+                            BindingFlags.GetProperty | BindingFlags.Default,
+                            null, customDocumentProperties, new object[] { });
+
+                        for (int counter = 1; counter <= ((int)nrProps); counter++)
+                        {
+                            var itemProp = typeCustomDocumentProperties.InvokeMember("Item",
+                                BindingFlags.GetProperty | BindingFlags.Default,
+                                null, customDocumentProperties, new object[] { counter });
+
+                            var oPropName = typeCustomDocumentProperties.InvokeMember("Name",
+                                BindingFlags.GetProperty | BindingFlags.Default,
+                                null, itemProp, new object[] { });
+
+                            if (string.Equals(kvp.Key, oPropName))
+                            {
+                                typeCustomDocumentProperties.InvokeMember("Delete",
+                                 BindingFlags.InvokeMethod | BindingFlags.Default,
+                                 null, itemProp, new object[] { });
+
+                                break;
+                            }
+                        }
+                    }
+                    catch (COMException)
+                    {
+                        // Blank
+                    }
+
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public Excel.CustomProperties GetCustomProperties()
+        {
+            var dict = new Excel.CustomProperties();
+
+            object customProperties = this.InteropWorkbook.CustomDocumentProperties;
+            Type docPropsType = customProperties.GetType();
+            object nrProps;
+
+            nrProps = docPropsType.InvokeMember("Count",
+                BindingFlags.GetProperty | BindingFlags.Default,
+                null, customProperties, new object[] { });
+
+            for (int counter = 1; counter <= ((int)nrProps); counter++)
+            {
+                var itemProp = docPropsType.InvokeMember("Item",
+                    BindingFlags.GetProperty | BindingFlags.Default,
+                    null, customProperties, new object[] { counter });
+
+                var oPropName = docPropsType.InvokeMember("Name",
+                    BindingFlags.GetProperty | BindingFlags.Default,
+                    null, itemProp, new object[] { });
+
+                var oPropVal = docPropsType.InvokeMember("Value",
+                        BindingFlags.GetProperty | BindingFlags.Default,
+                        null, itemProp, new object[] { });
+
+                if (Excel.CustomProperties.MagicNull.Equals(oPropVal))
+                {
+                    dict.Add((string)oPropName, null);
+                }
+                else if (Excel.CustomProperties.MagicDecimalMaxValue.Equals(oPropVal))
+                {
+                    dict.Add((string)oPropName, Decimal.MaxValue);
+                }
+                else if (Excel.CustomProperties.MagicDecimalMinValue.Equals(oPropVal))
+                {
+                    dict.Add((string)oPropName, Decimal.MinValue);
+                }
+                else if (Excel.CustomProperties.MagicDateTimeMaxValue.Equals(oPropVal))
+                {
+                    dict.Add((string)oPropName, DateTime.MaxValue);
+                }
+                else if (Excel.CustomProperties.MagicDateTimeMinValue.Equals(oPropVal))
+                {
+                    dict.Add((string)oPropName, DateTime.MinValue);
+                }
+                else
+                {
+                    dict.Add((string)oPropName, oPropVal);
+                }
+            }
+
+            return dict;
+        }
+
+        /// <inheritdoc/>
+        public bool TryGetCustomProperty(string name, ref object value)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return false;
+            }
+
+            try
+            {
+                object result = null;
+
+                var customDocumentProperties = this.InteropWorkbook.CustomDocumentProperties;
+                Type typeCustomDocumentProperties = customDocumentProperties.GetType();
+
+                if (this.TryGet(customDocumentProperties, typeCustomDocumentProperties, name, ref result))
+                {
+                    if (Excel.CustomProperties.MagicNull.Equals(result))
+                    {
+                        value = null;
+                    }
+                    else if (Excel.CustomProperties.MagicDecimalMaxValue.Equals(result))
+                    {
+                        value = Decimal.MaxValue;
+                    }
+                    else if (Excel.CustomProperties.MagicDecimalMinValue.Equals(result))
+                    {
+                        value = Decimal.MinValue;
+                    }
+                    else if (Excel.CustomProperties.MagicDateTimeMaxValue.Equals(result))
+                    {
+                        value = DateTime.MaxValue;
+                    }
+                    else if (Excel.CustomProperties.MagicDateTimeMinValue.Equals(result))
+                    {
+                        value = DateTime.MinValue;
+                    }
+                    else
+                    {
+                        value = result;
+                    }
+
+                    return true;
+                }
+
+                return false;
+            }
+            catch (COMException)
+            {
+                return false;
+            }
+        }
+
+        
+        private bool TryGet(object customDocumentProperties, Type typeCustomDocumentProperties, string key, ref dynamic result)
+        {
+            try
+            {
+               
+                var nrProps = typeCustomDocumentProperties.InvokeMember("Count",
+                    BindingFlags.GetProperty | BindingFlags.Default,
+                    null, customDocumentProperties, new object[] { });
+
+                for (int counter = 1; counter <= ((int)nrProps); counter++)
+                {
+                    var itemProp = typeCustomDocumentProperties.InvokeMember("Item",
+                        BindingFlags.GetProperty | BindingFlags.Default,
+                        null, customDocumentProperties, new object[] { counter });
+
+                    var oPropName = typeCustomDocumentProperties.InvokeMember("Name",
+                        BindingFlags.GetProperty | BindingFlags.Default,
+                        null, itemProp, new object[] { });
+
+                    if (string.Equals(key, oPropName))
+                    {
+                        result = typeCustomDocumentProperties.InvokeMember("Value",
+                        BindingFlags.GetProperty | BindingFlags.Default,
+                        null, itemProp, new object[] { });
+
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            catch (COMException)
+            {
+                return false;
+            }
+        }
+
+        private void TrySet(object customDocumentProperties, Type typeCustomDocumentProperties, string key, dynamic value)
+        {
+            try
+            {
+
+                dynamic setValue = value;
+
+                if ( setValue == null)
+                {
+                    setValue = Excel.CustomProperties.MagicNull;
+                }                               
+
+                object result = null;
+
+                if (!this.TryGet(customDocumentProperties, typeCustomDocumentProperties, key, ref result))
+                {
+                    var type = MsoDocProperties.msoPropertyTypeString;
+
+                    if (value is bool || value is bool?)
+                    {
+                        type = MsoDocProperties.msoPropertyTypeBoolean;
+                    }
+
+                    if (value is DateTime || value is DateTime?)
+                    {
+                        if ((DateTime)value == DateTime.MaxValue)
+                        {
+                            setValue = Excel.CustomProperties.MagicDateTimeMaxValue;
+                            type = MsoDocProperties.msoPropertyTypeString;
+                        }
+                        else if ((DateTime)value == DateTime.MinValue)
+                        {
+                            setValue = Excel.CustomProperties.MagicDateTimeMinValue;
+                            type = MsoDocProperties.msoPropertyTypeString;
+                        }
+                        else
+                        {
+                           setValue = ((DateTime?)setValue)?.ToOADate();
+                           type = MsoDocProperties.msoPropertyTypeDate;
+                        }
+                    }
+
+                    if (value is float || value is float?)
+                    {
+                        type = MsoDocProperties.msoPropertyTypeFloat;
+                    }
+
+                    if (value is decimal || value is decimal?)
+                    {
+                        if ((decimal)value == decimal.MaxValue)
+                        {
+                            setValue = Excel.CustomProperties.MagicDecimalMaxValue;
+                            type = MsoDocProperties.msoPropertyTypeString;
+                        } 
+                        else if ((decimal)value == decimal.MinValue)
+                        {
+                            setValue = Excel.CustomProperties.MagicDecimalMinValue;
+                            type = MsoDocProperties.msoPropertyTypeString;
+                        }
+                        else
+                        {
+                            if(decimal.TryParse(Convert.ToString(setValue), out decimal decimalResult))
+                            {
+                                var parts = decimal.GetBits(decimalResult);
+                                byte scale = (byte)((parts[3] >> 16) & 0x7F);
+
+                                if(scale > 6) // float can onlu hold 6 precision
+                                {
+                                    setValue = Convert.ToSingle(value);
+                                }
+                            }                            
+                            
+                            type = MsoDocProperties.msoPropertyTypeFloat;
+                        }
+                    }
+
+                    if (value is int || value is int?)
+                    {
+                        type = MsoDocProperties.msoPropertyTypeNumber;
+                    }                  
+
+                    object[] oArgs = { key, false, type, setValue };
+
+                    typeCustomDocumentProperties.InvokeMember("Add", BindingFlags.Default |
+                                               BindingFlags.InvokeMethod, null,
+                                               customDocumentProperties, oArgs);
+                }
+                else
+                {
+                    var nrProps = typeCustomDocumentProperties.InvokeMember("Count",
+                    BindingFlags.GetProperty | BindingFlags.Default,
+                    null, customDocumentProperties, new object[] { });
+
+                    for (int counter = 1; counter <= ((int)nrProps); counter++)
+                    {
+                        var itemProp = typeCustomDocumentProperties.InvokeMember("Item",
+                            BindingFlags.GetProperty | BindingFlags.Default,
+                            null, customDocumentProperties, new object[] { counter });
+
+                        var oPropName = typeCustomDocumentProperties.InvokeMember("Name",
+                            BindingFlags.GetProperty | BindingFlags.Default,
+                            null, itemProp, new object[] { });
+
+                        if (string.Equals(key, oPropName))
+                        {
+                            typeCustomDocumentProperties.InvokeMember("Value",
+                            BindingFlags.SetProperty | BindingFlags.Default,
+                            null, itemProp, new object[] { setValue });
+
+                            break;
+                        }
+                    }
+                }
+            }
+            catch (COMException)
+            {
+
+            }
+        }
+
+        /// <inheritdoc/>
+        public string SetCustomXML(XmlDocument xmlDocument)
+        {
+            var xmlPart = this.InteropWorkbook.CustomXMLParts.Add(xmlDocument.OuterXml, Type.Missing);
+
+            return xmlPart.Id;
+        }
+
+        /// <inheritdoc/>
+        public XmlDocument GetCustomXMLById(string id)
+        {
+            var xmlDocument = new XmlDocument();
+            var customXMLPart = this.InteropWorkbook.CustomXMLParts.SelectByID(id);
+
+            if(customXMLPart != null)
+            {
+                xmlDocument.LoadXml(customXMLPart.XML);
+
+                return xmlDocument;
+            }
+
+            return null;            
+        }
+
+        /// <inheritdoc/>
+        public bool TryDeleteCustomXMLById(string id)
+        {
+            try
+            {
+                var customXMLPart = this.InteropWorkbook.CustomXMLParts.SelectByID(id);
+
+                customXMLPart.Delete();
+
+                return true;
+            }
+            catch (COMException)
+            {
+                return false;
+            }
+           
         }
     }
 }

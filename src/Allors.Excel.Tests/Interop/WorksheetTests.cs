@@ -4,20 +4,14 @@
 // </copyright>
 
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Allors.Excel.Interop;
-using Allors.Excel.Interop;
-using Application;
 using Moq;
 using Xunit;
-using InteropApplication = Microsoft.Office.Interop.Excel.Application;
-using InteropWorkbook = Microsoft.Office.Interop.Excel.Workbook;
 
 namespace Allors.Excel.Tests.Interop
 {
@@ -61,7 +55,7 @@ namespace Allors.Excel.Tests.Interop
             // Sheet with content
             var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
 
-            var cell = sheet2[0, 0];
+            var cell = sheet2[5, 5];
 
             sheet2.SetInputMessage(cell, "this is some help message", "title", showInputMessage: false);
 

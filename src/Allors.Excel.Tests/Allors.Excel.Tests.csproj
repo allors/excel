@@ -19,4 +19,9 @@
     <ProjectReference Include="..\Allors.Excel\Allors.Excel.csproj" />
     <ProjectReference Include="..\ExcelAddIn.Interop\ExcelAddIn.Interop.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="data\Catalog.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
