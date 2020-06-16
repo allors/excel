@@ -42,7 +42,15 @@ class Build : NukeBuild
             EnsureCleanDirectory(ArtifactsDirectory);
         });
 
+    Target Setup => _ => _
+        .Executes(() =>
+        {
+            ProcessTasks.StartProcess("choco", "install visualstudio2019-workload-officebuildtools").WaitForExit();
+        });
+
+
     Target Restore => _ => _
+        .After(Setup)
         .Executes(() =>
         {
             MSBuild(s => s
@@ -51,6 +59,7 @@ class Build : NukeBuild
         });
 
     Target Compile => _ => _
+        .After(Setup)
         .DependsOn(Restore)
         .Executes(() =>
         {
@@ -65,6 +74,7 @@ class Build : NukeBuild
         });
 
     Target Tests => _ => _
+       .After(Setup)
        .DependsOn(Compile)
        .Executes(() =>
        {
@@ -79,6 +89,7 @@ class Build : NukeBuild
        });
 
     Target Pack => _ => _
+       .After(Setup)
        .After(Tests)
        .DependsOn(Compile)
        .Executes(() =>
@@ -97,6 +108,5 @@ class Build : NukeBuild
 
 
     Target Ci => _ => _
-      .DependsOn(Pack, Tests);
-
+        .DependsOn(Setup, Pack, Tests);
 }
