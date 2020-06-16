@@ -1,18 +1,42 @@
-# ASP.NET Core
-# Build and test ASP.NET Core projects targeting .NET Core.
-# Add steps that run tests, create a NuGet package, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+trigger:
+- master
+- feature/*
 
-jobs:
-- job: Windows
-  pool:
-    vmImage: 'windows-latest'
-  steps:
+variables:
+  buildConfiguration: 'Release'
+
+stages:
+- stage: Excel
+  jobs:
+  - job: Windows
+    timeoutInMinutes: 180
+
+    pool:
+      vmImage: 'windows-2019'
+
+    strategy:
+      matrix:
+        Excel32:
+          bits: ''
+          target: 'CiTest'
+        Excel64:
+          bits: '/64bit'
+          target: 'Ci'
+      maxParallel: 2
+
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Use latest .NET Core 3.1 sdk'
+      inputs:
+        packageType: sdk
+        version: 3.1.x
+        installationPath: $(Agent.ToolsDirectory)/dotnet
     - task: PowerShell@2
       inputs:
         targetType: 'inline'
         script: |
-          choco install office365business
+          #choco install office365business
+          choco install microsoft-office-deployment $(bits) /Product ExcelRetail
         failOnStderr: true
       displayName: 'Install Excel'
     - task: PowerShell@2
@@ -34,7 +58,7 @@ jobs:
       inputs:
         targetType: 'filePath'
         filePath: 'build.ps1'
-        arguments: '-configuration $(buildConfiguration) -target Ci'
+        arguments: '-configuration $(buildConfiguration) -target $(target)'
         failOnStderr: true
       displayName: 'Build'
     - task: PublishTestResults@2
@@ -52,11 +76,4 @@ jobs:
         packagesToPush: '$(Build.SourcesDirectory)/**/*.nupkg;$(Build.SourcesDirectory)/**/*.snupkg;!$(Build.SourcesDirectory)/**/*.symbols.nupkg'
         publishVstsFeed: 'Excel/Excel'
         allowPackageConflicts: true
-
-trigger:
-- master
-- feature/*
-
-variables:
-  buildConfiguration: 'Release'
 
