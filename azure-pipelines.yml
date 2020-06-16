@@ -12,8 +12,13 @@ jobs:
       inputs:
         targetType: 'inline'
         script: |
-          Write-Host "Add Excel PFX file to the certificate store."
-
+          choco install visualstudio2019-workload-officebuildtools
+        failOnStderr: true
+      displayName: 'Install VSTO libraries'
+    - task: PowerShell@2
+      inputs:
+        targetType: 'inline'
+        script: |
           $pfxpath = '$(Build.SourcesDirectory)/src/ExcelAddIn.Interop/ExcelAddIn.Interop_TemporaryKey.pfx'
           
           Add-Type -AssemblyName System.Security
@@ -23,6 +28,8 @@ jobs:
           $store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]"ReadWrite")
           $store.Add($cert)
           $store.Close()
+        failOnStderr: true
+      displayName: 'Add Excel PFX file to the certificate store.'
     - task: PowerShell@2
       inputs:
         targetType: 'filePath'
