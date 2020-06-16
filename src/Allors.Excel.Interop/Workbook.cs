@@ -16,7 +16,6 @@ namespace Allors.Excel.Interop
     using InteropXlSheetVisibility = Microsoft.Office.Interop.Excel.XlSheetVisibility;
     using System.Xml;
     using System.Runtime.InteropServices;
-    using Microsoft.Office.Core;
 
     public class Workbook : IWorkbook
     {
@@ -82,7 +81,7 @@ namespace Allors.Excel.Interop
                         {
                             var insertBefore = this.worksheetByInteropWorksheet.Keys.FirstOrDefault(v => v.Index == index);
                             interopWorksheet = (InteropWorksheet)this.InteropWorkbook.Sheets.Add(insertBefore);
-                        }                        
+                        }
                     }
                 }
 
@@ -91,7 +90,7 @@ namespace Allors.Excel.Interop
             finally
             {
                 this.AddIn.Application.WorkbookNewSheet += this.ApplicationOnWorkbookNewSheet;
-            }                     
+            }
         }
 
         /// <inheritdoc/>
@@ -131,7 +130,7 @@ namespace Allors.Excel.Interop
             return this.TryAdd(interopWorksheet);
         }
 
-        
+
         private void ApplicationOnWorkbookNewSheet(InteropWorkbook wb, object sh)
         {
             if (sh is InteropWorksheet interopWorksheet)
@@ -181,16 +180,16 @@ namespace Allors.Excel.Interop
                 {
                     var refersToRange = namedRange.RefersToRange;
                     if (refersToRange != null)
-                    {                   
+                    {
                         var iworkSheet = this.worksheetByInteropWorksheet.FirstOrDefault(v => string.Equals(v.Key.Name, refersToRange.Worksheet.Name)).Value;
 
-                        if(string.IsNullOrEmpty(refersToSheetName) || refersToSheetName.Equals(iworkSheet?.Name, StringComparison.OrdinalIgnoreCase))
+                        if (string.IsNullOrEmpty(refersToSheetName) || refersToSheetName.Equals(iworkSheet?.Name, StringComparison.OrdinalIgnoreCase))
                         {
                             ranges.Add(new Excel.Range(refersToRange.Row - 1, refersToRange.Column - 1, refersToRange.Rows.Count, refersToRange.Columns.Count, worksheet: iworkSheet, name: namedRange.Name));
                         }
                     }
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     // RefersToRange can throw exception
                 }
@@ -207,7 +206,7 @@ namespace Allors.Excel.Interop
             {
                 try
                 {
-                    
+
                     var interopWorksheet = ((Worksheet)range.Worksheet).InteropWorksheet;
 
                     if (interopWorksheet != null)
@@ -272,7 +271,7 @@ namespace Allors.Excel.Interop
             {
                 this.TrySet(customDocumentProperties, typeCustomDocumentProperties, name, value);
 
-                return true;                              
+                return true;
             }
             catch (COMException)
             {
@@ -439,12 +438,12 @@ namespace Allors.Excel.Interop
             }
         }
 
-        
+
         private bool TryGet(object customDocumentProperties, Type typeCustomDocumentProperties, string key, ref dynamic result)
         {
             try
             {
-               
+
                 var nrProps = typeCustomDocumentProperties.InvokeMember("Count",
                     BindingFlags.GetProperty | BindingFlags.Default,
                     null, customDocumentProperties, new object[] { });
@@ -484,20 +483,22 @@ namespace Allors.Excel.Interop
 
                 dynamic setValue = value;
 
-                if ( setValue == null)
+                if (setValue == null)
                 {
                     setValue = Excel.CustomProperties.MagicNull;
-                }                               
+                }
 
                 object result = null;
 
                 if (!this.TryGet(customDocumentProperties, typeCustomDocumentProperties, key, ref result))
                 {
-                    var type = MsoDocProperties.msoPropertyTypeString;
+                    var office = this.AddIn.Office;
+
+                    var type = office.MsoPropertyTypeString;
 
                     if (value is bool || value is bool?)
                     {
-                        type = MsoDocProperties.msoPropertyTypeBoolean;
+                        type = office.MsoPropertyTypeBoolean;
                     }
 
                     if (value is DateTime || value is DateTime?)
@@ -505,23 +506,23 @@ namespace Allors.Excel.Interop
                         if ((DateTime)value == DateTime.MaxValue)
                         {
                             setValue = Excel.CustomProperties.MagicDateTimeMaxValue;
-                            type = MsoDocProperties.msoPropertyTypeString;
+                            type = office.MsoPropertyTypeString;
                         }
                         else if ((DateTime)value == DateTime.MinValue)
                         {
                             setValue = Excel.CustomProperties.MagicDateTimeMinValue;
-                            type = MsoDocProperties.msoPropertyTypeString;
+                            type = office.MsoPropertyTypeString;
                         }
                         else
                         {
-                           setValue = ((DateTime?)setValue)?.ToOADate();
-                           type = MsoDocProperties.msoPropertyTypeDate;
+                            setValue = ((DateTime?)setValue)?.ToOADate();
+                            type = office.MsoPropertyTypeDate;
                         }
                     }
 
                     if (value is float || value is float?)
                     {
-                        type = MsoDocProperties.msoPropertyTypeFloat;
+                        type = office.MsoPropertyTypeFloat;
                     }
 
                     if (value is decimal || value is decimal?)
@@ -529,34 +530,34 @@ namespace Allors.Excel.Interop
                         if ((decimal)value == decimal.MaxValue)
                         {
                             setValue = Excel.CustomProperties.MagicDecimalMaxValue;
-                            type = MsoDocProperties.msoPropertyTypeString;
-                        } 
+                            type = office.MsoPropertyTypeString;
+                        }
                         else if ((decimal)value == decimal.MinValue)
                         {
                             setValue = Excel.CustomProperties.MagicDecimalMinValue;
-                            type = MsoDocProperties.msoPropertyTypeString;
+                            type = office.MsoPropertyTypeString;
                         }
                         else
                         {
-                            if(decimal.TryParse(Convert.ToString(setValue), out decimal decimalResult))
+                            if (decimal.TryParse(Convert.ToString(setValue), out decimal decimalResult))
                             {
                                 var parts = decimal.GetBits(decimalResult);
                                 byte scale = (byte)((parts[3] >> 16) & 0x7F);
 
-                                if(scale > 6) // float can onlu hold 6 precision
+                                if (scale > 6) // float can onlu hold 6 precision
                                 {
                                     setValue = Convert.ToSingle(value);
                                 }
-                            }                            
-                            
-                            type = MsoDocProperties.msoPropertyTypeFloat;
+                            }
+
+                            type = office.MsoPropertyTypeFloat;
                         }
                     }
 
                     if (value is int || value is int?)
                     {
-                        type = MsoDocProperties.msoPropertyTypeNumber;
-                    }                  
+                        type = office.MsoPropertyTypeNumber;
+                    }
 
                     object[] oArgs = { key, false, type, setValue };
 
@@ -598,45 +599,12 @@ namespace Allors.Excel.Interop
         }
 
         /// <inheritdoc/>
-        public string SetCustomXML(XmlDocument xmlDocument)
-        {
-            var xmlPart = this.InteropWorkbook.CustomXMLParts.Add(xmlDocument.OuterXml, Type.Missing);
-
-            return xmlPart.Id;
-        }
+        public XmlDocument GetCustomXMLById(string id) => this.AddIn.Office.GetCustomXMLById(this.InteropWorkbook, id);
 
         /// <inheritdoc/>
-        public XmlDocument GetCustomXMLById(string id)
-        {
-            var xmlDocument = new XmlDocument();
-            var customXMLPart = this.InteropWorkbook.CustomXMLParts.SelectByID(id);
-
-            if(customXMLPart != null)
-            {
-                xmlDocument.LoadXml(customXMLPart.XML);
-
-                return xmlDocument;
-            }
-
-            return null;            
-        }
+        public string SetCustomXML(XmlDocument xmlDocument) => this.AddIn.Office.SetCustomXmlPart(this.InteropWorkbook, xmlDocument);
 
         /// <inheritdoc/>
-        public bool TryDeleteCustomXMLById(string id)
-        {
-            try
-            {
-                var customXMLPart = this.InteropWorkbook.CustomXMLParts.SelectByID(id);
-
-                customXMLPart.Delete();
-
-                return true;
-            }
-            catch (COMException)
-            {
-                return false;
-            }
-           
-        }
+        public bool TryDeleteCustomXMLById(string id) => this.AddIn.Office.TryDeleteCustomXMLById(this.InteropWorkbook, id);
     }
 }
