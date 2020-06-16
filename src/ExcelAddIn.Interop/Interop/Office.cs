@@ -8,13 +8,6 @@ namespace ExcelAddIn.Interop
 {
     public class Office : IOffice
     {
-        private ThisAddIn thisAddIn;
-
-        public Office(ThisAddIn thisAddIn)
-        {
-            this.thisAddIn = thisAddIn;
-        }
-
         public object MsoPropertyTypeString => MsoDocProperties.msoPropertyTypeString;
 
         public object MsoPropertyTypeBoolean => MsoDocProperties.msoPropertyTypeBoolean;

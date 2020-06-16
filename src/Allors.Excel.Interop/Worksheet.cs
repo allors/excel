@@ -963,7 +963,7 @@ namespace Allors.Excel.Interop
 
                             // Add the existing cell with its new key
                             var coordinates = (cell.Row.Index, cell.Column.Index);
-                            CellByCoordinates.Add(coordinates, cell);
+                            CellByCoordinates[coordinates] =  cell;
                         }
                     }
                 }
@@ -1020,7 +1020,7 @@ namespace Allors.Excel.Interop
 
                             int columnIndex = cell.Column.Index - numberOfColumns;
 
-                            Column column = ColumnByIndex[columnIndex];
+                            Column column = Column(columnIndex);
 
                             // Link to the correct column that already exists.
                             cell.Column = column;

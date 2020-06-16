@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using System.Xml;
 using Allors.Excel.Interop;
+using ExcelAddIn.Interop;
 using Moq;
 using Xunit;
 
@@ -18,9 +19,9 @@ namespace Allors.Excel.Tests.Interop
         public async void OnNew()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -33,9 +34,9 @@ namespace Allors.Excel.Tests.Interop
         public void SetCustomProperties()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
             var workbook = addIn.Workbooks[0];
@@ -120,9 +121,9 @@ namespace Allors.Excel.Tests.Interop
         public void SetManyKeysCustomProperties()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
             var workbook = addIn.Workbooks[0];
@@ -144,9 +145,9 @@ namespace Allors.Excel.Tests.Interop
         public void SetLargeStringValueCustomPropertiesTruncatesTo255()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
             var workbook = addIn.Workbooks[0];
@@ -172,9 +173,9 @@ namespace Allors.Excel.Tests.Interop
         public void SetDecimalValueCustomProperties()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
             var workbook = addIn.Workbooks[0];
@@ -209,9 +210,9 @@ namespace Allors.Excel.Tests.Interop
         public void SetIntValueCustomProperties()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
             var workbook = addIn.Workbooks[0];
@@ -241,9 +242,9 @@ namespace Allors.Excel.Tests.Interop
         public void SetDateTimeValueCustomProperties()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
             var workbook = addIn.Workbooks[0];
@@ -276,9 +277,9 @@ namespace Allors.Excel.Tests.Interop
         public void SetCustomXMLParts()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
             var workbook = addIn.Workbooks[0];
@@ -307,9 +308,9 @@ namespace Allors.Excel.Tests.Interop
         public void DeleteCustomXMLParts()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
             var workbook = addIn.Workbooks[0];
@@ -332,9 +333,9 @@ namespace Allors.Excel.Tests.Interop
         public void SetNamedRangeWorkbook() 
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -359,9 +360,9 @@ namespace Allors.Excel.Tests.Interop
         public void SetNamedRangeWorksheet()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -386,9 +387,9 @@ namespace Allors.Excel.Tests.Interop
         public void UpdateNamedRangeWorkbook()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -422,9 +423,9 @@ namespace Allors.Excel.Tests.Interop
         public void UpdateNamedRangeWorksheet()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -455,9 +456,9 @@ namespace Allors.Excel.Tests.Interop
         public void GetNamedRangeWorkbookForWorksheet()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 

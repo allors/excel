@@ -10,6 +10,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Allors.Excel.Interop;
+using ExcelAddIn.Interop;
 using Moq;
 using Xunit;
 
@@ -44,9 +45,9 @@ namespace Allors.Excel.Tests.Interop
         public void ShowInputMessage()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -71,9 +72,9 @@ namespace Allors.Excel.Tests.Interop
         public void SetCustomProperties()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -139,9 +140,9 @@ namespace Allors.Excel.Tests.Interop
         public void SaveAsPDFWithNullThrowsException()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -157,9 +158,9 @@ namespace Allors.Excel.Tests.Interop
         public void SetPrintArea()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -195,9 +196,9 @@ namespace Allors.Excel.Tests.Interop
         public void SaveAsPDF()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -219,9 +220,9 @@ namespace Allors.Excel.Tests.Interop
         public void SaveAsPDFThrowsComExceptionWhenEmpty()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -239,9 +240,9 @@ namespace Allors.Excel.Tests.Interop
         public async void SaveAsPDFThrowsExceptionWhenFileExists()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -273,9 +274,9 @@ namespace Allors.Excel.Tests.Interop
         public void SaveAsXPS()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -297,9 +298,9 @@ namespace Allors.Excel.Tests.Interop
         public void SaveAsXPSSetsExtensiontoXPS()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -324,9 +325,9 @@ namespace Allors.Excel.Tests.Interop
         public void SaveAsPDFSetsExtensiontoXPS()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -353,9 +354,9 @@ namespace Allors.Excel.Tests.Interop
         public async void FreezePanes()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -437,9 +438,9 @@ namespace Allors.Excel.Tests.Interop
         public async void AddWorksheetsBeforeAndAfter()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -517,9 +518,9 @@ namespace Allors.Excel.Tests.Interop
         public async void AddWorksheetsByIndex()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -579,9 +580,9 @@ namespace Allors.Excel.Tests.Interop
             this.ExpectedContextTags = new List<ContextTag>();
 
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -639,9 +640,9 @@ namespace Allors.Excel.Tests.Interop
         public async void IsVisible()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();           
+            var office = new Office();           
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -666,9 +667,9 @@ namespace Allors.Excel.Tests.Interop
         public async void AddWorkbook()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -682,10 +683,10 @@ namespace Allors.Excel.Tests.Interop
         public async void InsertRows()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
             ICell cell = null;
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -728,10 +729,10 @@ namespace Allors.Excel.Tests.Interop
         public async void DeleteRows()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
             ICell cell = null;
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -768,10 +769,10 @@ namespace Allors.Excel.Tests.Interop
         public async void InsertColumn()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
             ICell cell = null;
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -810,10 +811,10 @@ namespace Allors.Excel.Tests.Interop
         public async void InsertColumns()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
             ICell cell = null;
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -855,10 +856,10 @@ namespace Allors.Excel.Tests.Interop
         public async void DeleteColumn()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
             ICell cell = null;
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -912,10 +913,10 @@ namespace Allors.Excel.Tests.Interop
         public async void DeleteColumns()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
             ICell cell = null;
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -965,10 +966,10 @@ namespace Allors.Excel.Tests.Interop
         public async void SetIsActiveWorksheet()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
             ICell cell = null;
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -990,9 +991,9 @@ namespace Allors.Excel.Tests.Interop
         public void GetRange()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
            
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -1077,9 +1078,9 @@ namespace Allors.Excel.Tests.Interop
         public async void GetUsedRange()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -1148,9 +1149,9 @@ namespace Allors.Excel.Tests.Interop
         public async void GetUsedRangeColumn()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -1212,9 +1213,9 @@ namespace Allors.Excel.Tests.Interop
         public async void GetUsedRangeRow()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -1261,9 +1262,9 @@ namespace Allors.Excel.Tests.Interop
         public void GetRectangle()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 
@@ -1283,9 +1284,9 @@ namespace Allors.Excel.Tests.Interop
         public void NewSheetIsActive()
         {
             var program = new Mock<IProgram>();
-            var office = new Mock<IOffice>();
+            var office = new Office();
 
-            var addIn = new AddIn(application, program.Object, office.Object);
+            var addIn = new AddIn(application, program.Object, office);
 
             application.Workbooks.Add();
 

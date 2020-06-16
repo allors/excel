@@ -18,7 +18,7 @@ stages:
       matrix:
         Excel32:
           options: '--forcex86'
-          target: 'CiTest'
+          target: 'CiTests'
         Excel64:
           options: ''
           target: 'Ci'

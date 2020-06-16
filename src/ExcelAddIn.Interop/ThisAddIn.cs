@@ -27,10 +27,10 @@ namespace ExcelAddIn
         {
             this.serviceLocator = new ServiceLocator();
             var program = new Program(serviceLocator);
-
-            var office = new Office(this);
+            var office = new Office();
 
             this.addIn = new AddIn(this.Application, program, office);
+            
             this.Ribbon.AddIn = this.addIn;
             await program.OnStart(addIn);
         });
