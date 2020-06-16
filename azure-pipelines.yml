@@ -36,7 +36,7 @@ stages:
         targetType: 'inline'
         script: |
           #choco install office365business
-          choco install microsoft-office-deployment $(bits) /Product ExcelRetail
+          choco install microsoft-office-deployment $(bits)
         failOnStderr: true
       displayName: 'Install Excel'
     - task: PowerShell@2
