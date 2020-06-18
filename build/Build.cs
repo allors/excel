@@ -86,13 +86,14 @@ class Build : NukeBuild
            foreach (var project in projects)
            {
                DotNetPack(s => s
-                     .SetProject(Solution.GetProject(project))
-                     .SetConfiguration(Configuration)
-                     .SetVersion(GitVersion.NuGetVersionV2)
-                     .SetOutputDirectory(ArtifactsDirectory / "nuget"));
+                .SetProject(Solution.GetProject(project))
+                .SetConfiguration(Configuration)
+                .EnableIncludeSource()
+                .EnableIncludeSymbols()
+                .SetVersion(GitVersion.NuGetVersionV2)
+                .SetOutputDirectory(ArtifactsDirectory / "nuget"));
            }
        });
-
 
     Target CiTests => _ => _
     .DependsOn(Tests);
