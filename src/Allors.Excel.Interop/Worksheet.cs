@@ -6,6 +6,7 @@
 namespace Allors.Excel.Interop
 {
     using Allors.Excel;
+    using Microsoft.Office.Interop.Excel;
     using Polly;
     using System;
     using System.Collections.Generic;
@@ -28,6 +29,7 @@ namespace Allors.Excel.Interop
     using InteropXlFixedFormatType = Microsoft.Office.Interop.Excel.XlFixedFormatType;
     using InteropXlInsertShiftDirection = Microsoft.Office.Interop.Excel.XlInsertShiftDirection;
     using InteropXlSheetVisibility = Microsoft.Office.Interop.Excel.XlSheetVisibility;
+    using Range = Excel.Range;
 
     public class Worksheet : IWorksheet
     {
@@ -664,7 +666,7 @@ namespace Allors.Excel.Interop
                 });
         }
 
-        private void WaitAndRetry(Action method, int waitTime = 100, int maxRetries = 10)
+        private void WaitAndRetry(System.Action method, int waitTime = 100, int maxRetries = 10)
         {
             Policy
             .Handle<System.Runtime.InteropServices.COMException>()
@@ -718,7 +720,7 @@ namespace Allors.Excel.Interop
         /// </summary>
         /// <param name="namedRange"></param>
         /// <returns></returns>
-        public Rectangle GetRectangle(string namedRange)
+        public System.Drawing.Rectangle GetRectangle(string namedRange)
         {
             InteropName name = null;
 
@@ -759,9 +761,9 @@ namespace Allors.Excel.Interop
 
         }
 
-        public Range[] GetNamedRanges()
+        public Excel.Range[] GetNamedRanges()
         {
-            List<Range> ranges = new List<Excel.Range>();
+            List<Excel.Range> ranges = new List<Excel.Range>();
 
             foreach (Microsoft.Office.Interop.Excel.Name namedRange in InteropWorksheet.Names)
             {
@@ -787,7 +789,7 @@ namespace Allors.Excel.Interop
         /// </summary>
         /// <param name="name"></param>
         /// <param name="range"></param>
-        public void SetNamedRange(string name, Range range)
+        public void SetNamedRange(string name, Excel.Range range)
         {
             if (!string.IsNullOrWhiteSpace(name) && range != null)
             {
@@ -1323,7 +1325,7 @@ namespace Allors.Excel.Interop
             InteropWorksheet.PageSetup.PrintArea = printArea;
         }
 
-        public void SetCustomProperties(CustomProperties properties)
+        public void SetCustomProperties(Excel.CustomProperties properties)
         {
             InteropCustomProperty[] cps = InteropWorksheet.CustomProperties.Cast<InteropCustomProperty>().ToArray(); ;
 
@@ -1363,9 +1365,9 @@ namespace Allors.Excel.Interop
             }
         }
 
-        public CustomProperties GetCustomProperties()
+        public Excel.CustomProperties GetCustomProperties()
         {
-            CustomProperties dict = new Excel.CustomProperties();
+            Excel.CustomProperties dict = new Excel.CustomProperties();
 
             foreach (InteropCustomProperty customProperty in InteropWorksheet.CustomProperties)
             {
@@ -1443,6 +1445,41 @@ namespace Allors.Excel.Interop
             {
                 CellsChanged?.Invoke(this, new CellChangedEvent(changedCells.ToArray()));
             }
+        }
+
+        public void SetPageSetup(Excel.PageSetup pageSetup)
+        {
+            if (pageSetup == null)
+            {
+                return;
+            }
+
+            this.InteropWorksheet.PageSetup.Orientation = pageSetup.Orientation == 1 
+                    ? XlPageOrientation.xlPortrait
+                    : XlPageOrientation.xlLandscape;
+
+            if(pageSetup.PaperSize >= 1 && pageSetup.PaperSize <= 41)
+            {
+                this.InteropWorksheet.PageSetup.PaperSize = (XlPaperSize)pageSetup.PaperSize;
+            }
+
+            if (pageSetup.Header?.Margin >= 0)
+            {
+                this.InteropWorksheet.PageSetup.HeaderMargin = pageSetup.Header?.Margin ?? 0;
+            }            
+
+            this.InteropWorksheet.PageSetup.LeftHeader = pageSetup.Header?.Left;
+            this.InteropWorksheet.PageSetup.CenterHeader = pageSetup.Header?.Center;
+            this.InteropWorksheet.PageSetup.RightHeader = pageSetup.Header?.Right;
+
+            if (pageSetup.Footer?.Margin >= 0)
+            {
+                this.InteropWorksheet.PageSetup.FooterMargin = pageSetup.Footer?.Margin ?? 0;
+            }
+
+            this.InteropWorksheet.PageSetup.LeftFooter = pageSetup.Footer?.Left;
+            this.InteropWorksheet.PageSetup.CenterFooter = pageSetup.Footer?.Center;
+            this.InteropWorksheet.PageSetup.RightFooter = pageSetup.Footer?.Right;
         }
     }
 }

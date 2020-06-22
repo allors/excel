@@ -193,6 +193,82 @@ namespace Allors.Excel.Tests.Interop
         }
 
         [Fact(Skip = skipReason)]
+        public void SaveAsPDFWithHeader()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Office();
+
+            var addIn = new AddIn(application, program.Object, office);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            // Sheet with content
+            var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
+
+            var file = new FileInfo(Path.Combine(tempDirectory.FullName, $"{nameof(sheet2)}.pdf"));
+
+            sheet2.SetPageSetup(new PageSetup()
+            {
+                Orientation = 1, // Portrait https://docs.microsoft.com/en-us/dotnet/api/microsoft.office.interop.excel.xlpageorientation?view=excel-pia
+                PaperSize = 11, // A5 => https://docs.microsoft.com/en-us/dotnet/api/microsoft.office.interop.excel.xlpapersize?view=excel-pia
+                Header = new PageHeaderFooter()
+                {
+                    Margin = 10.0,
+                    Left = "&\"Arial\"&B&12LeftHeader&B",
+                    Right = "&P of &N"
+                },
+                Footer = new PageHeaderFooter()
+                {
+                    Margin = 60.0,
+                    Center = $"Copy presented to Walter Hesius",
+                }
+            });
+
+            sheet2.SaveAsPDF(file);
+
+            Assert.True(new FileInfo(file.FullName).Exists);
+
+            //sheet2.SaveAsPDF(file, true, true);
+        }
+
+        [Fact(Skip = skipReason)]
+        public void PageSetupOrientationDefaultsToPortrait()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Office();
+
+            var addIn = new AddIn(application, program.Object, office);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            // Sheet with content
+            var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
+
+            var file = new FileInfo(Path.Combine(tempDirectory.FullName, $"{nameof(sheet2)}.pdf"));
+
+            sheet2.SetPageSetup(new PageSetup()
+            {
+                // No specific settings for PaperSize and Orientation
+                Header = new PageHeaderFooter()
+                {
+                    Margin = 10.0,
+                    Left = "&\"Arial\"&B&12LeftHeader&B",
+                    Right = "&P of &N"
+                },
+            });
+
+            sheet2.SaveAsPDF(file);
+
+            Assert.True(new FileInfo(file.FullName).Exists);
+
+            //sheet2.SaveAsPDF(file, true, true);
+        }
+
+        [Fact(Skip = skipReason)]
         public void SaveAsPDF()
         {
             var program = new Mock<IProgram>();

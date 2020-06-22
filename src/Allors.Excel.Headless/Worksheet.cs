@@ -39,11 +39,7 @@ namespace Allors.Excel.Headless
 
         public Dictionary<(int, int), Cell> CellByCoordinates { get; }
 
-        public bool IsVisible
-        {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
-        }
+        public bool IsVisible { get; set; }
 
         public bool HasFreezePanes => throw new NotImplementedException();
 
@@ -224,6 +220,11 @@ namespace Allors.Excel.Headless
         }
 
         public void SetInputMessage(ICell cell, string message, string title = null, bool showInputMessage = true)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetPageSetup(PageSetup pageSetup)
         {
             throw new NotImplementedException();
         }

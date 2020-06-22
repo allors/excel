@@ -244,5 +244,12 @@ namespace Allors.Excel
         /// <param name="cell"></param>
         /// <param name="clearInputMessage"></param>
         void HideInputMessage(ICell cell, bool clearInputMessage = false);
+
+
+        /// <summary>
+        /// PageSetup for printing purpose: Orientation, PageSize, Header and Footer
+        /// </summary>
+        /// <param name="pageSetup"></param>
+        void SetPageSetup(PageSetup pageSetup);
     }
 }
