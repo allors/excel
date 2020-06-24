@@ -42,6 +42,137 @@ namespace Allors.Excel.Tests.Interop
         }
 
         [Fact(Skip = skipReason)]
+        public void SheetHasIndex()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Office();
+
+            var addIn = new AddIn(application, program.Object, office);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+                        
+            var sheet1 = workbook.Worksheets.Single(v => v.Name == "1");
+            Assert.Equal(1, sheet1.Index);
+
+            var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
+            Assert.Equal(2, sheet2.Index);
+        }
+
+        [Fact(Skip = skipReason)]
+        public void NewSheetAtActiveSheetHasIndex()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Office();
+
+            var addIn = new AddIn(application, program.Object, office);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            var sheet1 = workbook.Worksheets.Single(v => v.Name == "1");
+            Assert.Equal(1, sheet1.Index);
+
+            var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
+            Assert.Equal(2, sheet2.Index);
+
+            // Add sheet to the left of the activeSheet (== sheet 2)
+            var sheet = workbook.AddWorksheet(0);
+            Assert.Equal(1, sheet1.Index);
+            Assert.Equal(2, sheet.Index);
+            Assert.Equal(3, sheet2.Index);
+
+        }
+
+        [Fact(Skip = skipReason)]
+        public void NewSheetBeforeSheetHasIndex()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Office();
+
+            var addIn = new AddIn(application, program.Object, office);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            var sheet1 = workbook.Worksheets.Single(v => v.Name == "1");
+            Assert.Equal(1, sheet1.Index);
+
+            var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
+            Assert.Equal(2, sheet2.Index);
+
+            // Add sheet to the left of the sheet 2
+            var sheet = workbook.AddWorksheet(null, sheet2);
+            Assert.Equal(1, sheet1.Index);
+            Assert.Equal(2, sheet.Index);
+            Assert.Equal(3, sheet2.Index);
+
+        }
+
+        [Fact(Skip = skipReason)]
+        public void NewSheetAtIndexHasIndex()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Office();
+
+            var addIn = new AddIn(application, program.Object, office);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            var sheet1 = workbook.Worksheets.Single(v => v.Name == "1");
+            Assert.Equal(1, sheet1.Index);
+
+            var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
+            Assert.Equal(2, sheet2.Index);
+
+            // Add sheet to right of index 99 (index > sheets.Count will add sheet after last index)
+            var sheet = workbook.AddWorksheet(99, null, null);
+            Assert.Equal(1, sheet1.Index);
+            Assert.Equal(2, sheet2.Index);
+            Assert.Equal(3, sheet.Index);
+
+            // Add sheet at index 2 will add before sheet 2 (sheet with index 2)
+            // So it will get the index we want it to have.
+            sheet = workbook.AddWorksheet(2, null, null);
+            Assert.Equal(1, sheet1.Index);
+            Assert.Equal(3, sheet2.Index);
+            Assert.Equal(2, sheet.Index);
+
+        }
+
+        [Fact(Skip = skipReason)]
+        public void NewSheetAfterSheetHasIndex()
+        {
+            var program = new Mock<IProgram>();
+            var office = new Office();
+
+            var addIn = new AddIn(application, program.Object, office);
+
+            application.Workbooks.Add();
+
+            var workbook = addIn.Workbooks[0];
+
+            var sheet1 = workbook.Worksheets.Single(v => v.Name == "1");
+            Assert.Equal(1, sheet1.Index);
+
+            var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
+            Assert.Equal(2, sheet2.Index);
+
+            // Add sheet to the right of the sheet 1
+            var sheet = workbook.AddWorksheet(null, null, sheet1);
+            Assert.Equal(1, sheet1.Index);
+            Assert.Equal(2, sheet.Index);
+            Assert.Equal(3, sheet2.Index);
+
+        }
+
+
+        [Fact(Skip = skipReason)]
         public void ShowInputMessage()
         {
             var program = new Mock<IProgram>();

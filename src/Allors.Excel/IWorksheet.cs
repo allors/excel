@@ -38,6 +38,11 @@ namespace Allors.Excel
         string Name { get; set; }
 
         /// <summary>
+        /// Gets the index of the sheet inside the workbook
+        /// </summary>
+        int Index { get; }
+
+        /// <summary>
         /// Gets or sets the active worksheet.
         /// </summary>
         bool IsActive { get; set; }

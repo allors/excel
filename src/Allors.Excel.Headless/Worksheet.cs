@@ -35,6 +35,9 @@ namespace Allors.Excel.Headless
 
         public string Name { get; set; }
 
+        public int Index => throw new NotImplementedException();
+
+
         public bool IsActive { get; set; }
 
         public Dictionary<(int, int), Cell> CellByCoordinates { get; }
@@ -42,6 +45,7 @@ namespace Allors.Excel.Headless
         public bool IsVisible { get; set; }
 
         public bool HasFreezePanes => throw new NotImplementedException();
+
 
         ICell IWorksheet.this[(int, int) coordinates] => this[coordinates];
 
