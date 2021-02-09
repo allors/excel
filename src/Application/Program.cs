@@ -8,6 +8,7 @@ namespace Application
     using System;
     using System.Collections.Generic;
     using System.Drawing;
+    using System.Globalization;
     using System.Linq;
     using System.Threading.Tasks;
     using Allors.Excel;
@@ -45,7 +46,7 @@ namespace Application
                 case Actions.Hide:
                     var worksheet = this.AddIn.Workbooks.First(v => v.IsActive).Worksheets.First(v => v.IsActive);
 
-                    foreach(var index in Enumerable.Range(5, 5))
+                    foreach (var index in Enumerable.Range(5, 5))
                     {
                         worksheet.Row(index).Hidden = true;
                     }
@@ -120,7 +121,14 @@ namespace Application
             });
             binder.Set(5, 12, binding);
 
-           
+
+            for (var day = 1; day <= 31; ++day)
+            {
+                sheet[day + 5, 10].NumberFormat = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+                sheet[day+5, 10].Value = new DateTime(2020, 7, day);
+            }
+
+
             await sheet.Flush();
 
             //sheet.CellsChanged += (sender, v) =>

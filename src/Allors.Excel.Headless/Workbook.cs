@@ -25,7 +25,7 @@ namespace Allors.Excel.Headless
 
         public bool IsActive { get; private set; }
 
-        public List<Range> NamedRanges { get; } = new List<Range>();
+        public Dictionary<string, Range> NamedRangeByName { get; } = new Dictionary<string, Range>();
 
         public IWorksheet AddWorksheet(int? index = null, IWorksheet before = null, IWorksheet after = null)
         {
@@ -68,9 +68,9 @@ namespace Allors.Excel.Headless
             this.IsActive = true;
         }
 
-        public Excel.Range[] GetNamedRanges(string refersToSheetName = null)
+        public Range[] GetNamedRanges(string refersToSheetName = null)
         {
-            return this.NamedRanges.ToArray();
+            return this.NamedRangeByName.Values.ToArray();
         }
 
         public IWorksheet Copy(IWorksheet source, IWorksheet beforeWorksheet)
@@ -80,7 +80,7 @@ namespace Allors.Excel.Headless
 
         public void SetNamedRange(string name, Range range)
         {
-            throw new System.NotImplementedException();
+            this.NamedRangeByName[name] = range;
         }
 
         public void SetCustomProperties(CustomProperties properties)
