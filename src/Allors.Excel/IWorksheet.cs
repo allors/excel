@@ -185,6 +185,8 @@ namespace Allors.Excel
 
         void AutoFit();
 
+        void SetChartObjectSourceData(object chartObject, object pivotTable);
+
         bool IsVisible { get; set; }
 
         /// <summary>

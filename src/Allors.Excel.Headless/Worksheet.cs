@@ -236,5 +236,9 @@ namespace Allors.Excel.Headless
         public void AutoFit()
         {
         }
+
+        public void SetChartObjectSourceData(object chartObject, object pivotTable)
+        {
+        }
     }
 }

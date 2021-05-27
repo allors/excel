@@ -1481,5 +1481,14 @@ namespace Allors.Excel.Interop
             this.InteropWorksheet.PageSetup.CenterFooter = pageSetup.Footer?.Center;
             this.InteropWorksheet.PageSetup.RightFooter = pageSetup.Footer?.Right;
         }
+
+        public void SetChartObjectSourceData(object chartObject, object pivotTable)
+        {
+            var chart = ((ChartObject)this.InteropWorksheet.ChartObjects(chartObject)).Chart;
+            var interopPivotTable = (InteropPivotTable)this.InteropWorksheet.PivotTables(pivotTable);
+
+            chart.SetSourceData(interopPivotTable.TableRange1);
+            chart.Refresh();
+        }
     }
 }
