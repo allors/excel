@@ -17,5 +17,7 @@ namespace Allors.Excel.Interop
         XmlDocument GetCustomXMLById(InteropWorkbook interopWorkbook, string id);
         string SetCustomXmlPart(InteropWorkbook interopWorkbook, XmlDocument xmlDocument);
         bool TryDeleteCustomXMLById(InteropWorkbook interopWorkbook, string id);
+
+        void AutoFit(InteropWorksheet interopWorksheet);
     }
 }

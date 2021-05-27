@@ -5,15 +5,15 @@
 
 namespace Allors.Excel.Interop
 {
-    using Allors.Excel;
-    using Microsoft.Office.Interop.Excel;
-    using Polly;
     using System;
     using System.Collections.Generic;
     using System.Drawing;
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
+    using Allors.Excel;
+    using Microsoft.Office.Interop.Excel;
+    using Polly;
     using InteropCustomProperty = Microsoft.Office.Interop.Excel.CustomProperty;
     using InteropDocEvents_Event = Microsoft.Office.Interop.Excel.DocEvents_Event;
     using InteropName = Microsoft.Office.Interop.Excel.Name;
@@ -29,7 +29,7 @@ namespace Allors.Excel.Interop
     using InteropXlFixedFormatType = Microsoft.Office.Interop.Excel.XlFixedFormatType;
     using InteropXlInsertShiftDirection = Microsoft.Office.Interop.Excel.XlInsertShiftDirection;
     using InteropXlSheetVisibility = Microsoft.Office.Interop.Excel.XlSheetVisibility;
-    using Range = Excel.Range;
+    using Range = Allors.Excel.Range;
 
     public class Worksheet : IWorksheet
     {
@@ -136,17 +136,12 @@ namespace Allors.Excel.Interop
             }
         }
 
-        public async Task RefreshPivotTables(string sourceDataRange = null)
+        public async Task RefreshPivotTables()
         {
             InteropPivotTables pivotTables = (InteropPivotTables)InteropWorksheet.PivotTables();
 
             foreach (InteropPivotTable pivotTable in pivotTables)
             {
-                if (!string.IsNullOrWhiteSpace(sourceDataRange))
-                {
-                    pivotTable.SourceData = sourceDataRange;
-                }
-
                 pivotTable.RefreshTable();
             }
 
@@ -1188,6 +1183,11 @@ namespace Allors.Excel.Interop
             return new Excel.Range(beginRowIndex - 1, columnRange.Column - 1, rowCount, columnRange.Columns.Count, this);
         }
 
+        public void AutoFit()
+        {
+            this.Workbook.AddIn.Office.AutoFit(this.InteropWorksheet);
+        }
+
         /// <inheritdoc/>
         /// <summary>
         /// When range.Row = 0 and range.Column = -1, then topRow in frozen
@@ -1242,7 +1242,7 @@ namespace Allors.Excel.Interop
         }
 
         public bool HasFreezePanes => FreezeRange != null;
-             
+
         public void SaveAsXPS(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true)
         {
             SaveAs(file, InteropXlFixedFormatType.xlTypeXPS, overwriteExistingFile, openAfterPublish, ignorePrintAreas);

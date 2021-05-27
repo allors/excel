@@ -105,9 +105,9 @@ namespace Allors.Excel
         /// <summary>
         /// Updates the data for each pivottable in the worksheet to the newRange
         /// </summary>
-        /// <param name="newRange"></param>
+        /// <param></param>
         /// <returns></returns>
-        Task RefreshPivotTables(string newRange);
+        Task RefreshPivotTables();
 
         /// <summary>
         /// Inserts a picture (via url) in the given rectangle
@@ -182,6 +182,8 @@ namespace Allors.Excel
         /// <param name="row"></param>
         /// <returns></returns>
         Range GetUsedRange(int row);
+
+        void AutoFit();
 
         bool IsVisible { get; set; }
 

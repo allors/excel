@@ -116,7 +116,7 @@ namespace Allors.Excel.Headless
             this.IsActive = true;
         }
 
-        public async Task RefreshPivotTables(string newRange)
+        public async Task RefreshPivotTables()
         {
             // strictly ui
             await Task.CompletedTask;
@@ -231,6 +231,10 @@ namespace Allors.Excel.Headless
         public void SetPageSetup(PageSetup pageSetup)
         {
             throw new NotImplementedException();
+        }
+
+        public void AutoFit()
+        {
         }
     }
 }
