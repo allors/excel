@@ -3,25 +3,25 @@
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
+using Allors.Excel;
+
 namespace Application
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Drawing;
-    using System.Globalization;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using Allors.Excel;
-
     public class Program : IProgram
     {
         private readonly Dictionary<IWorksheet, Binder> binderByWorksheet;
 
         public Program(IServiceLocator serviceLocator)
         {
-            this.ServiceLocator = serviceLocator;
+            ServiceLocator = serviceLocator;
 
-            this.binderByWorksheet = new Dictionary<IWorksheet, Binder>();
+            binderByWorksheet = new Dictionary<IWorksheet, Binder>();
         }
 
         public IServiceLocator ServiceLocator { get; }
@@ -30,7 +30,7 @@ namespace Application
 
         public async Task OnStart(IAddIn addIn)
         {
-            this.AddIn = addIn;
+            AddIn = addIn;
 
             await Task.CompletedTask;
         }
@@ -44,7 +44,7 @@ namespace Application
                     break;
 
                 case Actions.Hide:
-                    var worksheet = this.AddIn.Workbooks.First(v => v.IsActive).Worksheets.First(v => v.IsActive);
+                    var worksheet = AddIn.Workbooks.First(v => v.IsActive).Worksheets.First(v => v.IsActive);
 
                     foreach (var index in Enumerable.Range(5, 5))
                     {
@@ -64,9 +64,9 @@ namespace Application
 
         public async Task OnNew(IWorkbook workbook)
         {
-            this.CanWriteCellStyle = new Style(Color.LightBlue, Color.Black);
-            this.CanNotWriteCellStyle = new Style(Color.MistyRose, Color.Black);
-            this.ChangedCellStyle = new Style(Color.DeepSkyBlue, Color.Black);
+            CanWriteCellStyle = new Style(Color.LightBlue, Color.Black);
+            CanNotWriteCellStyle = new Style(Color.MistyRose, Color.Black);
+            ChangedCellStyle = new Style(Color.DeepSkyBlue, Color.Black);
 
             var sheet = workbook.AddWorksheet();
             sheet.Name = $"{workbook.Worksheets.Length}";
@@ -78,12 +78,12 @@ namespace Application
                     sheet[i, j].Value = decimal.Parse($"{i},{j}");
                     if (j == 0 || j == 2)
                     {
-                        sheet[i, j].Style = this.CanWriteCellStyle;
+                        sheet[i, j].Style = CanWriteCellStyle;
                         sheet[i, j].NumberFormat = "#.###,00";
                     }
                     else
                     {
-                        sheet[i, j].Style = this.CanNotWriteCellStyle;
+                        sheet[i, j].Style = CanNotWriteCellStyle;
                     }
                 }
             }
@@ -100,7 +100,7 @@ namespace Application
             sheet[0, 0].Value = "Whoppa!";
             sheet[0, 0].Comment = "De Poppa!";
 
-            sheet[10, 2].Style = this.CanNotWriteCellStyle;
+            sheet[10, 2].Style = CanNotWriteCellStyle;
 
             sheet[3, 12].Value = "Walter";
             sheet[3, 13].Value = "Martien";
@@ -117,7 +117,7 @@ namespace Application
 
             var binding = new Binding(toDomain: cell =>
             {
-                string message = $"Binder toDomain: {cell.Row}:{cell.Column}";
+                var message = $"Binder toDomain: {cell.Row}:{cell.Column}";
             });
             binder.Set(5, 12, binding);
 
@@ -130,6 +130,8 @@ namespace Application
 
 
             await sheet.Flush();
+
+            sheet.AutoFit();
 
             //sheet.CellsChanged += (sender, v) =>
             //{

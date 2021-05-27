@@ -4,9 +4,7 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Dynamic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -193,7 +191,7 @@ namespace Allors.Excel
         /// Freeze the pane at the given range (row, column)
         /// </summary>
         /// <param name="range"></param>
-        void FreezePanes(Excel.Range range);
+        void FreezePanes(Range range);
 
         /// <summary>
         /// Removes the frozen pane from the worksheet
@@ -228,7 +226,7 @@ namespace Allors.Excel
         /// Sets the PrintArea to the given range, or to the entire sheet when range is null.
         /// </summary>
         /// <param name="range"></param>
-        void SetPrintArea(Excel.Range range = null);
+        void SetPrintArea(Range range = null);
 
         /// <summary>
         /// Adds or updates the worksheet's custom properties with the given customproperties keyvalue pairs

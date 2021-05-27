@@ -3,10 +3,10 @@
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
+using System;
+
 namespace Allors.Excel
 {
-    using System;
-
     public class Binding : IBinding
     {
         private readonly Action<ICell> toCell;
@@ -19,20 +19,20 @@ namespace Allors.Excel
             this.toDomain = toDomain;
         }
 
-        public bool OneWayBinding => this.toDomain == null;
+        public bool OneWayBinding => toDomain == null;
 
-        public bool TwoWayBinding => !this.OneWayBinding;
+        public bool TwoWayBinding => !OneWayBinding;
 
         public object Value { get; }
 
         public void ToCell(ICell cell)
         {
-            this.toCell?.Invoke(cell);
+            toCell?.Invoke(cell);
         }
 
         public void ToDomain(ICell cell)
         {
-            this.toDomain?.Invoke(cell);
+            toDomain?.Invoke(cell);
         }
     }
 }

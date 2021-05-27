@@ -17,7 +17,7 @@ namespace Allors.Excel.Headless
 
         private readonly Dictionary<int, Column> columnByIndex;
 
-        IWorkbook IWorksheet.Workbook => this.Workbook;
+        IWorkbook IWorksheet.Workbook => Workbook;
 
         public Workbook Workbook { get; }
 
@@ -25,9 +25,9 @@ namespace Allors.Excel.Headless
         {
             Workbook = workbook;
 
-            this.rowByIndex = new Dictionary<int, Row>();
-            this.columnByIndex = new Dictionary<int, Column>();
-            this.CellByCoordinates = new Dictionary<(int, int), Cell>();
+            rowByIndex = new Dictionary<int, Row>();
+            columnByIndex = new Dictionary<int, Column>();
+            CellByCoordinates = new Dictionary<(int, int), Cell>();
         }
 
         public event EventHandler<CellChangedEvent> CellsChanged;
@@ -55,17 +55,17 @@ namespace Allors.Excel.Headless
         {
             get
             {
-                if (!this.CellByCoordinates.TryGetValue(coordinates, out var cell))
+                if (!CellByCoordinates.TryGetValue(coordinates, out var cell))
                 {
                     cell = new Cell(this, Row(coordinates.Item1), Column(coordinates.Item2));
-                    this.CellByCoordinates.Add(coordinates, cell);
+                    CellByCoordinates.Add(coordinates, cell);
                 }
 
                 return cell;
             }
         }
 
-        IRow IWorksheet.Row(int index) => this.Row(index);
+        IRow IWorksheet.Row(int index) => Row(index);
 
         public Row Row(int index)
         {
@@ -74,16 +74,16 @@ namespace Allors.Excel.Headless
                 throw new ArgumentException("Index can not be negative", nameof(Row));
             }
 
-            if (!this.rowByIndex.TryGetValue(index, out var row))
+            if (!rowByIndex.TryGetValue(index, out var row))
             {
                 row = new Row(this, index);
-                this.rowByIndex.Add(index, row);
+                rowByIndex.Add(index, row);
             }
 
             return row;
         }
 
-        IColumn IWorksheet.Column(int index) => this.Column(index);
+        IColumn IWorksheet.Column(int index) => Column(index);
 
         public Column Column(int index)
         {
@@ -92,10 +92,10 @@ namespace Allors.Excel.Headless
                 throw new ArgumentException(nameof(Column));
             }
 
-            if (!this.columnByIndex.TryGetValue(index, out var column))
+            if (!columnByIndex.TryGetValue(index, out var column))
             {
                 column = new Column(this, index);
-                this.columnByIndex.Add(index, column);
+                columnByIndex.Add(index, column);
             }
 
             return column;
@@ -108,12 +108,12 @@ namespace Allors.Excel.Headless
 
         public void Activate()
         {
-            foreach (var worksheet in this.Workbook.WorksheetList)
+            foreach (var worksheet in Workbook.WorksheetList)
             {
                 worksheet.IsActive = false;
             }
 
-            this.IsActive = true;
+            IsActive = true;
         }
 
         public async Task RefreshPivotTables()
@@ -203,17 +203,17 @@ namespace Allors.Excel.Headless
 
         }
 
-        public void SetPrintArea(Excel.Range range = null)
+        public void SetPrintArea(Range range = null)
         {
 
         }
 
-        public void SetCustomProperties(Excel.CustomProperties properties)
+        public void SetCustomProperties(CustomProperties properties)
         {
             throw new NotImplementedException();
         }
 
-        public Excel.CustomProperties GetCustomProperties()
+        public CustomProperties GetCustomProperties()
         {
             throw new NotImplementedException();
         }

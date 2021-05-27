@@ -13,19 +13,19 @@ namespace Allors.Excel.Tests.Interop
 
         public InteropTest()
         {
-            this.application = new InteropApplication { Visible = true };
+            application = new InteropApplication { Visible = true };
         }
 
         public void Dispose()
         {
-            var workbooks = this.application.Workbooks;
+            var workbooks = application.Workbooks;
             foreach (InteropWorkbook workbook in workbooks)
             {
                 workbook.Close(false);
             }
 
 
-            this.application.Quit();
+            application.Quit();
         }
     }
 }

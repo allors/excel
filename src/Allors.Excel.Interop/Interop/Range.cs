@@ -3,7 +3,6 @@
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-using System;
 using InteropRange = Microsoft.Office.Interop.Excel.Range;
 
 namespace Allors.Excel.Interop

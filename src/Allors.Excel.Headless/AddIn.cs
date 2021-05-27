@@ -12,24 +12,24 @@ namespace Allors.Excel.Headless
     {
         public AddIn()
         {
-            this.WorkbookList = new List<Workbook>();
+            WorkbookList = new List<Workbook>();
         }
 
-        public IWorkbook[] Workbooks => this.WorkbookList.Cast<IWorkbook>().ToArray();
+        public IWorkbook[] Workbooks => WorkbookList.Cast<IWorkbook>().ToArray();
 
         public IList<Workbook> WorkbookList { get; }
 
         public Workbook AddWorkbook()
         {
             var workbook = new Workbook(this);
-            this.WorkbookList.Add(workbook);
+            WorkbookList.Add(workbook);
             workbook.Activate();
             return workbook;
         }
 
         public void Remove(Workbook workbook)
         {
-            this.WorkbookList.Remove(workbook);
+            WorkbookList.Remove(workbook);
         }
     }
 }

@@ -3,18 +3,15 @@
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-using System.ComponentModel;
-using System.Reflection;
+using System;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Allors.Excel.Interop;
 using Application;
-using AppEvents_Event = Microsoft.Office.Interop.Excel.AppEvents_Event;
-using InteropWorkbook = Microsoft.Office.Interop.Excel.Workbook;
-using InteropWorksheet = Microsoft.Office.Interop.Excel.Worksheet;
-using System.Threading.Tasks;
 using ExcelAddIn.Interop;
 using ExcelAddIn.Services;
+using Microsoft.Office.Core;
 
 namespace ExcelAddIn
 {
@@ -23,30 +20,30 @@ namespace ExcelAddIn
         private ServiceLocator serviceLocator;
         private AddIn addIn;
 
-        private async void ThisAddIn_Startup(object sender, System.EventArgs e) => await Task.Run(async () =>
+        private async void ThisAddIn_Startup(object sender, EventArgs e) => await Task.Run(async () =>
         {
-            this.serviceLocator = new ServiceLocator();
+            serviceLocator = new ServiceLocator();
             var program = new Program(serviceLocator);
-            var office = new Office();
+            var office = new OfficeCore();
 
-            this.addIn = new AddIn(this.Application, program, office);
+            addIn = new AddIn(Application, program, office);
             
-            this.Ribbon.AddIn = this.addIn;
+            Ribbon.AddIn = addIn;
             await program.OnStart(addIn);
         });
 
-        private async void ThisAddIn_Shutdown(object sender, System.EventArgs e) => await Task.Run(async () =>
+        private async void ThisAddIn_Shutdown(object sender, EventArgs e) => await Task.Run(async () =>
         {
-            await this.addIn.Program.OnStop();
+            await addIn.Program.OnStop();
         });
 
-        protected override Microsoft.Office.Core.IRibbonExtensibility CreateRibbonExtensibilityObject()
+        protected override IRibbonExtensibility CreateRibbonExtensibilityObject()
         {
             SynchronizationContext windowsFormsSynchronizationContext = new WindowsFormsSynchronizationContext();
             SynchronizationContext.SetSynchronizationContext(windowsFormsSynchronizationContext);
 
-            this.Ribbon = new Ribbon();
-            return this.Ribbon;
+            Ribbon = new Ribbon();
+            return Ribbon;
         }
 
         public Ribbon Ribbon { get; set; }
@@ -59,8 +56,8 @@ namespace ExcelAddIn
         /// </summary>
         private void InternalStartup()
         {
-            this.Startup += new System.EventHandler(ThisAddIn_Startup);
-            this.Shutdown += new System.EventHandler(ThisAddIn_Shutdown);
+            Startup += ThisAddIn_Startup;
+            Shutdown += ThisAddIn_Shutdown;
         }
 
         #endregion

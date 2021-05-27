@@ -1,10 +1,11 @@
-﻿using System.Xml;
+﻿using System.Drawing;
+using System.Xml;
 using InteropWorksheet = Microsoft.Office.Interop.Excel.Worksheet;
 using InteropWorkbook = Microsoft.Office.Interop.Excel.Workbook;
 
 namespace Allors.Excel.Interop
 {
-    public interface IOffice
+    public interface IOfficeCore
     {
         object MsoPropertyTypeString { get; }
         object MsoPropertyTypeBoolean { get; }
@@ -12,12 +13,12 @@ namespace Allors.Excel.Interop
         object MsoPropertyTypeFloat { get; }
         object MsoPropertyTypeNumber { get; }
 
-        void AddPicture(InteropWorksheet interopWorksheet, string filename, System.Drawing.Rectangle rectangle);
+        void AddPicture(InteropWorksheet interopWorksheet, string filename, Rectangle rectangle);
 
-        XmlDocument GetCustomXMLById(InteropWorkbook interopWorkbook, string id);
+        XmlDocument GetCustomXmlById(InteropWorkbook interopWorkbook, string id);
+
         string SetCustomXmlPart(InteropWorkbook interopWorkbook, XmlDocument xmlDocument);
-        bool TryDeleteCustomXMLById(InteropWorkbook interopWorkbook, string id);
 
-        void AutoFit(InteropWorksheet interopWorksheet);
+        bool TryDeleteCustomXmlById(InteropWorkbook interopWorkbook, string id);
     }
 }
