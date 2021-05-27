@@ -17,13 +17,13 @@ namespace Allors.Excel.Interop
             Index = index;
         }
 
-        Excel.IWorksheet IRow.Worksheet => this.Worksheet;
+        Excel.IWorksheet IRow.Worksheet => Worksheet;
 
         public Worksheet Worksheet { get; }
 
         public int Index { get; internal set; }
 
-        bool IRow.Hidden { get => this.Hidden; set => this.Hidden = value; }
+        bool IRow.Hidden { get => Hidden; set => Hidden = value; }
 
         public bool Hidden
         {
@@ -31,13 +31,13 @@ namespace Allors.Excel.Interop
             set
             {
                 hidden = value;
-                this.Worksheet.AddDirtyRow(this);
+                Worksheet.AddDirtyRow(this);
             }
         }     
 
         public int CompareTo(Row other)
         {
-            return this.Index.CompareTo(other.Index);
+            return Index.CompareTo(other.Index);
         }
     }
 }

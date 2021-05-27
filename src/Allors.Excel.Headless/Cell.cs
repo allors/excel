@@ -12,18 +12,18 @@ namespace Allors.Excel.Headless
     {
         public Cell(Worksheet worksheet, Row row, Column column)
         {
-            this.Worksheet = worksheet;
-            this.Row = row;
-            this.Column = column;
+            Worksheet = worksheet;
+            Row = row;
+            Column = column;
         }
 
         public IWorksheet Worksheet { get; }
 
-        IRow ICell.Row => this.Row;
+        IRow ICell.Row => Row;
 
         public Row Row { get; }
 
-        IColumn ICell.Column => this.Column;
+        IColumn ICell.Column => Column;
 
         public Column Column { get; }
 
@@ -45,13 +45,13 @@ namespace Allors.Excel.Headless
 
         public string Formula { get; set; }
 
-        public string ValueAsString => Convert.ToString(this.Value, CultureInfo.CurrentCulture);
+        public string ValueAsString => Convert.ToString(Value, CultureInfo.CurrentCulture);
 
         public void Clear()
         {
-            this.Value = string.Empty;
-            this.NumberFormat = null;
-            this.Style = null;            
+            Value = string.Empty;
+            NumberFormat = null;
+            Style = null;            
         }
              
 

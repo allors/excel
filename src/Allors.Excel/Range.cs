@@ -11,20 +11,20 @@ namespace Allors.Excel
     {
         public override string ToString()
         {
-            return $"{this.Worksheet?.Name ?? "null"}!{this.Name ?? "null"} (row:{this.Row}, col:{this.Column}, rows:{this.Rows}, cols:{this.Columns})";
+            return $"{Worksheet?.Name ?? "null"}!{Name ?? "null"} (row:{Row}, col:{Column}, rows:{Rows}, cols:{Columns})";
         }
 
 
         public Range(int row, int column, int? rows = null, int? columns = null, IWorksheet worksheet = null, string name = null)
         {
-            this.Row = row;
-            this.Column = column;
-            this.Rows = rows;
-            this.Columns = columns;
-            this.Worksheet = worksheet;
-            this.Name = name;
+            Row = row;
+            Column = column;
+            Rows = rows;
+            Columns = columns;
+            Worksheet = worksheet;
+            Name = name;
 
-            if (this.Columns == null && this.Rows == null && string.IsNullOrEmpty(this.Name))
+            if (Columns == null && Rows == null && string.IsNullOrEmpty(Name))
             {
                 throw new ArgumentException("Either Columns or Rows, or Name is required.");
             }

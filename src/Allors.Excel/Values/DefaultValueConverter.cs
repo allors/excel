@@ -4,7 +4,6 @@
 // </copyright>
 
 using System;
-using System.Linq;
 
 namespace Allors.Excel
 {
@@ -33,10 +32,10 @@ namespace Allors.Excel
             }
 
             {
-                if (cell.Value is int @integer && excelValue is double @double)
+                if (cell.Value is int integer && excelValue is double @double)
                 {
-                    const double min = (double)int.MinValue;
-                    const double max = (double)int.MaxValue;
+                    const double min = int.MinValue;
+                    const double max = int.MaxValue;
 
                     if (@double < min)
                     {

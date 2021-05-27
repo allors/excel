@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Allors.Excel
 {
@@ -20,7 +19,7 @@ namespace Allors.Excel
 
         public new void Add(string key, object value)
         {
-            if (this.ContainsKey(key))
+            if (ContainsKey(key))
             {
                 base[key] = value;
             }
@@ -61,10 +60,8 @@ namespace Allors.Excel
 
                     return (T) uV;
                 }
-                else
-                {
-                    return (T)Convert.ChangeType(value, typeof(T));
-                }
+
+                return (T)Convert.ChangeType(value, typeof(T));
             }
             catch (FormatException)
             {
@@ -74,10 +71,8 @@ namespace Allors.Excel
                 {
                     return (T)Convert.ChangeType(false, typeof(bool));
                 }
-                else
-                {
-                    return (T) Convert.ChangeType(true, typeof(bool));
-                }
+
+                return (T) Convert.ChangeType(true, typeof(bool));
             }
             catch (InvalidCastException)
             {

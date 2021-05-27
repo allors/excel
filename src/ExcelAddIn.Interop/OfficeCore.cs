@@ -1,12 +1,16 @@
-﻿using Allors.Excel.Interop;
-using Microsoft.Office.Core;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Xml;
+using Allors.Excel.Interop;
+using Microsoft.Office.Core;
+using Microsoft.Office.Interop.Excel;
+using Rectangle = System.Drawing.Rectangle;
+using Workbook = Microsoft.Office.Interop.Excel.Workbook;
+using Worksheet = Microsoft.Office.Interop.Excel.Worksheet;
 
 namespace ExcelAddIn.Interop
 {
-    public class Office : IOffice
+    public class OfficeCore : IOfficeCore
     {
         public object MsoPropertyTypeString => MsoDocProperties.msoPropertyTypeString;
 
@@ -18,12 +22,12 @@ namespace ExcelAddIn.Interop
 
         public object MsoPropertyTypeNumber => MsoDocProperties.msoPropertyTypeNumber;
 
-        public void AddPicture(Microsoft.Office.Interop.Excel.Worksheet worksheet, string fileName, System.Drawing.Rectangle rectangle)
+        public void AddPicture(Worksheet worksheet, string fileName, Rectangle rectangle)
         {
             worksheet.Shapes.AddPicture(fileName, MsoTriState.msoFalse, MsoTriState.msoTrue, rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
         }
 
-        public XmlDocument GetCustomXMLById(Microsoft.Office.Interop.Excel.Workbook interopWorkbook, string id)
+        public XmlDocument GetCustomXmlById(Workbook interopWorkbook, string id)
         {
             var xmlDocument = new XmlDocument();
             var customXMLPart = interopWorkbook.CustomXMLParts.SelectByID(id);
@@ -38,12 +42,12 @@ namespace ExcelAddIn.Interop
             return null;
         }
 
-        public string SetCustomXmlPart(Microsoft.Office.Interop.Excel.Workbook interopWorkbook, XmlDocument xmlDocument)
+        public string SetCustomXmlPart(Workbook interopWorkbook, XmlDocument xmlDocument)
         {
             return interopWorkbook.CustomXMLParts.Add(xmlDocument.OuterXml, Type.Missing).Id;
         }
 
-        public bool TryDeleteCustomXMLById(Microsoft.Office.Interop.Excel.Workbook interopWorkbook, string id)
+        public bool TryDeleteCustomXmlById(Workbook interopWorkbook, string id)
         {
             try
             {

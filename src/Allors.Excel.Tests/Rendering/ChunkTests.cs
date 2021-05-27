@@ -5,10 +5,10 @@
 
 using System;
 using System.Collections.Generic;
-using Allors.Excel.Interop;
-using Xunit;
 using System.Linq;
+using Allors.Excel.Interop;
 using Moq;
+using Xunit;
 
 namespace Allors.Excel.Tests.Rendering
 {
@@ -20,10 +20,10 @@ namespace Allors.Excel.Tests.Rendering
 
         public Row Row(int index)
         {
-            if (!this.rowByIndex.TryGetValue(index, out var row))
+            if (!rowByIndex.TryGetValue(index, out var row))
             {
                 row = new Row(null, index);
-                this.rowByIndex.Add(index, row);
+                rowByIndex.Add(index, row);
             }
 
             return row;
@@ -31,10 +31,10 @@ namespace Allors.Excel.Tests.Rendering
 
         public Column Column(int index)
         {
-            if (!this.columnByIndex.TryGetValue(index, out var column))
+            if (!columnByIndex.TryGetValue(index, out var column))
             {
                 column = new Column(null, index);
-                this.columnByIndex.Add(index, column);
+                columnByIndex.Add(index, column);
             }
 
             return column;

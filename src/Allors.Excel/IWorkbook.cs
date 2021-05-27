@@ -3,7 +3,6 @@
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-using System.Collections.Generic;
 using System.Xml;
 
 namespace Allors.Excel
@@ -61,19 +60,19 @@ namespace Allors.Excel
         /// Adds or updates the (interop) CustomDocumentProperties in this workbook
         /// </summary>
         /// <param name="properties"></param>
-        void SetCustomProperties(Excel.CustomProperties properties);
+        void SetCustomProperties(CustomProperties properties);
 
         /// <summary>
         /// Removes the Custom properties
         /// </summary>
         /// <param name="properties"></param>
-        void DeleteCustomProperties(Excel.CustomProperties properties);
+        void DeleteCustomProperties(CustomProperties properties);
 
         /// <summary>
         /// Gets the Custom Properties from this workbook
         /// </summary>
         /// <returns></returns>
-        Excel.CustomProperties GetCustomProperties();
+        CustomProperties GetCustomProperties();
 
         /// <summary>
         /// Gets the customProperty. returns true if the name exists. ref value will contain the value of the property

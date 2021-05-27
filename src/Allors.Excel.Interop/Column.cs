@@ -21,7 +21,7 @@ namespace Allors.Excel.Interop
 
         public int CompareTo(Column other)
         {
-            return this.Index.CompareTo(other.Index);
+            return Index.CompareTo(other.Index);
         }
     }
 }

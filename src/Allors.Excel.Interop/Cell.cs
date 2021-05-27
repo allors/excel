@@ -11,7 +11,7 @@ namespace Allors.Excel.Interop
     public class Cell : ICell
     {
         // the state of this when it is created
-        private bool touched = false;
+        private bool touched;
 
         private object value;
         private Style style;
@@ -30,49 +30,49 @@ namespace Allors.Excel.Interop
             Column = column;
         }
 
-        Excel.IWorksheet ICell.Worksheet => this.Worksheet;
+        Excel.IWorksheet ICell.Worksheet => Worksheet;
 
         public IWorksheet Worksheet { get; }
 
-        IRow ICell.Row => this.Row;
+        IRow ICell.Row => Row;
 
         public Row Row { get; internal set; }
 
-        IColumn ICell.Column => this.Column;
+        IColumn ICell.Column => Column;
 
         public Column Column { get; internal set; }
 
-        object ICell.Value { get => this.Value; set => this.Value = value; }
+        object ICell.Value { get => Value; set => Value = value; }
 
-        string ICell.Formula { get => this.Formula; set => this.Formula = value; }
+        string ICell.Formula { get => Formula; set => Formula = value; }
 
         public object Value
         {
-            get => this.value;
+            get => value;
             set
             {
                 // When we init the value with Null, we still want to be involved!
-                if (!this.touched || !Equals(this.value, value))
+                if (!touched || !Equals(this.value, value))
                 {
-                    this.Worksheet.AddDirtyValue(this);
+                    Worksheet.AddDirtyValue(this);
                     this.value = value;
-                    this.touched = true;
+                    touched = true;
                 }
             }
         }
 
-        public string ValueAsString => Convert.ToString(this.Value, CultureInfo.CurrentCulture);
+        public string ValueAsString => Convert.ToString(Value, CultureInfo.CurrentCulture);
 
         public string Formula
         {
-            get => this.formula;
+            get => formula;
             set
             {
-                if (!this.touched || !Equals(this.formula, value))
+                if (!touched || !Equals(formula, value))
                 {
-                    this.Worksheet.AddDirtyFormula(this);
-                    this.formula = value;
-                    this.touched = true;
+                    Worksheet.AddDirtyFormula(this);
+                    formula = value;
+                    touched = true;
                 }
             }
         }
@@ -82,10 +82,10 @@ namespace Allors.Excel.Interop
             get => comment;
             set
             {
-                if (!Equals(this.comment, value))
+                if (!Equals(comment, value))
                 {
-                    this.Worksheet.AddDirtyComment(this);
-                    this.comment = value;                
+                    Worksheet.AddDirtyComment(this);
+                    comment = value;                
 
                 }
             }
@@ -96,10 +96,10 @@ namespace Allors.Excel.Interop
             get => style;
             set
             {
-                if (!this.style?.Equals(value) ?? value != null)
+                if (!style?.Equals(value) ?? value != null)
                 {
-                    this.Worksheet.AddDirtyStyle(this);
-                    this.style = value;
+                    Worksheet.AddDirtyStyle(this);
+                    style = value;
                 }
             }
         }
@@ -109,17 +109,17 @@ namespace Allors.Excel.Interop
             get => numberFormat;
             set
             {
-                if (!Equals(this.numberFormat, value))
+                if (!Equals(numberFormat, value))
                 {
-                    this.Worksheet.AddDirtyNumberFormat(this);
-                    this.numberFormat = value;
+                    Worksheet.AddDirtyNumberFormat(this);
+                    numberFormat = value;
                 }
             }
         }
 
         public IValueConverter ValueConverter
         {
-            get => valueConverter ?? this.defaultValueConverter;
+            get => valueConverter ?? defaultValueConverter;
             set => valueConverter = value;
         }
 
@@ -128,10 +128,10 @@ namespace Allors.Excel.Interop
             get => options;
             set
             {
-                if (!Equals(this.options, value))
+                if (!Equals(options, value))
                 {
-                    this.Worksheet.AddDirtyOptions(this);
-                    this.options = value;
+                    Worksheet.AddDirtyOptions(this);
+                    options = value;
                 }
             }
         }
@@ -147,12 +147,12 @@ namespace Allors.Excel.Interop
 
         public bool UpdateValue(object rawExcelValue)
         {
-            var excelValue = this.ValueConverter.Convert(this, rawExcelValue);
-            var update = !Equals(this.value, excelValue);
+            var excelValue = ValueConverter.Convert(this, rawExcelValue);
+            var update = !Equals(value, excelValue);
 
             if (update)
             {
-                this.value = excelValue;
+                value = excelValue;
             }
 
             return update;
@@ -160,10 +160,10 @@ namespace Allors.Excel.Interop
 
         public void Clear()
         {
-            this.Value = string.Empty;
-            this.Formula = string.Empty;
-            this.Style = null;
-            this.NumberFormat = null;
+            Value = string.Empty;
+            Formula = string.Empty;
+            Style = null;
+            NumberFormat = null;
         }
         
         public object Tag { get; set; }
