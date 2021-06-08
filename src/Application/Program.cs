@@ -17,14 +17,17 @@ namespace Application
     {
         private readonly Dictionary<IWorksheet, Binder> binderByWorksheet;
 
-        public Program(IServiceLocator serviceLocator)
+        public Program(IServiceLocator serviceLocator, string name)
         {
             ServiceLocator = serviceLocator;
+            Name = name;
 
             binderByWorksheet = new Dictionary<IWorksheet, Binder>();
         }
 
         public IServiceLocator ServiceLocator { get; }
+
+        public string Name { get; }
 
         public IAddIn AddIn { get; private set; }
 
@@ -159,7 +162,7 @@ namespace Application
 
         public async Task OnNew(IWorksheet worksheet)
         {
-            worksheet.Name = "1";
+            worksheet.Name = this.Name;
 
             await Task.CompletedTask;
         }

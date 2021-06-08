@@ -53,7 +53,7 @@ class Build : NukeBuild
         .Executes(() =>
         {
             MSBuild(s => s
-                .SetTargetPath(SourceDirectory / "Allors.Excel.Tests" / "Allors.Excel.Tests.csproj")
+                .SetTargetPath(SourceDirectory / "Allors.Excel.Interop.Tests" / "Allors.Excel.Interop.Tests.csproj")
                 .SetTargets("Rebuild")
                 .SetConfiguration(Configuration)
                 .SetAssemblyVersion(GitVersion.AssemblySemVer)
@@ -66,7 +66,7 @@ class Build : NukeBuild
        .DependsOn(Compile)
        .Executes(() =>
        {
-           var assembly = (AbsolutePath)GlobFiles(SourceDirectory, "**/Allors.Excel.Tests.dll").First();
+           var assembly = (AbsolutePath)GlobFiles(SourceDirectory, "**/Allors.Excel.Interop.Tests.dll").First();
            var workingDirectory = assembly.Parent;
 
            Xunit2(v => v

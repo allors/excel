@@ -18,9 +18,9 @@ namespace Allors.Excel.Interop
     {
         private readonly Dictionary<InteropWorkbook, Workbook> workbookByInteropWorkbook;
 
-        public AddIn(InteropApplication application, IProgram program, IOfficeCore officeCore)
+        public AddIn(object application, IProgram program, OfficeCore officeCore)
         {
-            Application = application;
+            Application = (InteropApplication)application;
             Program = program;
             OfficeCore = officeCore;
 
@@ -99,7 +99,7 @@ namespace Allors.Excel.Interop
         public InteropApplication Application { get; }
 
         public IProgram Program { get; }
-        public IOfficeCore OfficeCore { get; }
+        public OfficeCore OfficeCore { get; }
 
         public IReadOnlyDictionary<InteropWorkbook, Workbook> WorkbookByInteropWorkbook => workbookByInteropWorkbook;
 
