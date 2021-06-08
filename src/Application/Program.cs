@@ -17,17 +17,16 @@ namespace Application
     {
         private readonly Dictionary<IWorksheet, Binder> binderByWorksheet;
 
-        public Program(IServiceLocator serviceLocator, string name)
+        private int counter;
+
+        public Program(IServiceLocator serviceLocator)
         {
             ServiceLocator = serviceLocator;
-            Name = name;
-
             binderByWorksheet = new Dictionary<IWorksheet, Binder>();
+            this.counter = 0;
         }
 
         public IServiceLocator ServiceLocator { get; }
-
-        public string Name { get; }
 
         public IAddIn AddIn { get; private set; }
 
@@ -72,7 +71,7 @@ namespace Application
             ChangedCellStyle = new Style(Color.DeepSkyBlue, Color.Black);
 
             var sheet = workbook.AddWorksheet();
-            sheet.Name = $"{workbook.Worksheets.Length}";
+            sheet.Name = $"{++counter}";
 
             for (var i = 0; i < 50; i++)
             {
@@ -128,7 +127,7 @@ namespace Application
             for (var day = 1; day <= 31; ++day)
             {
                 sheet[day + 5, 10].NumberFormat = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
-                sheet[day+5, 10].Value = new DateTime(2020, 7, day);
+                sheet[day + 5, 10].Value = new DateTime(2020, 7, day);
             }
 
 
@@ -162,7 +161,7 @@ namespace Application
 
         public async Task OnNew(IWorksheet worksheet)
         {
-            worksheet.Name = this.Name;
+            worksheet.Name = $"{++counter}";
 
             await Task.CompletedTask;
         }

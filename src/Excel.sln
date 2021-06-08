@@ -24,7 +24,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Allors.Excel.Interop.Tests"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExcelAddIn.VSTO.Tests", "ExcelAddIn.VSTO.Tests\ExcelAddIn.VSTO.Tests.csproj", "{ED6DE278-C2A5-432D-8815-633E53B11BDE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelAddin.DNA", "ExcelAddin.DNA\ExcelAddin.DNA.csproj", "{0B1B7C28-731E-4B69-8E7D-86B2E800DFDF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelAddIn.DNA", "ExcelAddIn.DNA\ExcelAddIn.DNA.csproj", "{8C0DDE1E-65EA-452C-A9D7-EB298745C453}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -62,10 +62,10 @@ Global
 		{ED6DE278-C2A5-432D-8815-633E53B11BDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED6DE278-C2A5-432D-8815-633E53B11BDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED6DE278-C2A5-432D-8815-633E53B11BDE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0B1B7C28-731E-4B69-8E7D-86B2E800DFDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0B1B7C28-731E-4B69-8E7D-86B2E800DFDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0B1B7C28-731E-4B69-8E7D-86B2E800DFDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0B1B7C28-731E-4B69-8E7D-86B2E800DFDF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C0DDE1E-65EA-452C-A9D7-EB298745C453}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C0DDE1E-65EA-452C-A9D7-EB298745C453}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C0DDE1E-65EA-452C-A9D7-EB298745C453}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C0DDE1E-65EA-452C-A9D7-EB298745C453}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

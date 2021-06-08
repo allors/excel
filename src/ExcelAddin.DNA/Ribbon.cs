@@ -17,7 +17,7 @@ namespace ExcelAddin.DNA
         {
             var application = ExcelDnaUtil.Application;
             var serviceLocator = new ServiceLocator();
-            this.Program = new Program(serviceLocator, "DNA");
+            this.Program = new Program(serviceLocator);
             var office = new OfficeCore();
 
             this.AddIn = new AddIn(application, this.Program, office);

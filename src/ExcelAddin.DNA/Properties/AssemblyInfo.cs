@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ExcelAddin.DNA")]
+[assembly: AssemblyTitle("ExcelAddIn.DNA")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("ExcelAddin.DNA")]
+[assembly: AssemblyProduct("ExcelAddIn.DNA")]
 [assembly: AssemblyCopyright("Copyright ©  2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("0b1b7c28-731e-4b69-8e7d-86b2e800dfdf")]
+[assembly: Guid("8c0dde1e-65ea-452c-a9d7-eb298745c453")]
 
 // Version information for an assembly consists of the following four values:
 //

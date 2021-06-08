@@ -16,7 +16,7 @@ namespace ExcelAddIn.VSTO
         private async void ThisAddIn_Startup(object sender, EventArgs e) => await Task.Run(async () =>
         {
             serviceLocator = new ServiceLocator();
-            var program = new Program(serviceLocator, "VSTO");
+            var program = new Program(serviceLocator);
             var office = new OfficeCore();
 
             addIn = new AddIn(Application, program, office);

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net48</TargetFramework>
+		<TargetFramework>net461</TargetFramework>
 		<Title>Allors Excel Interop</Title>
 		<Authors>allors</Authors>
 		<Company>Allors bvba</Company>
