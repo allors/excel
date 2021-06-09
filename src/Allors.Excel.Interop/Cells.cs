@@ -1,19 +1,18 @@
-﻿// <copyright file="Cells.cs" company="Allors bvba">
+// <copyright file="Cells.cs" company="Allors bvba">
 // Copyright (c) Allors bvba. All rights reserved.
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace Allors.Excel.Interop
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     public static class Cells
     {
-        public static IEnumerable<IList<IList<Cell>>> Chunks(this IEnumerable<Cell> @this, Func<Cell, Cell, bool> combine)
-        {
-            return @this
+        public static IEnumerable<IList<IList<Cell>>> Chunks(this IEnumerable<Cell> @this, Func<Cell, Cell, bool> combine) =>
+            @this
                 .GroupBy(v => v.Row)
                 .SelectMany(v =>
                 {
@@ -55,6 +54,5 @@ namespace Allors.Excel.Interop
                             return acc;
                         });
                 });
-        }
     }
 }

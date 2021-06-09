@@ -1,12 +1,12 @@
-﻿// <copyright file="IWorkbook.cs" company="Allors bvba">
+// <copyright file="IWorkbook.cs" company="Allors bvba">
 // Copyright (c) Allors bvba. All rights reserved.
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-using System.Xml;
-
 namespace Allors.Excel
 {
+    using System.Xml;
+
     public interface IWorkbook
     {
         /// <summary>
@@ -56,39 +56,9 @@ namespace Allors.Excel
         /// <param name="range"></param>
         void SetNamedRange(string name, Range range);
 
-        /// <summary>
-        /// Adds or updates the (interop) CustomDocumentProperties in this workbook
-        /// </summary>
-        /// <param name="properties"></param>
-        void SetCustomProperties(CustomProperties properties);
+        IBuiltinProperties BuiltinProperties { get; }
 
-        /// <summary>
-        /// Removes the Custom properties
-        /// </summary>
-        /// <param name="properties"></param>
-        void DeleteCustomProperties(CustomProperties properties);
-
-        /// <summary>
-        /// Gets the Custom Properties from this workbook
-        /// </summary>
-        /// <returns></returns>
-        CustomProperties GetCustomProperties();
-
-        /// <summary>
-        /// Gets the customProperty. returns true if the name exists. ref value will contain the value of the property
-        /// </summary>
-        /// <param name="name">the name of the customproperty</param>
-        /// <param name="value">the value of the customproperty</param>
-        /// <returns>true when the customproperty exists.</returns>
-        bool TryGetCustomProperty(string name, ref object value);
-
-        /// <summary>
-        /// Add or updates the value of the customproperty.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        bool TrySetCustomProperty(string name, dynamic value);
+        ICustomProperties CustomProperties { get; }
 
 
         /// <summary>

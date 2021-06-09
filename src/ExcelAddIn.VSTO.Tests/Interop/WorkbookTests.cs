@@ -1,4 +1,4 @@
-﻿// <copyright file="WorkbookTests.cs" company="Allors bvba">
+// <copyright file="WorkbookTests.cs" company="Allors bvba">
 // Copyright (c) Allors bvba. All rights reserved.
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -12,19 +12,19 @@ namespace ExcelAddIn.VSTO.Tests
     {
         public WorkbookTests()
         {
-            application = new InteropApplication { Visible = true };
+            this.application = new InteropApplication { Visible = true };
         }
 
         public override void Dispose()
         {
-            var workbooks = application.Workbooks;
+            var workbooks = this.application.Workbooks;
             foreach (InteropWorkbook workbook in workbooks)
             {
                 workbook.Close(false);
             }
 
 
-            application.Quit();
+            this.application.Quit();
         }
     }
 }

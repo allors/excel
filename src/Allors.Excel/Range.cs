@@ -1,4 +1,4 @@
-﻿// <copyright file="Range.cs" company="Allors bvba">
+// <copyright file="Range.cs" company="Allors bvba">
 // Copyright (c) Allors bvba. All rights reserved.
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -11,20 +11,20 @@ namespace Allors.Excel
     {
         public override string ToString()
         {
-            return $"{Worksheet?.Name ?? "null"}!{Name ?? "null"} (row:{Row}, col:{Column}, rows:{Rows}, cols:{Columns})";
+            return $"{this.Worksheet?.Name ?? "null"}!{this.Name ?? "null"} (row:{this.Row}, col:{this.Column}, rows:{this.Rows}, cols:{this.Columns})";
         }
 
 
         public Range(int row, int column, int? rows = null, int? columns = null, IWorksheet worksheet = null, string name = null)
         {
-            Row = row;
-            Column = column;
-            Rows = rows;
-            Columns = columns;
-            Worksheet = worksheet;
-            Name = name;
+            this.Row = row;
+            this.Column = column;
+            this.Rows = rows;
+            this.Columns = columns;
+            this.Worksheet = worksheet;
+            this.Name = name;
 
-            if (Columns == null && Rows == null && string.IsNullOrEmpty(Name))
+            if (this.Columns == null && this.Rows == null && string.IsNullOrEmpty(this.Name))
             {
                 throw new ArgumentException("Either Columns or Rows, or Name is required.");
             }

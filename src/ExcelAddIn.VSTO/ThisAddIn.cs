@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -15,19 +15,17 @@ namespace ExcelAddIn.VSTO
 
         private async void ThisAddIn_Startup(object sender, EventArgs e) => await Task.Run(async () =>
         {
-            serviceLocator = new ServiceLocator();
-            var program = new Program(serviceLocator);
-            var office = new OfficeCore();
+            this.serviceLocator = new ServiceLocator();
+            var program = new Program(this.serviceLocator);
+            this.addIn = new AddIn(this.Application, program);
 
-            addIn = new AddIn(Application, program, office);
-
-            Ribbon.AddIn = addIn;
-            await program.OnStart(addIn);
+            this.Ribbon.AddIn = this.addIn;
+            await program.OnStart(this.addIn);
         });
 
         private async void ThisAddIn_Shutdown(object sender, EventArgs e) => await Task.Run(async () =>
         {
-            await addIn.Program.OnStop();
+            await this.addIn.Program.OnStop();
         });
 
         protected override IRibbonExtensibility CreateRibbonExtensibilityObject()
@@ -35,8 +33,8 @@ namespace ExcelAddIn.VSTO
             SynchronizationContext windowsFormsSynchronizationContext = new WindowsFormsSynchronizationContext();
             SynchronizationContext.SetSynchronizationContext(windowsFormsSynchronizationContext);
 
-            Ribbon = new Ribbon();
-            return Ribbon;
+            this.Ribbon = new Ribbon();
+            return this.Ribbon;
         }
 
         public Ribbon Ribbon { get; set; }
@@ -49,8 +47,8 @@ namespace ExcelAddIn.VSTO
         /// </summary>
         private void InternalStartup()
         {
-            this.Startup += new System.EventHandler(ThisAddIn_Startup);
-            this.Shutdown += new System.EventHandler(ThisAddIn_Shutdown);
+            this.Startup += new EventHandler(this.ThisAddIn_Startup);
+            this.Shutdown += new EventHandler(this.ThisAddIn_Shutdown);
         }
         
         #endregion

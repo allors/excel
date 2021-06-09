@@ -10,14 +10,15 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Microsoft.Office.Core;
 using Microsoft.Office.Interop.Excel;
 using Polly;
 using Action = System.Action;
 using Rectangle = System.Drawing.Rectangle;
+using XlColorIndex = Microsoft.Office.Interop.Excel.XlColorIndex;
 
 namespace Allors.Excel.Interop
 {
-    using InteropCustomProperty = CustomProperty;
     using InteropDocEvents_Event = DocEvents_Event;
     using InteropName = Name;
     using InteropPivotTable = PivotTable;
@@ -39,31 +40,33 @@ namespace Allors.Excel.Interop
 
         public Worksheet(Workbook workbook, InteropWorksheet interopWorksheet)
         {
-            Workbook = workbook;
-            InteropWorksheet = interopWorksheet;
+            this.Workbook = workbook;
+            this.InteropWorksheet = interopWorksheet;
 
-            RowByIndex = new Dictionary<int, Row>();
-            ColumnByIndex = new Dictionary<int, Column>();
-            CellByCoordinates = new Dictionary<(int, int), Cell>();
-            DirtyValueCells = new HashSet<Cell>();
-            DirtyCommentCells = new HashSet<Cell>();
-            DirtyStyleCells = new HashSet<Cell>();
-            DirtyOptionCells = new HashSet<Cell>();
-            DirtyNumberFormatCells = new HashSet<Cell>();
-            DirtyFormulaCells = new HashSet<Cell>();
-            DirtyRows = new HashSet<Row>();
+            this.RowByIndex = new Dictionary<int, Row>();
+            this.ColumnByIndex = new Dictionary<int, Column>();
+            this.CellByCoordinates = new Dictionary<(int, int), Cell>();
+            this.DirtyValueCells = new HashSet<Cell>();
+            this.DirtyCommentCells = new HashSet<Cell>();
+            this.DirtyStyleCells = new HashSet<Cell>();
+            this.DirtyOptionCells = new HashSet<Cell>();
+            this.DirtyNumberFormatCells = new HashSet<Cell>();
+            this.DirtyFormulaCells = new HashSet<Cell>();
+            this.DirtyRows = new HashSet<Row>();
 
-            interopWorksheet.Change += InteropWorksheet_Change;
+            interopWorksheet.Change += this.InteropWorksheet_Change;
 
             ((InteropDocEvents_Event)interopWorksheet).Activate += () =>
             {
-                isActive = true;
-                SheetActivated?.Invoke(this, Name);
+                this.isActive = true;
+                this.SheetActivated?.Invoke(this, this.Name);
             };
 
-            interopWorksheet.Deactivate += () => isActive = false;
+            interopWorksheet.Deactivate += () => this.isActive = false;
 
-            Reset();
+            this.CustomProperties = new CustomProperties(this.InteropWorksheet.CustomProperties);
+
+            this.Reset();
         }
 
         public event EventHandler<CellChangedEvent> CellsChanged;
@@ -72,33 +75,35 @@ namespace Allors.Excel.Interop
 
         private Range FreezeRange { get; set; }
 
-        public int Index => InteropWorksheet.Index;
+        public int Index => this.InteropWorksheet.Index;
 
         public bool IsActive
         {
-            get => isActive;
+            get => this.isActive;
             set
             {
                 if (value)
                 {
-                    isActive = true;
+                    this.isActive = true;
 
-                    InteropWorksheet.Activate();
+                    this.InteropWorksheet.Activate();
                 }
                 else
                 {
-                    isActive = false;
+                    this.isActive = false;
                 }
             }
         }
 
         public Workbook Workbook { get; set; }
 
+        public ICustomProperties CustomProperties { get; }
+
         public InteropWorksheet InteropWorksheet { get; set; }
 
-        public string Name { get => InteropWorksheet.Name; set => InteropWorksheet.Name = value; }
+        public string Name { get => this.InteropWorksheet.Name; set => this.InteropWorksheet.Name = value; }
 
-        IWorkbook Excel.IWorksheet.Workbook => Workbook;
+        IWorkbook Excel.IWorksheet.Workbook => this.Workbook;
 
         public Dictionary<int, Row> RowByIndex { get; set; }
 
@@ -124,23 +129,23 @@ namespace Allors.Excel.Interop
 
         public bool IsVisible
         {
-            get => InteropWorksheet.Visible == InteropXlSheetVisibility.xlSheetVisible;
+            get => this.InteropWorksheet.Visible == InteropXlSheetVisibility.xlSheetVisible;
             set
             {
                 if (value)
                 {
-                    InteropWorksheet.Visible = InteropXlSheetVisibility.xlSheetVisible;
+                    this.InteropWorksheet.Visible = InteropXlSheetVisibility.xlSheetVisible;
                 }
                 else
                 {
-                    InteropWorksheet.Visible = InteropXlSheetVisibility.xlSheetHidden;
+                    this.InteropWorksheet.Visible = InteropXlSheetVisibility.xlSheetHidden;
                 }
             }
         }
 
         public async Task RefreshPivotTables()
         {
-            var pivotTables = (InteropPivotTables)InteropWorksheet.PivotTables();
+            var pivotTables = (InteropPivotTables)this.InteropWorksheet.PivotTables();
 
             foreach (InteropPivotTable pivotTable in pivotTables)
             {
@@ -158,10 +163,10 @@ namespace Allors.Excel.Interop
         {
             get
             {
-                if (!CellByCoordinates.TryGetValue(coordinates, out var cell))
+                if (!this.CellByCoordinates.TryGetValue(coordinates, out var cell))
                 {
-                    cell = new Cell(this, Row(coordinates.Item1), Column(coordinates.Item2));
-                    CellByCoordinates.Add(coordinates, cell);
+                    cell = new Cell(this, this.Row(coordinates.Item1), this.Column(coordinates.Item2));
+                    this.CellByCoordinates.Add(coordinates, cell);
                 }
 
                 return cell;
@@ -198,25 +203,25 @@ namespace Allors.Excel.Interop
 
         IRow Excel.IWorksheet.Row(int index)
         {
-            return Row(index);
+            return this.Row(index);
         }
 
         IColumn Excel.IWorksheet.Column(int index)
         {
-            return Column(index);
+            return this.Column(index);
         }
 
         public Row Row(int index)
         {
             if (index < 0)
             {
-                throw new ArgumentException("Index can not be negative", nameof(Row));
+                throw new ArgumentException("Index can not be negative", nameof(this.Row));
             }
 
-            if (!RowByIndex.TryGetValue(index, out var row))
+            if (!this.RowByIndex.TryGetValue(index, out var row))
             {
                 row = new Row(this, index);
-                RowByIndex.Add(index, row);
+                this.RowByIndex.Add(index, row);
             }
 
             return row;
@@ -226,13 +231,13 @@ namespace Allors.Excel.Interop
         {
             if (index < 0)
             {
-                throw new ArgumentException(nameof(Column));
+                throw new ArgumentException(nameof(this.Column));
             }
 
-            if (!ColumnByIndex.TryGetValue(index, out var column))
+            if (!this.ColumnByIndex.TryGetValue(index, out var column))
             {
                 column = new Column(this, index);
-                ColumnByIndex.Add(index, column);
+                this.ColumnByIndex.Add(index, column);
             }
 
             return column;
@@ -240,22 +245,22 @@ namespace Allors.Excel.Interop
 
         private Tuple<InteropXlCalculation, bool> DisableExcel()
         {
-            var calculation = Workbook.InteropWorkbook.Application.Calculation;
+            var calculation = this.Workbook.InteropWorkbook.Application.Calculation;
             if (calculation != InteropXlCalculation.xlCalculationManual)
             {
-                Workbook.InteropWorkbook.Application.Calculation = InteropXlCalculation.xlCalculationManual;
+                this.Workbook.InteropWorkbook.Application.Calculation = InteropXlCalculation.xlCalculationManual;
             }
 
-            Workbook.InteropWorkbook.Application.ScreenUpdating = false;
-            Workbook.InteropWorkbook.Application.EnableEvents = false;
-            Workbook.InteropWorkbook.Application.DisplayStatusBar = false;
-            Workbook.InteropWorkbook.Application.PrintCommunication = false;
+            this.Workbook.InteropWorkbook.Application.ScreenUpdating = false;
+            this.Workbook.InteropWorkbook.Application.EnableEvents = false;
+            this.Workbook.InteropWorkbook.Application.DisplayStatusBar = false;
+            this.Workbook.InteropWorkbook.Application.PrintCommunication = false;
 
-            var enableFormatConditionsCalculation = InteropWorksheet.EnableFormatConditionsCalculation;
+            var enableFormatConditionsCalculation = this.InteropWorksheet.EnableFormatConditionsCalculation;
 
             if (enableFormatConditionsCalculation)
             {
-                InteropWorksheet.EnableFormatConditionsCalculation = false;
+                this.InteropWorksheet.EnableFormatConditionsCalculation = false;
             }
 
             return Tuple.Create(calculation, enableFormatConditionsCalculation);
@@ -263,20 +268,20 @@ namespace Allors.Excel.Interop
 
         private void EnableExcel(Tuple<InteropXlCalculation, bool> tuple)
         {
-            Workbook.InteropWorkbook.Application.Calculation = tuple.Item1;
-            Workbook.InteropWorkbook.Application.ScreenUpdating = true;
-            Workbook.InteropWorkbook.Application.EnableEvents = true;
-            Workbook.InteropWorkbook.Application.DisplayStatusBar = true;
-            Workbook.InteropWorkbook.Application.PrintCommunication = true;
+            this.Workbook.InteropWorkbook.Application.Calculation = tuple.Item1;
+            this.Workbook.InteropWorkbook.Application.ScreenUpdating = true;
+            this.Workbook.InteropWorkbook.Application.EnableEvents = true;
+            this.Workbook.InteropWorkbook.Application.DisplayStatusBar = true;
+            this.Workbook.InteropWorkbook.Application.PrintCommunication = true;
 
-            InteropWorksheet.EnableFormatConditionsCalculation = tuple.Item2;
+            this.InteropWorksheet.EnableFormatConditionsCalculation = tuple.Item2;
 
             try
             {
                 // Recalculate when required. Formulas need to be resolved.
                 if (tuple.Item1 == InteropXlCalculation.xlCalculationAutomatic)
                 {
-                    InteropWorksheet.Calculate();
+                    this.InteropWorksheet.Calculate();
                 }
             }
             catch
@@ -285,34 +290,34 @@ namespace Allors.Excel.Interop
         }
         public async Task Flush()
         {
-            var tuple = DisableExcel();
+            var tuple = this.DisableExcel();
 
             try
             {
-                RenderNumberFormat(DirtyNumberFormatCells);
-                DirtyNumberFormatCells = new HashSet<Cell>();
+                this.RenderNumberFormat(this.DirtyNumberFormatCells);
+                this.DirtyNumberFormatCells = new HashSet<Cell>();
 
-                RenderValue(DirtyValueCells);
-                DirtyValueCells = new HashSet<Cell>();
+                this.RenderValue(this.DirtyValueCells);
+                this.DirtyValueCells = new HashSet<Cell>();
 
-                RenderFormula(DirtyFormulaCells);
-                DirtyFormulaCells = new HashSet<Cell>();
+                this.RenderFormula(this.DirtyFormulaCells);
+                this.DirtyFormulaCells = new HashSet<Cell>();
 
-                RenderComments(DirtyCommentCells);
-                DirtyCommentCells = new HashSet<Cell>();
+                this.RenderComments(this.DirtyCommentCells);
+                this.DirtyCommentCells = new HashSet<Cell>();
 
-                RenderStyle(DirtyStyleCells);
-                DirtyStyleCells = new HashSet<Cell>();
+                this.RenderStyle(this.DirtyStyleCells);
+                this.DirtyStyleCells = new HashSet<Cell>();
 
-                SetOptions(DirtyOptionCells);
-                DirtyOptionCells = new HashSet<Cell>();
+                this.SetOptions(this.DirtyOptionCells);
+                this.DirtyOptionCells = new HashSet<Cell>();
 
-                UpdateRows(DirtyRows);
-                DirtyRows = new HashSet<Row>();
+                this.UpdateRows(this.DirtyRows);
+                this.DirtyRows = new HashSet<Row>();
             }
             finally
             {
-                EnableExcel(tuple);
+                this.EnableExcel(tuple);
             }
 
             await Task.CompletedTask;
@@ -320,50 +325,50 @@ namespace Allors.Excel.Interop
 
         public void AddDirtyNumberFormat(Cell cell)
         {
-            DirtyNumberFormatCells.Add(cell);
+            this.DirtyNumberFormatCells.Add(cell);
         }
 
         public void AddDirtyValue(Cell cell)
         {
-            DirtyValueCells.Add(cell);
+            this.DirtyValueCells.Add(cell);
         }
 
         public void AddDirtyFormula(Cell cell)
         {
-            DirtyFormulaCells.Add(cell);
+            this.DirtyFormulaCells.Add(cell);
         }
 
         public void AddDirtyComment(Cell cell)
         {
-            DirtyCommentCells.Add(cell);
+            this.DirtyCommentCells.Add(cell);
         }
 
         public void AddDirtyStyle(Cell cell)
         {
-            DirtyStyleCells.Add(cell);
+            this.DirtyStyleCells.Add(cell);
         }
 
         public void AddDirtyOptions(Cell cell)
         {
-            DirtyOptionCells.Add(cell);
+            this.DirtyOptionCells.Add(cell);
         }
 
         public void AddDirtyRow(Row row)
         {
-            DirtyRows.Add(row);
+            this.DirtyRows.Add(row);
         }
 
         private void InteropWorksheet_Change(InteropRange target)
         {
-            if (PreventChangeEvent)
+            if (this.PreventChangeEvent)
             {
                 return;
             }
 
-            if (target.Cells.Count >= InteropWorksheet.Columns.Count)
+            if (target.Cells.Count >= this.InteropWorksheet.Columns.Count)
             {
                 // (probably) row or rolumn insert(s)
-                Reset();
+                this.Reset();
             }
             else
             {
@@ -384,7 +389,7 @@ namespace Allors.Excel.Interop
 
                 if (cells != null)
                 {
-                    CellsChanged?.Invoke(this, new CellChangedEvent(cells.Cast<ICell>().ToArray()));
+                    this.CellsChanged?.Invoke(this, new CellChangedEvent(cells.Cast<ICell>().ToArray()));
                 }
             }
         }
@@ -412,14 +417,14 @@ namespace Allors.Excel.Interop
                     var toRow = chunk.Last().Last().Row;
                     var toColumn = chunk.Last().Last().Column;
 
-                    var range = WaitAndRetry(() =>
+                    var range = this.WaitAndRetry(() =>
                     {
-                        var from = (InteropRange)InteropWorksheet.Cells[fromRow.Index + 1, fromColumn.Index + 1];
-                        var to = (InteropRange)InteropWorksheet.Cells[toRow.Index + 1, toColumn.Index + 1];
-                        return InteropWorksheet.Range[from, to];
+                        var from = (InteropRange)this.InteropWorksheet.Cells[fromRow.Index + 1, fromColumn.Index + 1];
+                        var to = (InteropRange)this.InteropWorksheet.Cells[toRow.Index + 1, toColumn.Index + 1];
+                        return this.InteropWorksheet.Range[from, to];
                     });
 
-                    WaitAndRetry(() =>
+                    this.WaitAndRetry(() =>
                     {
                         range.Value2 = values;
                     });
@@ -449,14 +454,14 @@ namespace Allors.Excel.Interop
                     var toRow = chunk.Last().Last().Row;
                     var toColumn = chunk.Last().Last().Column;
 
-                    var range = WaitAndRetry(() =>
+                    var range = this.WaitAndRetry(() =>
                     {
-                        var from = (InteropRange)InteropWorksheet.Cells[fromRow.Index + 1, fromColumn.Index + 1];
-                        var to = (InteropRange)InteropWorksheet.Cells[toRow.Index + 1, toColumn.Index + 1];
-                        return InteropWorksheet.Range[from, to];
+                        var from = (InteropRange)this.InteropWorksheet.Cells[fromRow.Index + 1, fromColumn.Index + 1];
+                        var to = (InteropRange)this.InteropWorksheet.Cells[toRow.Index + 1, toColumn.Index + 1];
+                        return this.InteropWorksheet.Range[from, to];
                     });
 
-                    WaitAndRetry(() =>
+                    this.WaitAndRetry(() =>
                     {
                         range.Formula = formulas;
                     });
@@ -469,12 +474,12 @@ namespace Allors.Excel.Interop
                 cells,
                 cell =>
                 {
-                    var range = WaitAndRetry(() =>
+                    var range = this.WaitAndRetry(() =>
                     {
-                        return (InteropRange)InteropWorksheet.Cells[cell.Row.Index + 1, cell.Column.Index + 1];
+                        return (InteropRange)this.InteropWorksheet.Cells[cell.Row.Index + 1, cell.Column.Index + 1];
                     });
 
-                    WaitAndRetry(() =>
+                    this.WaitAndRetry(() =>
                     {
                         if (range.Comment == null)
                         {
@@ -503,14 +508,14 @@ namespace Allors.Excel.Interop
                     var toRow = chunk.Last().Last().Row;
                     var toColumn = chunk.Last().Last().Column;
 
-                    var range = WaitAndRetry(() =>
+                    var range = this.WaitAndRetry(() =>
                     {
-                        var from = InteropWorksheet.Cells[fromRow.Index + 1, fromColumn.Index + 1];
-                        var to = InteropWorksheet.Cells[toRow.Index + 1, toColumn.Index + 1];
-                        return InteropWorksheet.Range[from, to];
+                        var from = this.InteropWorksheet.Cells[fromRow.Index + 1, fromColumn.Index + 1];
+                        var to = this.InteropWorksheet.Cells[toRow.Index + 1, toColumn.Index + 1];
+                        return this.InteropWorksheet.Range[from, to];
                     });
 
-                    WaitAndRetry(() =>
+                    this.WaitAndRetry(() =>
                     {
                         var cc = chunk[0][0];
                         if (cc.Style != null)
@@ -539,14 +544,14 @@ namespace Allors.Excel.Interop
                     var toRow = chunk.Last().Last().Row;
                     var toColumn = chunk.Last().Last().Column;
 
-                    var range = WaitAndRetry(() =>
+                    var range = this.WaitAndRetry(() =>
                     {
-                        var from = InteropWorksheet.Cells[fromRow.Index + 1, fromColumn.Index + 1];
-                        var to = InteropWorksheet.Cells[toRow.Index + 1, toColumn.Index + 1];
-                        return InteropWorksheet.Range[from, to];
+                        var from = this.InteropWorksheet.Cells[fromRow.Index + 1, fromColumn.Index + 1];
+                        var to = this.InteropWorksheet.Cells[toRow.Index + 1, toColumn.Index + 1];
+                        return this.InteropWorksheet.Range[from, to];
                     });
 
-                    WaitAndRetry(() =>
+                    this.WaitAndRetry(() =>
                     {
                         range.NumberFormat = chunk[0][0].NumberFormat;
                     });
@@ -567,14 +572,14 @@ namespace Allors.Excel.Interop
                     var toRow = chunk.Last().Last().Row;
                     var toColumn = chunk.Last().Last().Column;
 
-                    var range = WaitAndRetry(() =>
+                    var range = this.WaitAndRetry(() =>
                     {
-                        var from = InteropWorksheet.Cells[fromRow.Index + 1, fromColumn.Index + 1];
-                        var to = InteropWorksheet.Cells[toRow.Index + 1, toColumn.Index + 1];
-                        return InteropWorksheet.Range[from, to];
+                        var from = this.InteropWorksheet.Cells[fromRow.Index + 1, fromColumn.Index + 1];
+                        var to = this.InteropWorksheet.Cells[toRow.Index + 1, toColumn.Index + 1];
+                        return this.InteropWorksheet.Range[from, to];
                     });
 
-                    WaitAndRetry(() =>
+                    this.WaitAndRetry(() =>
                     {
                         var cc = chunk[0][0];
                         if (cc.Options != null)
@@ -651,12 +656,12 @@ namespace Allors.Excel.Interop
                     var from = $"$A${fromChunk.Index + 1}";
                     var to = $"$A${toChunk.Index + 1}";
 
-                    var range = WaitAndRetry(() =>
+                    var range = this.WaitAndRetry(() =>
                     {
-                        return InteropWorksheet.Range[from, to];
+                        return this.InteropWorksheet.Range[from, to];
                     });
 
-                    WaitAndRetry(() =>
+                    this.WaitAndRetry(() =>
                     {
                         range.EntireRow.Hidden = hidden;
                     });
@@ -699,7 +704,7 @@ namespace Allors.Excel.Interop
         /// <param name="size"></param>
         public void AddPicture(string fileName, Rectangle rectangle)
         {
-            Workbook.AddIn.OfficeCore.AddPicture(InteropWorksheet, fileName, rectangle);
+            this.InteropWorksheet.Shapes.AddPicture(fileName, MsoTriState.msoFalse, MsoTriState.msoTrue, rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
 
             try
             {
@@ -724,7 +729,7 @@ namespace Allors.Excel.Interop
             try
             {
                 // Get the Namedrange that is scoped to this worksheet
-                name = InteropWorksheet.Names.Item(namedRange);
+                name = this.InteropWorksheet.Names.Item(namedRange);
             }
             catch
             {
@@ -762,7 +767,7 @@ namespace Allors.Excel.Interop
         {
             var ranges = new List<Range>();
 
-            foreach (Name namedRange in InteropWorksheet.Names)
+            foreach (Name namedRange in this.InteropWorksheet.Names)
             {
                 try
                 {
@@ -792,21 +797,21 @@ namespace Allors.Excel.Interop
             {
                 try
                 {
-                    var topLeft = InteropWorksheet.Cells[range.Row + 1, range.Column + 1];
-                    var bottomRight = InteropWorksheet.Cells[range.Row + range.Rows, range.Column + range.Columns];
+                    var topLeft = this.InteropWorksheet.Cells[range.Row + 1, range.Column + 1];
+                    var bottomRight = this.InteropWorksheet.Cells[range.Row + range.Rows, range.Column + range.Columns];
 
-                    var refersTo = InteropWorksheet.Range[topLeft, bottomRight];
+                    var refersTo = this.InteropWorksheet.Range[topLeft, bottomRight];
 
                     // When it does not exist, add it, else we update the range.
-                    if (InteropWorksheet.Names
+                    if (this.InteropWorksheet.Names
                         .Cast<Name>()
                         .Any(v => string.Equals(v.Name, name)))
                     {
-                        InteropWorksheet.Names.Item(name).RefersTo = refersTo;
+                        this.InteropWorksheet.Names.Item(name).RefersTo = refersTo;
                     }
                     else
                     {
-                        InteropWorksheet.Names.Add(name, refersTo);
+                        this.InteropWorksheet.Names.Add(name, refersTo);
                     }
                 }
                 catch
@@ -820,46 +825,46 @@ namespace Allors.Excel.Interop
         {
             if (startRowIndex >= 0 && numberOfRows > 0)
             {
-                PreventChangeEvent = true;
+                this.PreventChangeEvent = true;
 
                 try
                 {
-                    var rows = InteropWorksheet.Range[$"{startRowIndex + 2}:{startRowIndex + numberOfRows + 1}"];
+                    var rows = this.InteropWorksheet.Range[$"{startRowIndex + 2}:{startRowIndex + numberOfRows + 1}"];
 
-                    WaitAndRetry(() =>
+                    this.WaitAndRetry(() =>
                     {
-                        var tuple = DisableExcel();
+                        var tuple = this.DisableExcel();
                         rows.Insert(InteropXlInsertShiftDirection.xlShiftDown);
-                        EnableExcel(tuple);
+                        this.EnableExcel(tuple);
                     });
 
-                    if (CellByCoordinates.Any())
+                    if (this.CellByCoordinates.Any())
                     {
                         // Shift all cell rows down with the numberOfRows
                         // Shift all cell rows up with the numberOfRows
                         // We need to set the Key in the correct format "row:column" in order to track the rights cells.
                         // Order by descending so we will not have a duplicate key in the dictionary
-                        foreach (var item in CellByCoordinates
+                        foreach (var item in this.CellByCoordinates
                         .Where(kvp => kvp.Value.Row.Index > startRowIndex)
                         .OrderByDescending(kvp => kvp.Value.Row.Index)
                         .ToList())
                         {
                             // Remove the entry in the dictionary, but keep the cell.
                             var cell = item.Value;
-                            CellByCoordinates.Remove(item.Key);
+                            this.CellByCoordinates.Remove(item.Key);
 
                             // Shift rows up with the numberofrows that were deleted.
                             cell.Row.Index += numberOfRows;
 
                             // Add the existing cell with its new key
                             var coordinates = (cell.Row.Index, cell.Column.Index);
-                            CellByCoordinates.Add(coordinates, cell);
+                            this.CellByCoordinates.Add(coordinates, cell);
                         }
                     }
                 }
                 finally
                 {
-                    PreventChangeEvent = false;
+                    this.PreventChangeEvent = false;
                 }
             }
         }
@@ -868,57 +873,57 @@ namespace Allors.Excel.Interop
         {
             if (startRowIndex >= 0 && numberOfRows > 0)
             {
-                PreventChangeEvent = true;
+                this.PreventChangeEvent = true;
 
                 try
                 {
-                    var rows = InteropWorksheet.Range[$"{startRowIndex + 1}:{startRowIndex + numberOfRows}"];
+                    var rows = this.InteropWorksheet.Range[$"{startRowIndex + 1}:{startRowIndex + numberOfRows}"];
 
-                    WaitAndRetry(() =>
+                    this.WaitAndRetry(() =>
                     {
-                        var tuple = DisableExcel();
+                        var tuple = this.DisableExcel();
                         rows.Delete(InteropXlDeleteShiftDirection.xlShiftUp);
-                        EnableExcel(tuple);
+                        this.EnableExcel(tuple);
                     });
 
-                    if (CellByCoordinates.Any())
+                    if (this.CellByCoordinates.Any())
                     {
                         // Delete all cells in the deleted rows.
                         foreach (var rowIndex in Enumerable.Range(startRowIndex, numberOfRows))
                         {
-                            foreach (var item in CellByCoordinates
+                            foreach (var item in this.CellByCoordinates
                               .Where(kvp => kvp.Value.Row.Index == rowIndex)
                               .ToList())
                             {
-                                CellByCoordinates.Remove(item.Key);
+                                this.CellByCoordinates.Remove(item.Key);
                             }
                         }
 
                         // Shift all cell rows up with the numberOfRows
                         // We need to set the Key in the correct format "row:column" in order to track the rights cells.
-                        foreach (var item in CellByCoordinates
+                        foreach (var item in this.CellByCoordinates
                             .Where(kvp => kvp.Value.Row.Index > startRowIndex)
                             .OrderBy(kvp => kvp.Value.Row.Index)
                             .ToList())
                         {
                             // Remove the entry in the dictionary, but keep the cell.
                             var cell = item.Value;
-                            CellByCoordinates.Remove(item.Key);
+                            this.CellByCoordinates.Remove(item.Key);
 
                             var rowIndex = cell.Row.Index - numberOfRows;
 
                             // Link the cell to the new Row that already exists
-                            cell.Row = RowByIndex[rowIndex];
+                            cell.Row = this.RowByIndex[rowIndex];
 
                             // Add the existing cell with its new key
                             var coordinates = (cell.Row.Index, cell.Column.Index);
-                            CellByCoordinates.Add(coordinates, cell);
+                            this.CellByCoordinates.Add(coordinates, cell);
                         }
                     }
                 }
                 finally
                 {
-                    PreventChangeEvent = false;
+                    this.PreventChangeEvent = false;
                 }
             }
         }
@@ -927,48 +932,48 @@ namespace Allors.Excel.Interop
         {
             if (startColumnIndex >= 0 && numberOfColumns > 0)
             {
-                PreventChangeEvent = true;
+                this.PreventChangeEvent = true;
 
                 try
                 {
                     var startColumnName = ExcelColumnFromNumber(startColumnIndex + 2);
                     var endColumnName = ExcelColumnFromNumber(startColumnIndex + 1 + numberOfColumns);
 
-                    var rows = InteropWorksheet.Range[$"{startColumnName}1:{endColumnName}1"];
+                    var rows = this.InteropWorksheet.Range[$"{startColumnName}1:{endColumnName}1"];
 
-                    WaitAndRetry(() =>
+                    this.WaitAndRetry(() =>
                     {
-                        var tuple = DisableExcel();
+                        var tuple = this.DisableExcel();
                         rows.EntireColumn.Insert(InteropXlInsertShiftDirection.xlShiftToRight);
-                        EnableExcel(tuple);
+                        this.EnableExcel(tuple);
                     });
 
-                    if (CellByCoordinates.Any())
+                    if (this.CellByCoordinates.Any())
                     {
                         // Shift all cell columns to the right with the numberOfColumns
                         // We need to set the Key in the correct format "row:column" in order to track the rights cells.
                         // Order by descending so we will not have a duplicate key in the dictionary
-                        foreach (var item in CellByCoordinates
+                        foreach (var item in this.CellByCoordinates
                                     .Where(kvp => kvp.Value.Column.Index > startColumnIndex)
                                     .OrderByDescending(kvp => kvp.Value.Column.Index)
                                     .ToList())
                         {
                             // Remove the entry in the dictionary, but keep the cell.
                             var cell = item.Value;
-                            CellByCoordinates.Remove(item.Key);
+                            this.CellByCoordinates.Remove(item.Key);
 
                             // Shift rows up with the numberofrows that were deleted.
                             cell.Column.Index += numberOfColumns;
 
                             // Add the existing cell with its new key
                             var coordinates = (cell.Row.Index, cell.Column.Index);
-                            CellByCoordinates[coordinates] = cell;
+                            this.CellByCoordinates[coordinates] = cell;
                         }
                     }
                 }
                 finally
                 {
-                    PreventChangeEvent = false;
+                    this.PreventChangeEvent = false;
                 }
             }
         }
@@ -977,62 +982,62 @@ namespace Allors.Excel.Interop
         {
             if (startColumnIndex >= 0 && numberOfColumns > 0)
             {
-                PreventChangeEvent = true;
+                this.PreventChangeEvent = true;
 
                 try
                 {
                     var startColumnName = ExcelColumnFromNumber(startColumnIndex + 1);
                     var endColumnName = ExcelColumnFromNumber(startColumnIndex + numberOfColumns);
 
-                    var range = InteropWorksheet.Range[$"{startColumnName}1:{endColumnName}1"];
+                    var range = this.InteropWorksheet.Range[$"{startColumnName}1:{endColumnName}1"];
 
-                    WaitAndRetry(() =>
+                    this.WaitAndRetry(() =>
                     {
-                        var tuple = DisableExcel();
+                        var tuple = this.DisableExcel();
                         range.EntireColumn.Delete(InteropXlDeleteShiftDirection.xlShiftToLeft);
-                        EnableExcel(tuple);
+                        this.EnableExcel(tuple);
                     });
 
-                    if (CellByCoordinates.Any())
+                    if (this.CellByCoordinates.Any())
                     {
                         // Delete all cells in the deleted columns.
                         foreach (var columnIndex in Enumerable.Range(startColumnIndex, numberOfColumns))
                         {
-                            foreach (var item in CellByCoordinates
+                            foreach (var item in this.CellByCoordinates
                                 .Where(kvp => kvp.Value.Column.Index == columnIndex)
                                 .ToList())
                             {
-                                CellByCoordinates.Remove(item.Key);
+                                this.CellByCoordinates.Remove(item.Key);
                             }
                         }
 
                         // Shift all cell Columns to the left with the numberOfColumns
                         // We need to set the Key in the correct format "row:column" in order to track the rights cells.
-                        foreach (var item in CellByCoordinates
+                        foreach (var item in this.CellByCoordinates
                             .Where(kvp => kvp.Value.Column.Index > startColumnIndex)
                             .OrderBy(kvp => kvp.Value.Column.Index)
                             .ToList())
                         {
                             // Remove the entry in the dictionary, but keep the cell.
                             var cell = item.Value;
-                            CellByCoordinates.Remove(item.Key);
+                            this.CellByCoordinates.Remove(item.Key);
 
                             var columnIndex = cell.Column.Index - numberOfColumns;
 
-                            var column = Column(columnIndex);
+                            var column = this.Column(columnIndex);
 
                             // Link to the correct column that already exists.
                             cell.Column = column;
 
                             // Add the existing cell with its new key
                             var coordinates = (cell.Row.Index, cell.Column.Index);
-                            CellByCoordinates.Add(coordinates, cell);
+                            this.CellByCoordinates.Add(coordinates, cell);
                         }
                     }
                 }
                 finally
                 {
-                    PreventChangeEvent = false;
+                    this.PreventChangeEvent = false;
                 }
             }
         }
@@ -1055,11 +1060,11 @@ namespace Allors.Excel.Interop
                 InteropRange interopRange;
                 if (cell2 == null)
                 {
-                    interopRange = InteropWorksheet.Range[cell1];
+                    interopRange = this.InteropWorksheet.Range[cell1];
                 }
                 else
                 {
-                    interopRange = InteropWorksheet.Range[cell1, cell2];
+                    interopRange = this.InteropWorksheet.Range[cell1, cell2];
                 }
 
 
@@ -1075,26 +1080,26 @@ namespace Allors.Excel.Interop
 
         public Range GetUsedRange()
         {
-            var range = InteropWorksheet.UsedRange;
+            var range = this.InteropWorksheet.UsedRange;
 
             return new Range(range.Row - 1, range.Column - 1, range.Rows.Count, range.Columns.Count, this);
         }
 
         public Range GetUsedRange(int row)
         {
-            if (row < 0 || row >= InteropWorksheet.UsedRange.Row + InteropWorksheet.UsedRange.Rows.Count)
+            if (row < 0 || row >= this.InteropWorksheet.UsedRange.Row + this.InteropWorksheet.UsedRange.Rows.Count)
             {
                 return null;
             }
 
-            var rowRange = (InteropRange)InteropWorksheet.Rows[row + 1];
+            var rowRange = (InteropRange)this.InteropWorksheet.Rows[row + 1];
 
-            var endColumnIndex = InteropWorksheet.UsedRange.Column + InteropWorksheet.UsedRange.Columns.Count - 1;
+            var endColumnIndex = this.InteropWorksheet.UsedRange.Column + this.InteropWorksheet.UsedRange.Columns.Count - 1;
             var quit = false;
 
             do
             {
-                var cell = (InteropRange)InteropWorksheet.Cells[rowRange.Row, endColumnIndex];
+                var cell = (InteropRange)this.InteropWorksheet.Cells[rowRange.Row, endColumnIndex];
 
                 if (cell.Value2 == null)
                 {
@@ -1112,7 +1117,7 @@ namespace Allors.Excel.Interop
 
             do
             {
-                var cell = (InteropRange)InteropWorksheet.Cells[rowRange.Row, beginColumnIndex];
+                var cell = (InteropRange)this.InteropWorksheet.Cells[rowRange.Row, beginColumnIndex];
 
                 if (cell.Value2 == null)
                 {
@@ -1140,15 +1145,15 @@ namespace Allors.Excel.Interop
             }
 
             var columnIndex = ExcelColumnFromLetter(column);
-            var columnRange = (InteropRange)InteropWorksheet.Columns[columnIndex];
+            var columnRange = (InteropRange)this.InteropWorksheet.Columns[columnIndex];
 
             var beginRowIndex = columnRange.Row;
-            var maxRows = InteropWorksheet.UsedRange.Rows.Count;
+            var maxRows = this.InteropWorksheet.UsedRange.Rows.Count;
             var quit = false;
 
             do
             {
-                var cell = (InteropRange)InteropWorksheet.Cells[beginRowIndex, columnRange.Column];
+                var cell = (InteropRange)this.InteropWorksheet.Cells[beginRowIndex, columnRange.Column];
 
                 if (cell.Value2 == null)
                 {
@@ -1162,12 +1167,12 @@ namespace Allors.Excel.Interop
             while (!quit || beginRowIndex >= maxRows);
 
 
-            var endRowIndex = InteropWorksheet.UsedRange.Row + InteropWorksheet.UsedRange.Rows.Count - 1;
+            var endRowIndex = this.InteropWorksheet.UsedRange.Row + this.InteropWorksheet.UsedRange.Rows.Count - 1;
             quit = false;
 
             do
             {
-                var cell = (InteropRange)InteropWorksheet.Cells[endRowIndex, columnRange.Column];
+                var cell = (InteropRange)this.InteropWorksheet.Cells[endRowIndex, columnRange.Column];
 
                 if (cell.Value2 == null)
                 {
@@ -1200,15 +1205,15 @@ namespace Allors.Excel.Interop
         /// </summary>
         public void FreezePanes(Range range)
         {
-            InteropWorksheet.Application.ScreenUpdating = true;
-            InteropWorksheet.Activate();
+            this.InteropWorksheet.Application.ScreenUpdating = true;
+            this.InteropWorksheet.Activate();
 
-            InteropWorksheet.Application.ActiveWindow.FreezePanes = false;
+            this.InteropWorksheet.Application.ActiveWindow.FreezePanes = false;
 
             if (range.Row > 0 && range.Column > 0)
             {
-                InteropWorksheet.Application.ActiveWindow.SplitRow = range.Row;
-                InteropWorksheet.Application.ActiveWindow.SplitColumn = range.Column;
+                this.InteropWorksheet.Application.ActiveWindow.SplitRow = range.Row;
+                this.InteropWorksheet.Application.ActiveWindow.SplitColumn = range.Column;
             }
             else
             {
@@ -1218,43 +1223,44 @@ namespace Allors.Excel.Interop
                     row = range.Row + 1;
                 }
 
-                InteropWorksheet.Application.ActiveWindow.SplitRow = row;
+                this.InteropWorksheet.Application.ActiveWindow.SplitRow = row;
 
                 var column = 0;
                 if (range.Column > -1)
                 {
                     column = range.Column + 1;
                 }
-                InteropWorksheet.Application.ActiveWindow.SplitColumn = column;
+
+                this.InteropWorksheet.Application.ActiveWindow.SplitColumn = column;
             }
 
-            InteropWorksheet.Application.ActiveWindow.FreezePanes = true;
+            this.InteropWorksheet.Application.ActiveWindow.FreezePanes = true;
 
-            FreezeRange = range;
+            this.FreezeRange = range;
         }
 
         public void UnfreezePanes()
         {
-            InteropWorksheet.Application.ScreenUpdating = true;
-            InteropWorksheet.Activate();
+            this.InteropWorksheet.Application.ScreenUpdating = true;
+            this.InteropWorksheet.Activate();
 
-            InteropWorksheet.Application.ActiveWindow.SplitRow = 0;
-            InteropWorksheet.Application.ActiveWindow.SplitColumn = 0;
-            InteropWorksheet.Application.ActiveWindow.FreezePanes = false;
+            this.InteropWorksheet.Application.ActiveWindow.SplitRow = 0;
+            this.InteropWorksheet.Application.ActiveWindow.SplitColumn = 0;
+            this.InteropWorksheet.Application.ActiveWindow.FreezePanes = false;
 
-            FreezeRange = null;
+            this.FreezeRange = null;
         }
 
-        public bool HasFreezePanes => FreezeRange != null;
+        public bool HasFreezePanes => this.FreezeRange != null;
 
         public void SaveAsXPS(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true)
         {
-            SaveAs(file, InteropXlFixedFormatType.xlTypeXPS, overwriteExistingFile, openAfterPublish, ignorePrintAreas);
+            this.SaveAs(file, InteropXlFixedFormatType.xlTypeXPS, overwriteExistingFile, openAfterPublish, ignorePrintAreas);
         }
 
         public void SaveAsPDF(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true)
         {
-            SaveAs(file, InteropXlFixedFormatType.xlTypePDF, overwriteExistingFile, openAfterPublish, ignorePrintAreas);
+            this.SaveAs(file, InteropXlFixedFormatType.xlTypePDF, overwriteExistingFile, openAfterPublish, ignorePrintAreas);
         }
 
         /// <summary>
@@ -1326,71 +1332,12 @@ namespace Allors.Excel.Interop
                 printArea = $"{startColumn}{startRow}:{endColumn}{endRow}";
             }
 
-            InteropWorksheet.PageSetup.PrintArea = printArea;
-        }
-
-        public void SetCustomProperties(CustomProperties properties)
-        {
-            var cps = InteropWorksheet.CustomProperties.Cast<InteropCustomProperty>().ToArray(); ;
-
-            foreach (var kvp in properties)
-            {
-                var found = false;
-                foreach (var cp in cps)
-                {
-                    if (string.Equals(cp.Name, kvp.Key, StringComparison.OrdinalIgnoreCase))
-                    {
-                        found = true;
-
-                        if (kvp.Value == null)
-                        {
-                            cp.Value = CustomProperties.MagicNull;
-                        }
-                        else
-                        {
-                            cp.Value = kvp.Value;
-                        }
-                    }
-                }
-
-
-                if (!found)
-                {
-                    if (kvp.Value == null)
-                    {
-                        InteropWorksheet.CustomProperties.Add(kvp.Key, CustomProperties.MagicNull);
-                    }
-                    else
-                    {
-                        InteropWorksheet.CustomProperties.Add(kvp.Key, kvp.Value);
-                    }
-                }
-
-            }
-        }
-
-        public CustomProperties GetCustomProperties()
-        {
-            var dict = new CustomProperties();
-
-            foreach (InteropCustomProperty customProperty in InteropWorksheet.CustomProperties)
-            {
-                if (CustomProperties.MagicNull.Equals(customProperty.Value))
-                {
-                    dict.Add(customProperty.Name, null);
-                }
-                else
-                {
-                    dict.Add(customProperty.Name, customProperty.Value);
-                }
-            }
-
-            return dict;
+            this.InteropWorksheet.PageSetup.PrintArea = printArea;
         }
 
         public void SetInputMessage(ICell cell, string message, string title = null, bool showInputMessage = true)
         {
-            var inputCell = (InteropRange)InteropWorksheet.Cells[cell.Row.Index + 1, cell.Column.Index + 1];
+            var inputCell = (InteropRange)this.InteropWorksheet.Cells[cell.Row.Index + 1, cell.Column.Index + 1];
 
             inputCell.Validation.Delete();
             inputCell.Validation.Add(InteropXlDVType.xlValidateInputOnly);
@@ -1402,7 +1349,7 @@ namespace Allors.Excel.Interop
 
         public void HideInputMessage(ICell cell, bool clearInputMessage = false)
         {
-            var inputCell = (InteropRange)InteropWorksheet.Cells[cell.Row.Index + 1, cell.Column.Index + 1];
+            var inputCell = (InteropRange)this.InteropWorksheet.Cells[cell.Row.Index + 1, cell.Column.Index + 1];
 
             if (clearInputMessage)
             {
@@ -1415,12 +1362,12 @@ namespace Allors.Excel.Interop
 
         private void Reset()
         {
-            var deletedCells = new HashSet<Cell>(CellByCoordinates.Values);
+            var deletedCells = new HashSet<Cell>(this.CellByCoordinates.Values);
             var changedCells = new List<ICell>();
-            foreach (InteropRange interopCell in InteropWorksheet.UsedRange)
+            foreach (InteropRange interopCell in this.InteropWorksheet.UsedRange)
             {
                 var coordinates = interopCell.Coordinates();
-                if (!CellByCoordinates.TryGetValue(coordinates, out var cell))
+                if (!this.CellByCoordinates.TryGetValue(coordinates, out var cell))
                 {
                     if (interopCell.Value2 == null)
                     {
@@ -1447,7 +1394,7 @@ namespace Allors.Excel.Interop
 
             if (changedCells.Count > 0)
             {
-                CellsChanged?.Invoke(this, new CellChangedEvent(changedCells.ToArray()));
+                this.CellsChanged?.Invoke(this, new CellChangedEvent(changedCells.ToArray()));
             }
         }
 
@@ -1458,32 +1405,32 @@ namespace Allors.Excel.Interop
                 return;
             }
 
-            InteropWorksheet.PageSetup.Orientation = pageSetup.Orientation == 1
+            this.InteropWorksheet.PageSetup.Orientation = pageSetup.Orientation == 1
                     ? XlPageOrientation.xlPortrait
                     : XlPageOrientation.xlLandscape;
 
             if (pageSetup.PaperSize >= 1 && pageSetup.PaperSize <= 41)
             {
-                InteropWorksheet.PageSetup.PaperSize = (XlPaperSize)pageSetup.PaperSize;
+                this.InteropWorksheet.PageSetup.PaperSize = (XlPaperSize)pageSetup.PaperSize;
             }
 
             if (pageSetup.Header?.Margin >= 0)
             {
-                InteropWorksheet.PageSetup.HeaderMargin = pageSetup.Header?.Margin ?? 0;
+                this.InteropWorksheet.PageSetup.HeaderMargin = pageSetup.Header?.Margin ?? 0;
             }
 
-            InteropWorksheet.PageSetup.LeftHeader = pageSetup.Header?.Left;
-            InteropWorksheet.PageSetup.CenterHeader = pageSetup.Header?.Center;
-            InteropWorksheet.PageSetup.RightHeader = pageSetup.Header?.Right;
+            this.InteropWorksheet.PageSetup.LeftHeader = pageSetup.Header?.Left;
+            this.InteropWorksheet.PageSetup.CenterHeader = pageSetup.Header?.Center;
+            this.InteropWorksheet.PageSetup.RightHeader = pageSetup.Header?.Right;
 
             if (pageSetup.Footer?.Margin >= 0)
             {
-                InteropWorksheet.PageSetup.FooterMargin = pageSetup.Footer?.Margin ?? 0;
+                this.InteropWorksheet.PageSetup.FooterMargin = pageSetup.Footer?.Margin ?? 0;
             }
 
-            InteropWorksheet.PageSetup.LeftFooter = pageSetup.Footer?.Left;
-            InteropWorksheet.PageSetup.CenterFooter = pageSetup.Footer?.Center;
-            InteropWorksheet.PageSetup.RightFooter = pageSetup.Footer?.Right;
+            this.InteropWorksheet.PageSetup.LeftFooter = pageSetup.Footer?.Left;
+            this.InteropWorksheet.PageSetup.CenterFooter = pageSetup.Footer?.Center;
+            this.InteropWorksheet.PageSetup.RightFooter = pageSetup.Footer?.Right;
         }
 
         public void SetChartObjectSourceData(object chartObject, object pivotTable)

@@ -1,4 +1,4 @@
-﻿// <copyright file="Binder.cs" company="Allors bvba">
+// <copyright file="Binder.cs" company="Allors bvba">
 // Copyright (c) Allors bvba. All rights reserved.
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -28,39 +28,39 @@ namespace Allors.Excel
 
         public Binder(IWorksheet worksheet, Style changedStyle = null)
         {
-            Worksheet = worksheet;
-            Worksheet.CellsChanged += Worksheet_CellsChanged;
+            this.Worksheet = worksheet;
+            this.Worksheet.CellsChanged += this.Worksheet_CellsChanged;
  
             this.changedStyle = changedStyle;
             if (this.changedStyle != null)
             {
-                changedCells = new Dictionary<ICell, Style>();
+                this.changedCells = new Dictionary<ICell, Style>();
             }
         }
 
         public void Set(int row, int column, IBinding binding)
         {
-            Set(Worksheet[row, column], binding);
+            this.Set(this.Worksheet[row, column], binding);
         }
 
         public void Set(ICell cell, IBinding binding)
         {
-            bindingByCell[cell] = binding;
-            bindingCells.Add(cell);
+            this.bindingByCell[cell] = binding;
+            this.bindingCells.Add(cell);
         }
 
         public ICell[] ToCells()
         {
-            var obsoleteCells = boundCells.Except(bindingCells).ToArray();
-            boundCells = bindingCells;
-            bindingCells = new List<ICell>();
+            var obsoleteCells = this.boundCells.Except(this.bindingCells).ToArray();
+            this.boundCells = this.bindingCells;
+            this.bindingCells = new List<ICell>();
 
             foreach (var obsoleteCell in obsoleteCells)
             {
-                bindingByCell.Remove(obsoleteCell);
+                this.bindingByCell.Remove(obsoleteCell);
             }
 
-            foreach (var kvp in bindingByCell)
+            foreach (var kvp in this.bindingByCell)
             {
                 var cell = kvp.Key;
                 var binding = kvp.Value;
@@ -74,19 +74,19 @@ namespace Allors.Excel
         {
             foreach (var cell in e.Cells)
             {
-                if (bindingByCell.TryGetValue(cell, out var binding))
+                if (this.bindingByCell.TryGetValue(cell, out var binding))
                 {
                     if (binding.TwoWayBinding)
                     {
                         binding.ToDomain(cell);
 
-                        if (changedStyle != null)
+                        if (this.changedStyle != null)
                         {
-                            if (!changedCells.ContainsKey(cell))
+                            if (!this.changedCells.ContainsKey(cell))
                             {
-                                changedCells.Add(cell, cell.Style);
+                                this.changedCells.Add(cell, cell.Style);
                             }
-                            cell.Style = changedStyle;
+                            cell.Style = this.changedStyle;
                         }
                     }
                     else
@@ -96,27 +96,27 @@ namespace Allors.Excel
                 }
             }
 
-            ToDomained?.Invoke(this, EventArgs.Empty);
+            this.ToDomained?.Invoke(this, EventArgs.Empty);
         }
 
         public void ResetChangedCells()
         {
-            if (changedStyle != null)
+            if (this.changedStyle != null)
             {
-                foreach (var kvp in changedCells)
+                foreach (var kvp in this.changedCells)
                 {
                     var cell = kvp.Key;
                     var style = kvp.Value;
                     cell.Style = style;
                 }
 
-                changedCells.Clear();
+                this.changedCells.Clear();
             }
         }
 
         public bool ExistBinding(int row, int column)
         {
-            return bindingCells.Any(v => v.Row.Index == row && v.Column.Index == column);
+            return this.bindingCells.Any(v => v.Row.Index == row && v.Column.Index == column);
         }
     }
 }

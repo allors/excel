@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 using ExcelDna.Integration.CustomUI;
 using System.Runtime.InteropServices;
-using System.Threading;
 using Allors.Excel.Interop;
 using Application;
 using ExcelAddIn.DNA;
@@ -18,10 +16,7 @@ namespace ExcelAddin.DNA
             var application = ExcelDnaUtil.Application;
             var serviceLocator = new ServiceLocator();
             this.Program = new Program(serviceLocator);
-            var office = new OfficeCore();
-
-            this.AddIn = new AddIn(application, this.Program, office);
-
+            this.AddIn = new AddIn(application, this.Program);
             return RibbonResources.Ribbon;
         }
 

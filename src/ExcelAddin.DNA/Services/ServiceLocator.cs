@@ -1,4 +1,4 @@
-﻿using Application;
+using Application;
 
 namespace ExcelAddIn.DNA
 {
@@ -6,7 +6,7 @@ namespace ExcelAddIn.DNA
     {
         public ServiceLocator()
         {
-            Alerter = new Alerter();
+            this.Alerter = new Alerter();
         }
 
         public IAlerter Alerter { get; }

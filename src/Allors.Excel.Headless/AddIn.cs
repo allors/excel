@@ -3,33 +3,33 @@
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-using System.Collections.Generic;
-using System.Linq;
-
 namespace Allors.Excel.Headless
 {
+    using System.Collections.Generic;
+    using System.Linq;
+
     public class AddIn : IAddIn
     {
         public AddIn()
         {
-            WorkbookList = new List<Workbook>();
+            this.WorkbookList = new List<Workbook>();
         }
 
-        public IWorkbook[] Workbooks => WorkbookList.Cast<IWorkbook>().ToArray();
+        public IWorkbook[] Workbooks => this.WorkbookList.Cast<IWorkbook>().ToArray();
 
         public IList<Workbook> WorkbookList { get; }
 
         public Workbook AddWorkbook()
         {
             var workbook = new Workbook(this);
-            WorkbookList.Add(workbook);
+            this.WorkbookList.Add(workbook);
             workbook.Activate();
             return workbook;
         }
 
         public void Remove(Workbook workbook)
         {
-            WorkbookList.Remove(workbook);
+            this.WorkbookList.Remove(workbook);
         }
     }
 }

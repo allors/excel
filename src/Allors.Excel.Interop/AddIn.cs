@@ -3,32 +3,29 @@
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Office.Interop.Excel;
-
 namespace Allors.Excel.Interop
 {
-    using InteropApplication = Application;
+    using System.Collections.Generic;
+    using System.Linq;
+    using InteropApplication = Microsoft.Office.Interop.Excel.Application;
     using InteropWorkbook = Microsoft.Office.Interop.Excel.Workbook;
     using InteropWorksheet = Microsoft.Office.Interop.Excel.Worksheet;
-    using InteropAppEvents_Event = AppEvents_Event;
+    using InteropAppEvents_Event = Microsoft.Office.Interop.Excel.AppEvents_Event;
 
     public class AddIn : IAddIn
     {
         private readonly Dictionary<InteropWorkbook, Workbook> workbookByInteropWorkbook;
 
-        public AddIn(object application, IProgram program, OfficeCore officeCore)
+        public AddIn(object application, IProgram program)
         {
-            Application = (InteropApplication)application;
-            Program = program;
-            OfficeCore = officeCore;
+            this.Application = (InteropApplication)application;
+            this.Program = program;
 
-            workbookByInteropWorkbook = new Dictionary<InteropWorkbook, Workbook>();
+            this.workbookByInteropWorkbook = new Dictionary<InteropWorkbook, Workbook>();
 
-            ((InteropAppEvents_Event)Application).NewWorkbook += async interopWorkbook =>
+            ((InteropAppEvents_Event)this.Application).NewWorkbook += async interopWorkbook =>
             {
-                var workbook = New(interopWorkbook);
+                var workbook = this.New(interopWorkbook);
                 for (var i = 1; i <= interopWorkbook.Worksheets.Count; i++)
                 {
                     var interopWorksheet = (InteropWorksheet)interopWorkbook.Worksheets[i];
@@ -36,16 +33,16 @@ namespace Allors.Excel.Interop
                 }
 
                 var worksheets = workbook.Worksheets;
-                await Program.OnNew(workbook);
+                await this.Program.OnNew(workbook);
                 foreach (var worksheet in worksheets)
                 {
                     await program.OnNew(worksheet);
                 }
             };
 
-            Application.WorkbookOpen += async interopWorkbook =>
+            this.Application.WorkbookOpen += async interopWorkbook =>
             {
-                var workbook = New(interopWorkbook);
+                var workbook = this.New(interopWorkbook);
                 for (var i = 1; i <= interopWorkbook.Worksheets.Count; i++)
                 {
                     var interopWorksheet = (InteropWorksheet)interopWorkbook.Worksheets[i];
@@ -53,7 +50,7 @@ namespace Allors.Excel.Interop
                 }
 
                 var worksheets = workbook.Worksheets;
-                await Program.OnNew(workbook);
+                await this.Program.OnNew(workbook);
                 foreach (var worksheet in worksheets)
                 {
                     await program.OnNew(worksheet);
@@ -63,59 +60,58 @@ namespace Allors.Excel.Interop
 
             void WorkbookBeforeClose(InteropWorkbook interopWorkbook, ref bool cancel)
             {
-                if (WorkbookByInteropWorkbook.TryGetValue(interopWorkbook, out var workbook))
+                if (this.WorkbookByInteropWorkbook.TryGetValue(interopWorkbook, out var workbook))
                 {
-                    Program.OnClose(workbook, ref cancel);
+                    this.Program.OnClose(workbook, ref cancel);
                     if (!cancel)
                     {
-                        Close(interopWorkbook);
+                        this.Close(interopWorkbook);
                     }
                 }
             }
 
-            Application.WorkbookActivate += wb =>
+            this.Application.WorkbookActivate += wb =>
             {
-                if (!WorkbookByInteropWorkbook.TryGetValue(wb, out var workbook))
+                if (!this.WorkbookByInteropWorkbook.TryGetValue(wb, out var workbook))
                 {
-                    workbook = New(wb);
+                    workbook = this.New(wb);
                 }
 
                 workbook.IsActive = true;
             };
-            
 
-            Application.WorkbookDeactivate += wb =>
+
+            this.Application.WorkbookDeactivate += wb =>
             {
                 // Could already be gone by the WorkbookBeforeClose event
-                if (WorkbookByInteropWorkbook.TryGetValue(wb, out var workbook))
+                if (this.WorkbookByInteropWorkbook.TryGetValue(wb, out _))
                 {
-                    WorkbookByInteropWorkbook[wb].IsActive = false;
+                    this.WorkbookByInteropWorkbook[wb].IsActive = false;
                 }
             };
 
-            Application.WorkbookBeforeClose += WorkbookBeforeClose;
+            this.Application.WorkbookBeforeClose += WorkbookBeforeClose;
         }
 
         public InteropApplication Application { get; }
 
         public IProgram Program { get; }
-        public OfficeCore OfficeCore { get; }
 
-        public IReadOnlyDictionary<InteropWorkbook, Workbook> WorkbookByInteropWorkbook => workbookByInteropWorkbook;
+        public IReadOnlyDictionary<InteropWorkbook, Workbook> WorkbookByInteropWorkbook => this.workbookByInteropWorkbook;
 
-        public IWorkbook[] Workbooks => WorkbookByInteropWorkbook.Values.Cast<IWorkbook>().ToArray();
+        public IWorkbook[] Workbooks => this.WorkbookByInteropWorkbook.Values.Cast<IWorkbook>().ToArray();
 
         public Workbook New(InteropWorkbook interopWorkbook)
         {
-            if (!workbookByInteropWorkbook.TryGetValue(interopWorkbook, out var workbook))
+            if (!this.workbookByInteropWorkbook.TryGetValue(interopWorkbook, out var workbook))
             {
                 workbook = new Workbook(this, interopWorkbook);
-                workbookByInteropWorkbook.Add(interopWorkbook, workbook);
+                this.workbookByInteropWorkbook.Add(interopWorkbook, workbook);
             }
 
             return workbook;
         }
 
-        public void Close(InteropWorkbook interopWorkbook) => workbookByInteropWorkbook.Remove(interopWorkbook);
+        public void Close(InteropWorkbook interopWorkbook) => this.workbookByInteropWorkbook.Remove(interopWorkbook);
     }
 }

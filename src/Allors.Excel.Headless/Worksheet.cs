@@ -3,31 +3,33 @@
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Threading.Tasks;
-
 namespace Allors.Excel.Headless
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Drawing;
+    using System.IO;
+    using System.Threading.Tasks;
+
     public class Worksheet : IWorksheet
     {
         private readonly Dictionary<int, Row> rowByIndex;
 
         private readonly Dictionary<int, Column> columnByIndex;
 
-        IWorkbook IWorksheet.Workbook => Workbook;
+        IWorkbook IWorksheet.Workbook => this.Workbook;
 
+        public ICustomProperties CustomProperties { get; }
+        
         public Workbook Workbook { get; }
 
         public Worksheet(Workbook workbook)
         {
-            Workbook = workbook;
+            this.Workbook = workbook;
 
-            rowByIndex = new Dictionary<int, Row>();
-            columnByIndex = new Dictionary<int, Column>();
-            CellByCoordinates = new Dictionary<(int, int), Cell>();
+            this.rowByIndex = new Dictionary<int, Row>();
+            this.columnByIndex = new Dictionary<int, Column>();
+            this.CellByCoordinates = new Dictionary<(int, int), Cell>();
         }
 
         public event EventHandler<CellChangedEvent> CellsChanged;
@@ -55,47 +57,47 @@ namespace Allors.Excel.Headless
         {
             get
             {
-                if (!CellByCoordinates.TryGetValue(coordinates, out var cell))
+                if (!this.CellByCoordinates.TryGetValue(coordinates, out var cell))
                 {
-                    cell = new Cell(this, Row(coordinates.Item1), Column(coordinates.Item2));
-                    CellByCoordinates.Add(coordinates, cell);
+                    cell = new Cell(this, this.Row(coordinates.Item1), this.Column(coordinates.Item2));
+                    this.CellByCoordinates.Add(coordinates, cell);
                 }
 
                 return cell;
             }
         }
 
-        IRow IWorksheet.Row(int index) => Row(index);
+        IRow IWorksheet.Row(int index) => this.Row(index);
 
         public Row Row(int index)
         {
             if (index < 0)
             {
-                throw new ArgumentException("Index can not be negative", nameof(Row));
+                throw new ArgumentException("Index can not be negative", nameof(this.Row));
             }
 
-            if (!rowByIndex.TryGetValue(index, out var row))
+            if (!this.rowByIndex.TryGetValue(index, out var row))
             {
                 row = new Row(this, index);
-                rowByIndex.Add(index, row);
+                this.rowByIndex.Add(index, row);
             }
 
             return row;
         }
 
-        IColumn IWorksheet.Column(int index) => Column(index);
+        IColumn IWorksheet.Column(int index) => this.Column(index);
 
         public Column Column(int index)
         {
             if (index < 0)
             {
-                throw new ArgumentException(nameof(Column));
+                throw new ArgumentException(nameof(this.Column));
             }
 
-            if (!columnByIndex.TryGetValue(index, out var column))
+            if (!this.columnByIndex.TryGetValue(index, out var column))
             {
                 column = new Column(this, index);
-                columnByIndex.Add(index, column);
+                this.columnByIndex.Add(index, column);
             }
 
             return column;
@@ -108,12 +110,12 @@ namespace Allors.Excel.Headless
 
         public void Activate()
         {
-            foreach (var worksheet in Workbook.WorksheetList)
+            foreach (var worksheet in this.Workbook.WorksheetList)
             {
                 worksheet.IsActive = false;
             }
 
-            IsActive = true;
+            this.IsActive = true;
         }
 
         public async Task RefreshPivotTables()
@@ -206,16 +208,6 @@ namespace Allors.Excel.Headless
         public void SetPrintArea(Range range = null)
         {
 
-        }
-
-        public void SetCustomProperties(CustomProperties properties)
-        {
-            throw new NotImplementedException();
-        }
-
-        public CustomProperties GetCustomProperties()
-        {
-            throw new NotImplementedException();
         }
 
         public void HideInputMessage(ICell cell, bool clearInputMessage = false)

@@ -1,32 +1,33 @@
-﻿// <copyright file="WorkbookTests.cs" company="Allors bvba">
+// <copyright file="WorkbookTests.cs" company="Allors bvba">
 // Copyright (c) Allors bvba. All rights reserved.
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading;
-using Allors.Excel.Interop;
-using Moq;
-using Xunit;
-
 namespace Allors.Excel.Tests.Interop
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Runtime.InteropServices;
+    using System.Threading;
+    using Allors.Excel.Interop;
+    using Moq;
+    using Xunit;
+    using Range = Excel.Range;
+
     public abstract class WorksheetTests : InteropTest
     {
         private DirectoryInfo tempDirectory;
 
         protected WorksheetTests()
-        {            
+        {
             var dir = Path.Combine(Path.GetTempPath(), nameof(WorksheetTests));
-            tempDirectory = new DirectoryInfo(dir);
+            this.tempDirectory = new DirectoryInfo(dir);
 
-            if (tempDirectory.Exists)
+            if (this.tempDirectory.Exists)
             {
-                foreach (var file in tempDirectory.GetFiles())
+                foreach (var file in this.tempDirectory.GetFiles())
                 {
                     try
                     {
@@ -37,21 +38,19 @@ namespace Allors.Excel.Tests.Interop
 
                     }
                 }
-            }           
+            }
         }
 
         [Fact]
         public void SheetHasIndex()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
+            var addIn = new AddIn(this.application, program.Object);
 
-            var addIn = new AddIn(application, program.Object, office);
-
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
-                        
+
             var sheet1 = workbook.Worksheets.Single(v => v.Name == "1");
             Assert.Equal(1, sheet1.Index);
 
@@ -63,11 +62,9 @@ namespace Allors.Excel.Tests.Interop
         public void NewSheetAtActiveSheetHasIndex()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
+            var addIn = new AddIn(this.application, program.Object);
 
-            var addIn = new AddIn(application, program.Object, office);
-
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
@@ -89,11 +86,10 @@ namespace Allors.Excel.Tests.Interop
         public void NewSheetBeforeSheetHasIndex()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
@@ -115,11 +111,10 @@ namespace Allors.Excel.Tests.Interop
         public void NewSheetAtIndexHasIndex()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
@@ -148,11 +143,10 @@ namespace Allors.Excel.Tests.Interop
         public void NewSheetAfterSheetHasIndex()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
@@ -175,11 +169,10 @@ namespace Allors.Excel.Tests.Interop
         public void ShowInputMessage()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
@@ -198,101 +191,98 @@ namespace Allors.Excel.Tests.Interop
             sheet2.HideInputMessage(cell, clearInputMessage: true);
         }
 
-        [Fact]
-        public void SetCustomProperties()
-        {
-            var program = new Mock<IProgram>();
-            var office = new OfficeCore();
+        //[Fact]
+        //public void SetCustomProperties()
+        //{
+        //    var program = new Mock<IProgram>();
 
-            var addIn = new AddIn(application, program.Object, office);
+        //    var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+        //    this.application.Workbooks.Add();
 
-            var workbook = addIn.Workbooks[0];
+        //    var workbook = addIn.Workbooks[0];
 
-            // Sheet with content
-            var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
+        //    // Sheet with content
+        //    var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
 
-            var expectedDate = DateTime.Now;
+        //    var expectedDate = DateTime.Now;
 
 
-            var dict = new CustomProperties();
-            dict.Add("Showcase.IsInvoiceSheet", false);
-            dict.Add("Showcase.IsSheet2", true);
-            dict.Add("Showcase.Sheet2.Date", expectedDate);
-            dict.Add("Showcase.Sheet2.Decimal", 123.45M);
+        //    var dict = new OldCustomProperties();
+        //    dict.Add("Showcase.IsInvoiceSheet", false);
+        //    dict.Add("Showcase.IsSheet2", true);
+        //    dict.Add("Showcase.Sheet2.Date", expectedDate);
+        //    dict.Add("Showcase.Sheet2.Decimal", 123.45M);
 
-            var nullableDecimal = new decimal?(123.45M);
-            dict.Add("Showcase.Sheet2.NullableDecimal", nullableDecimal);
+        //    var nullableDecimal = new decimal?(123.45M);
+        //    dict.Add("Showcase.Sheet2.NullableDecimal", nullableDecimal);
 
-            dict.Add("Showcase.Sheet2.Int", 12);
+        //    dict.Add("Showcase.Sheet2.Int", 12);
 
-            var nullableInt = new int?(12);
-            dict.Add("Showcase.Sheet2.NullableInt", nullableInt);
-           
-            dict.Add("Company.Name", "Zonsoft.be");
-            dict.Add("Company.Street", "Uikhoverstraat 158");
+        //    var nullableInt = new int?(12);
+        //    dict.Add("Showcase.Sheet2.NullableInt", nullableInt);
 
-            // Duplicates will be overwritten
-            dict.Add("Company.City", "3631 Maasmechelen");
-            dict.Add("Company.City", "3631 Uikhoven");
-            
-            dict.Add("Company.Country", "BE België");
+        //    dict.Add("Company.Name", "Zonsoft.be");
+        //    dict.Add("Company.Street", "Uikhoverstraat 158");
 
-            dict.Add("Showcase.Sheet2.Null", null);
+        //    // Duplicates will be overwritten
+        //    dict.Add("Company.City", "3631 Maasmechelen");
+        //    dict.Add("Company.City", "3631 Uikhoven");
 
-            sheet2.SetCustomProperties(dict);
+        //    dict.Add("Company.Country", "BE België");
 
-            var customProperties = sheet2.GetCustomProperties();
+        //    dict.Add("Showcase.Sheet2.Null", null);
 
-            Assert.Equal(dict.Count, customProperties.Count);
-                        
-            Assert.False(customProperties.Get<bool>("Showcase.IsInvoiceSheet"));
-            Assert.True(customProperties.Get<bool>("Showcase.IsSheet2"));
+        //    sheet2.SetCustomProperties(dict);
 
-            // fractions of MS are not preserved!
-            Assert.Equal(expectedDate.Date, customProperties.Get<DateTime>("Showcase.Sheet2.Date").Date);
-            
-            Assert.Equal(12, customProperties.Get< int>("Showcase.Sheet2.Int"));
-            Assert.Equal(12, customProperties.Get< int?>("Showcase.Sheet2.NullableInt"));
-            Assert.Null(customProperties.Get<int?>("Showcase.Sheet2.Null"));
+        //    var customProperties = sheet2.GetCustomProperties();
 
-            Assert.Equal(123.45M, customProperties.Get< decimal>("Showcase.Sheet2.Decimal"));
-            Assert.Equal(123.45M, customProperties.Get< decimal>("Showcase.Sheet2.NullableDecimal"));
+        //    Assert.Equal(dict.Count, customProperties.Count);
 
-            Assert.Equal("Zonsoft.be", customProperties.Get<string>("Company.Name"));
-            Assert.Equal("BE België", customProperties.Get<string>("Company.Country"));
-            Assert.Equal("3631 Uikhoven", customProperties.Get<string>("Company.City"));
+        //    Assert.False(customProperties.Get<bool>("Showcase.IsInvoiceSheet"));
+        //    Assert.True(customProperties.Get<bool>("Showcase.IsSheet2"));
 
-        }
+        //    // fractions of MS are not preserved!
+        //    Assert.Equal(expectedDate.Date, customProperties.Get<DateTime>("Showcase.Sheet2.Date").Date);
+
+        //    Assert.Equal(12, customProperties.Get<int>("Showcase.Sheet2.Int"));
+        //    Assert.Equal(12, customProperties.Get<int?>("Showcase.Sheet2.NullableInt"));
+        //    Assert.Null(customProperties.Get<int?>("Showcase.Sheet2.Null"));
+
+        //    Assert.Equal(123.45M, customProperties.Get<decimal>("Showcase.Sheet2.Decimal"));
+        //    Assert.Equal(123.45M, customProperties.Get<decimal>("Showcase.Sheet2.NullableDecimal"));
+
+        //    Assert.Equal("Zonsoft.be", customProperties.Get<string>("Company.Name"));
+        //    Assert.Equal("BE België", customProperties.Get<string>("Company.Country"));
+        //    Assert.Equal("3631 Uikhoven", customProperties.Get<string>("Company.City"));
+
+        //}
 
         [Fact]
         public void SaveAsPDFWithNullThrowsException()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
             // Sheet with content
             var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
 
-            Assert.Throws<ArgumentNullException>(() => sheet2.SaveAsPDF(null));           
+            Assert.Throws<ArgumentNullException>(() => sheet2.SaveAsPDF(null));
         }
 
         [Fact]
         public void SetPrintArea()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
@@ -301,7 +291,7 @@ namespace Allors.Excel.Tests.Interop
 
             sheet2.SetPrintArea(new Range(5, 1, 10, 5, sheet2));
 
-            var file = new FileInfo(Path.Combine(tempDirectory.FullName, $"{nameof(sheet2)}.pdf"));
+            var file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(sheet2)}.pdf"));
 
             // PrintArea is set, but we do not want to use it. Prints the entire sheet
             sheet2.SaveAsPDF(file, true);
@@ -326,18 +316,17 @@ namespace Allors.Excel.Tests.Interop
         public void SaveAsPDFWithHeader()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
             // Sheet with content
             var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
 
-            var file = new FileInfo(Path.Combine(tempDirectory.FullName, $"{nameof(sheet2)}.pdf"));
+            var file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(sheet2)}.pdf"));
 
             sheet2.SetPageSetup(new PageSetup
             {
@@ -367,18 +356,17 @@ namespace Allors.Excel.Tests.Interop
         public void PageSetupOrientationDefaultsToPortrait()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
             // Sheet with content
             var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
 
-            var file = new FileInfo(Path.Combine(tempDirectory.FullName, $"{nameof(sheet2)}.pdf"));
+            var file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(sheet2)}.pdf"));
 
             sheet2.SetPageSetup(new PageSetup
             {
@@ -402,19 +390,18 @@ namespace Allors.Excel.Tests.Interop
         public void SaveAsPDF()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
             // Sheet with content
             var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
 
-            var file = new FileInfo(Path.Combine(tempDirectory.FullName, $"{nameof(sheet2)}.pdf"));
-         
+            var file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(sheet2)}.pdf"));
+
             sheet2.SaveAsPDF(file);
 
             Assert.True(new FileInfo(file.FullName).Exists);
@@ -426,18 +413,17 @@ namespace Allors.Excel.Tests.Interop
         public void SaveAsPDFThrowsComExceptionWhenEmpty()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
             var newSheet = workbook.AddWorksheet();
-            
+
             // There is nothing to print => exception
-            var file = new FileInfo(Path.Combine(tempDirectory.FullName, $"{nameof(newSheet)}.pdf"));
+            var file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(newSheet)}.pdf"));
             Assert.Throws<COMException>(() => newSheet.SaveAsPDF(file));
         }
 
@@ -446,17 +432,16 @@ namespace Allors.Excel.Tests.Interop
         public async void SaveAsPDFThrowsExceptionWhenFileExists()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
-            var workbook = addIn.Workbooks[0];    
-          
+            var workbook = addIn.Workbooks[0];
+
             var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
 
-            var file = new FileInfo(Path.Combine(tempDirectory.FullName, $"{nameof(sheet2)}.pdf"));
+            var file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(sheet2)}.pdf"));
 
             // First save with overwriteExistingFile
             sheet2.SaveAsPDF(file, true);
@@ -465,14 +450,14 @@ namespace Allors.Excel.Tests.Interop
 
             // Second save with the same name will throw an exception
             // File exist and should not be overwritten.
-            Assert.Throws<IOException>( () =>  sheet2.SaveAsPDF(file));
+            Assert.Throws<IOException>(() => sheet2.SaveAsPDF(file));
 
             Thread.Sleep(1000);
 
             // Third save will overwrite existingFile
             sheet2.SaveAsPDF(file, true);
 
-            Assert.True(new FileInfo(file.FullName).LastWriteTimeUtc > lastWriteTime);          
+            Assert.True(new FileInfo(file.FullName).LastWriteTimeUtc > lastWriteTime);
 
         }
 
@@ -480,18 +465,17 @@ namespace Allors.Excel.Tests.Interop
         public void SaveAsXPS()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
             // Sheet with content
             var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
 
-            var file = new FileInfo(Path.Combine(tempDirectory.FullName, $"{nameof(sheet2)}.xps"));
+            var file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(sheet2)}.xps"));
 
             sheet2.SaveAsXPS(file);
 
@@ -504,24 +488,23 @@ namespace Allors.Excel.Tests.Interop
         public void SaveAsXPSSetsExtensiontoXPS()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
             // Sheet with content
             var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
 
-            var file = new FileInfo(Path.Combine(tempDirectory.FullName, $"{nameof(sheet2)}.AAA"));
+            var file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(sheet2)}.AAA"));
 
             sheet2.SaveAsXPS(file);
 
             Assert.False(new FileInfo(file.FullName).Exists);
 
-            file = new FileInfo(Path.Combine(tempDirectory.FullName, $"{nameof(sheet2)}.xps"));
+            file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(sheet2)}.xps"));
             Assert.True(new FileInfo(file.FullName).Exists);
 
             //sheet2.SaveAsPDF(file, true, true);
@@ -531,24 +514,23 @@ namespace Allors.Excel.Tests.Interop
         public void SaveAsPDFSetsExtensiontoXPS()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
             // Sheet with content
             var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
 
-            var file = new FileInfo(Path.Combine(tempDirectory.FullName, $"{nameof(sheet2)}.AAA"));
+            var file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(sheet2)}.AAA"));
 
             sheet2.SaveAsPDF(file);
 
             Assert.False(new FileInfo(file.FullName).Exists);
 
-            file = new FileInfo(Path.Combine(tempDirectory.FullName, $"{nameof(sheet2)}.pdf"));
+            file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(sheet2)}.pdf"));
             Assert.True(new FileInfo(file.FullName).Exists);
 
             //sheet2.SaveAsPDF(file, true, true);
@@ -560,11 +542,10 @@ namespace Allors.Excel.Tests.Interop
         public async void FreezePanes()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
@@ -644,11 +625,10 @@ namespace Allors.Excel.Tests.Interop
         public async void AddWorksheetsBeforeAndAfter()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
@@ -724,11 +704,10 @@ namespace Allors.Excel.Tests.Interop
         public async void AddWorksheetsByIndex()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
@@ -736,14 +715,14 @@ namespace Allors.Excel.Tests.Interop
 
             var last = workbook.Worksheets.Last();
             Assert.Equal("2", last.Name);
-            
+
             // At before index 1
             var worksheet = (Worksheet)workbook.AddWorksheet(1);
             var worksheetsByIndex = ((Workbook)workbook).WorksheetsByIndex;
             Assert.Equal(3, workbook.Worksheets.Length);
             Assert.Equal(3, worksheetsByIndex.Length);
             Assert.Equal(1, worksheet.Index);
-            
+
             // Expected order => Sheet3 | 1  | 2
 
             Assert.Equal("Sheet3", worksheetsByIndex[0].Name);
@@ -783,45 +762,44 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public async void CellTagContainsCustomObject()
         {
-            ExpectedContextTags = new List<ContextTag>();
+            this.ExpectedContextTags = new List<ContextTag>();
 
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
             Assert.Equal(2, workbook.Worksheets.Length);
 
-            var worksheet = (Worksheet) workbook.AddWorksheet(null, null, workbook.Worksheets.Last());
+            var worksheet = (Worksheet)workbook.AddWorksheet(null, null, workbook.Worksheets.Last());
 
-            worksheet.CellsChanged += Worksheet_CellsChanged;
+            worksheet.CellsChanged += this.Worksheet_CellsChanged;
 
             var tag1 = new ContextTag { Context = "Cell00" };
             var tag2 = new ContextTag { Context = "Cell01" };
-            ExpectedContextTags.Add(tag1);
-            ExpectedContextTags.Add(tag2);
+            this.ExpectedContextTags.Add(tag1);
+            this.ExpectedContextTags.Add(tag2);
 
             var cell00 = worksheet[(0, 0)];
             cell00.Tag = tag1;
 
-            Assert.NotEmpty(ExpectedContextTags);
+            Assert.NotEmpty(this.ExpectedContextTags);
 
             // Change the cell will trigger the Change Event
-            ExpectedContextTag = tag1;
-            worksheet.InteropWorksheet.Cells[1, 1] = "i am cell00";                      
-          
+            this.ExpectedContextTag = tag1;
+            worksheet.InteropWorksheet.Cells[1, 1] = "i am cell00";
+
             var cell01 = worksheet[(0, 1)];
             cell01.Tag = tag2;
 
             // Change the cell will trigger the Change Event
-            ExpectedContextTag = tag2;
-            worksheet.InteropWorksheet.Cells[1, 2] = "i am cell01";          
+            this.ExpectedContextTag = tag2;
+            worksheet.InteropWorksheet.Cells[1, 2] = "i am cell01";
 
-            Assert.Empty(ExpectedContextTags);
+            Assert.Empty(this.ExpectedContextTags);
         }
 
         private ContextTag ExpectedContextTag;
@@ -834,11 +812,11 @@ namespace Allors.Excel.Tests.Interop
 
         private void Worksheet_CellsChanged(object sender, CellChangedEvent e)
         {
-            var tag = (ContextTag) e.Cells[0].Tag;
+            var tag = (ContextTag)e.Cells[0].Tag;
 
-            Assert.Equal(ExpectedContextTag, tag);
+            Assert.Equal(this.ExpectedContextTag, tag);
 
-            ExpectedContextTags.Remove(tag);
+            this.ExpectedContextTags.Remove(tag);
 
         }
 
@@ -846,11 +824,10 @@ namespace Allors.Excel.Tests.Interop
         public async void IsVisible()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();           
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
@@ -873,11 +850,10 @@ namespace Allors.Excel.Tests.Interop
         public async void AddWorkbook()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
@@ -889,12 +865,11 @@ namespace Allors.Excel.Tests.Interop
         public async void InsertRows()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
             ICell cell = null;
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
@@ -935,22 +910,21 @@ namespace Allors.Excel.Tests.Interop
         public async void DeleteRows()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
             ICell cell = null;
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
             var iWorksheet = workbook.Worksheets.FirstOrDefault(v => v.Name == "2");
-            
-            for(var i=0; i<10; i++)
+
+            for (var i = 0; i < 10; i++)
             {
                 cell = iWorksheet[i, 0];
                 cell.Value = $"Cell A{i}";
-            }          
+            }
             await iWorksheet.Flush().ConfigureAwait(true);
 
             // Delete rows 3, 4 and 5
@@ -975,12 +949,11 @@ namespace Allors.Excel.Tests.Interop
         public async void InsertColumn()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
             ICell cell = null;
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
@@ -1017,12 +990,11 @@ namespace Allors.Excel.Tests.Interop
         public async void InsertColumns()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
             ICell cell = null;
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
@@ -1062,16 +1034,15 @@ namespace Allors.Excel.Tests.Interop
         public async void DeleteColumn()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
             ICell cell = null;
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
-            var iWorksheet = workbook.Worksheets.FirstOrDefault(v => v.Name == "2");                     
+            var iWorksheet = workbook.Worksheets.FirstOrDefault(v => v.Name == "2");
 
             for (var i = 0; i < 10; i++)
             {
@@ -1119,12 +1090,11 @@ namespace Allors.Excel.Tests.Interop
         public async void DeleteColumns()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
             ICell cell = null;
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
@@ -1172,12 +1142,11 @@ namespace Allors.Excel.Tests.Interop
         public async void SetIsActiveWorksheet()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
             ICell cell = null;
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
@@ -1197,11 +1166,10 @@ namespace Allors.Excel.Tests.Interop
         public void GetRange()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
-           
-            var addIn = new AddIn(application, program.Object, office);
 
-            application.Workbooks.Add();
+            var addIn = new AddIn(this.application, program.Object);
+
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
@@ -1284,11 +1252,10 @@ namespace Allors.Excel.Tests.Interop
         public async void GetUsedRange()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
@@ -1355,11 +1322,10 @@ namespace Allors.Excel.Tests.Interop
         public async void GetUsedRangeColumn()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
@@ -1385,8 +1351,8 @@ namespace Allors.Excel.Tests.Interop
             Assert.Equal(1, range.Rows);
 
             Assert.Equal(11, range.Column);
-            Assert.Equal(1, range.Columns);                      
-          
+            Assert.Equal(1, range.Columns);
+
             sheet1[50, 30].Value = "x";
             sheet1[51, 30].Value = "y";
             sheet1[52, 30].Value = "z";
@@ -1419,15 +1385,14 @@ namespace Allors.Excel.Tests.Interop
         public async void GetUsedRangeRow()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
-            var sheet1 = workbook.Worksheets[1];                       
+            var sheet1 = workbook.Worksheets[1];
 
             // for Row
             var range = sheet1.GetUsedRange(0);
@@ -1468,11 +1433,10 @@ namespace Allors.Excel.Tests.Interop
         public void GetRectangle()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
@@ -1483,22 +1447,21 @@ namespace Allors.Excel.Tests.Interop
             var rectangle = sheet1.GetRectangle("image");
 
             Assert.True(rectangle.Left > 0);
-           
+
         }
 
         [Fact]
         public void NewSheetIsActive()
         {
             var program = new Mock<IProgram>();
-            var office = new OfficeCore();
 
-            var addIn = new AddIn(application, program.Object, office);
+            var addIn = new AddIn(this.application, program.Object);
 
-            application.Workbooks.Add();
+            this.application.Workbooks.Add();
 
             var workbook = addIn.Workbooks[0];
 
-            var sheet1 = workbook.AddWorksheet(0);                      
+            var sheet1 = workbook.AddWorksheet(0);
 
             Assert.True(sheet1.IsActive);
 

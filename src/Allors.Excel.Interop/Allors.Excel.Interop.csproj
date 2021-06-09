@@ -22,10 +22,11 @@
 	<!-- AssemblySearchPaths is needed in order to use office.dll-->
 	<PropertyGroup>
 		<AssemblySearchPaths>$(AssemblySearchPaths);{GAC}</AssemblySearchPaths>
+		<AppDesignerFolder>Properties</AppDesignerFolder>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Reference Include="Office"/>
+		<Reference Include="Office" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -3,13 +3,13 @@
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-using System;
-using System.Drawing;
-using System.IO;
-using System.Threading.Tasks;
-
 namespace Allors.Excel
 {
+    using System;
+    using System.Drawing;
+    using System.IO;
+    using System.Threading.Tasks;
+
     public interface IWorksheet
     {
         /// <summary>
@@ -29,6 +29,8 @@ namespace Allors.Excel
         /// Gets the workbook for this worksheet
         /// </summary>
         IWorkbook Workbook { get; }
+
+        ICustomProperties CustomProperties { get; }
 
         /// <summary>
         /// Gets or sets the name of this worksheet.
@@ -162,7 +164,6 @@ namespace Allors.Excel
         /// <param name="numberOfColumns"></param>
         void DeleteColumns(int startColumnIndex, int numberOfColumns);
 
-
         Range GetRange(string cell1, string cell2 = null);
 
         Range GetUsedRange();
@@ -229,18 +230,6 @@ namespace Allors.Excel
         void SetPrintArea(Range range = null);
 
         /// <summary>
-        /// Adds or updates the worksheet's custom properties with the given customproperties keyvalue pairs
-        /// </summary>
-        /// <param name="properties"></param>
-        void SetCustomProperties(CustomProperties properties);
-
-        /// <summary>
-        /// Gets the CustomProperties from the worksheets
-        /// </summary>
-        /// <returns></returns>
-        CustomProperties GetCustomProperties();
-
-        /// <summary>
         /// Sets the inputMessage that will be displayed when the cell is selected (aka Help text)
         /// </summary>
         void SetInputMessage(ICell cell, string message, string title = null, bool showInputMessage = true);
@@ -251,7 +240,6 @@ namespace Allors.Excel
         /// <param name="cell"></param>
         /// <param name="clearInputMessage"></param>
         void HideInputMessage(ICell cell, bool clearInputMessage = false);
-
 
         /// <summary>
         /// PageSetup for printing purpose: Orientation, PageSize, Header and Footer
