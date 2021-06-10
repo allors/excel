@@ -63,6 +63,7 @@ namespace Allors.Excel.Tests.Interop
             properties.LastAuthor = "Jane Doe";
             Assert.Equal("Jane Doe", properties.LastAuthor);
 
+            // TODO: Is RevisionNumber writable?
             Assert.Null(properties.RevisionNumber);
 
             properties.ApplicationName = "MyApplication";
@@ -214,9 +215,9 @@ namespace Allors.Excel.Tests.Interop
             {
                 var prop = "MyDateProperty";
 
-                var now = trim(DateTime.UtcNow);
-                properties.SetDate(prop, now);
-                Assert.Equal(now, properties.GetDate(prop));
+                var birthDay = new DateTime(1973, 3, 27, 0, 0, 0, DateTimeKind.Local);
+                properties.SetDate(prop, birthDay);
+                Assert.Equal(birthDay, properties.GetDate(prop));
 
                 doRemoveOrNot(removeOrNot, prop);
 
@@ -341,7 +342,7 @@ namespace Allors.Excel.Tests.Interop
                 Assert.Null(properties.GetFloat(prop));
             }
         }
-        
+
         [Fact]
         public void CustomNumberProperties()
         {
@@ -447,163 +448,96 @@ namespace Allors.Excel.Tests.Interop
             }
         }
 
+        [Fact]
+        public void CustomStringProperties()
+        {
+            var program = new Mock<IProgram>();
 
-        //[Fact]
-        //public void SetLargeStringValueCustomPropertiesTruncatesTo255()
-        //{
-        //    var program = new Mock<IProgram>();
+            var addIn = new AddIn(this.application, program.Object);
 
-        //    var addIn = new AddIn(this.application, program.Object);
+            this.application.Workbooks.Add();
+            var workbook = addIn.Workbooks[0];
 
-        //    this.application.Workbooks.Add();
-        //    var workbook = addIn.Workbooks[0];
+            var properties = workbook.CustomProperties;
 
-        //    var customerProperties = new OldCustomProperties();
+            void doRemoveOrNot(bool removeOrNot, string prop)
+            {
+                if (removeOrNot)
+                {
+                    properties.Remove(prop);
+                }
+            }
 
-        //    customerProperties.Add("keyA", $"{new String('A', 10)}");
-        //    customerProperties.Add("keyB", $"{new String('A', 255)}");
-        //    customerProperties.Add("keyC", $"{new String('B', 256)}");
-        //    customerProperties.Add("keyD", $"{new String('C', 1000)}");
+            var removeOrNotOptions = new[] { false, true };
 
-        //    workbook.SetCustomProperties(customerProperties);
+            // Strings 
+            foreach (var removeOrNot in removeOrNotOptions)
+            {
+                var prop = "MyStringProperty";
 
-        //    var customProperties = workbook.GetCustomProperties();
-        //    Assert.Equal(customerProperties.Count, customProperties.Count);
-        //    Assert.Equal(10, customProperties.Get<string>("keyA").Length);
-        //    Assert.Equal(255, customProperties.Get<string>("keyB").Length);
-        //    Assert.Equal(256, customProperties.Get<string>("keyC").Length);
-        //    Assert.Equal(1000, customProperties.Get<string>("keyD").Length);
-        //}
+                properties.SetString(prop, string.Empty);
+                Assert.Equal(string.Empty, properties.GetString(prop));
 
-        //[Fact]
-        //public void SetDecimalValueCustomProperties()
-        //{
-        //    var program = new Mock<IProgram>();
+                doRemoveOrNot(removeOrNot, prop);
 
-        //    var addIn = new AddIn(this.application, program.Object);
+                properties.SetString(prop, "a string");
+                Assert.Equal("a string", properties.GetString(prop));
 
-        //    this.application.Workbooks.Add();
-        //    var workbook = addIn.Workbooks[0];
+                doRemoveOrNot(removeOrNot, prop);
 
-        //    var customerProperties = new OldCustomProperties();
+                properties.SetString(prop, null);
+                Assert.Null(properties.GetString(prop));
+            }
 
-        //    customerProperties.Add("keyA", decimal.MaxValue);
-        //    customerProperties.Add("keyB", decimal.MinValue);
-        //    customerProperties.Add("keyC", 1.25M);
-        //    customerProperties.Add("keyD", 1.123456M);
-        //    customerProperties.Add("keyE", 1.123456789M);
-        //    customerProperties.Add("keyF", -1.12M);
+            // Large strings 
+            foreach (var removeOrNot in removeOrNotOptions)
+            {
+                var prop = "MyStringProperty";
 
-        //    workbook.SetCustomProperties(customerProperties);
+                var length = 1000;
 
-        //    var customProperties = workbook.GetCustomProperties();
-        //    Assert.Equal(customerProperties.Count, customProperties.Count);
-        //    Assert.Equal(decimal.MaxValue, customProperties.Get<decimal>("keyA"));
-        //    Assert.Equal(decimal.MinValue, customProperties.Get<decimal>("keyB"));
-        //    Assert.Equal(1.25M, customProperties.Get<decimal>("keyC"));
-        //    Assert.Equal(1.123456M, customProperties.Get<decimal>("keyD"));
+                properties.SetString(prop, $"{new string('A', length)}");
+                Assert.Equal($"{new string('A', length)}", properties.GetString(prop));
 
-        //    // value is truncated, and rounded!
-        //    Assert.Equal(1.123457M, customProperties.Get<decimal>("keyE"));
+                doRemoveOrNot(removeOrNot, prop);
 
-        //    // Negative values
-        //    Assert.Equal(-1.12M, customProperties.Get<decimal>("keyF"));
+                length = 1000 * 1000;
 
-        //}
+                properties.SetString(prop, $"{new string('A', length)}");
+                Assert.Equal($"{new string('A', length)}", properties.GetString(prop));
 
-        //[Fact]
-        //public void SetIntValueCustomProperties()
-        //{
-        //    var program = new Mock<IProgram>();
+                doRemoveOrNot(removeOrNot, prop);
 
-        //    var addIn = new AddIn(this.application, program.Object);
+                length = 1000 * 1000 * 1000;
 
-        //    this.application.Workbooks.Add();
-        //    var workbook = addIn.Workbooks[0];
+                properties.SetString(prop, $"{new string('A', length)}");
+                Assert.Equal($"{new string('A', length)}", properties.GetString(prop));
 
-        //    var customerProperties = new OldCustomProperties();
+                doRemoveOrNot(removeOrNot, prop);
+            }
+        }
 
-        //    customerProperties.Add("keyA", int.MaxValue);
-        //    customerProperties.Add("keyB", int.MinValue);
-        //    customerProperties.Add("keyC", 0);
-        //    customerProperties.Add("keyD", 1);
-        //    customerProperties.Add("keyE", -1);
-        //    customerProperties.Add("keyF", 1000);
+        [Fact]
+        public void SetCustomXMLParts()
+        {
+            var program = new Mock<IProgram>();
 
-        //    workbook.SetCustomProperties(customerProperties);
+            var addIn = new AddIn(this.application, program.Object);
 
-        //    var customProperties = workbook.GetCustomProperties();
-        //    Assert.Equal(customerProperties.Count, customProperties.Count);
-        //    Assert.Equal(int.MaxValue, customProperties.Get<decimal>("keyA"));
-        //    Assert.Equal(int.MinValue, customProperties.Get<decimal>("keyB"));
-        //    Assert.Equal(0, customProperties.Get<decimal>("keyC"));
-        //    Assert.Equal(1, customProperties.Get<decimal>("keyD"));
-        //    Assert.Equal(-1, customProperties.Get<decimal>("keyE"));
-        //    Assert.Equal(1000, customProperties.Get<decimal>("keyF"));
-        //}
+            this.application.Workbooks.Add();
+            var workbook = addIn.Workbooks[0];
 
-        //[Fact]
-        //public void SetDateTimeValueCustomProperties()
-        //{
-        //    var program = new Mock<IProgram>();
+            var xmlDoc = new XmlDocument();
+            xmlDoc.Load(@"data\catalog.xml");
 
-        //    var addIn = new AddIn(this.application, program.Object);
+            var tagId = workbook.SetCustomXML(xmlDoc);
 
-        //    this.application.Workbooks.Add();
-        //    var workbook = addIn.Workbooks[0];
+            // Then read the xml
+            var outputXmlDoc = workbook.GetCustomXMLById(tagId);
+            Assert.Equal("CATALOG", outputXmlDoc.DocumentElement.Name);
 
-        //    var customerProperties = new OldCustomProperties();
-
-        //    customerProperties.Add("keyA", DateTime.MaxValue);
-        //    customerProperties.Add("keyB", DateTime.MinValue);
-
-        //    var cDate = new DateTime(2020, 5, 15, 10, 15, 20);
-        //    customerProperties.Add("keyC", cDate);
-
-        //    workbook.SetCustomProperties(customerProperties);
-
-        //    var customProperties = workbook.GetCustomProperties();
-        //    Assert.Equal(customerProperties.Count, customProperties.Count);
-
-        //    Assert.Equal(DateTime.MaxValue, customProperties.Get<DateTime>("keyA"));
-
-        //    Assert.Equal(DateTime.MinValue, customProperties.Get<DateTime>("keyB"));
-
-        //    var keyCDate = customProperties.Get<DateTime>("keyC");
-
-        //    Assert.Equal(cDate.AddSeconds(-1), keyCDate);
-
-        //}
-
-        //[Fact]
-        //public void SetCustomXMLParts()
-        //{
-        //    var program = new Mock<IProgram>();
-
-        //    var addIn = new AddIn(this.application, program.Object);
-
-        //    this.application.Workbooks.Add();
-        //    var workbook = addIn.Workbooks[0];
-
-        //    var xmlDoc = new XmlDocument();
-        //    xmlDoc.Load(@"data\catalog.xml");
-
-        //    var tagId = workbook.SetCustomXML(xmlDoc);
-
-        //    // store the tag in the customproperties
-        //    workbook.TrySetCustomProperty("##CATALOG", tagId);
-
-        //    // First get the tag
-        //    object tagId2 = null;
-        //    workbook.TryGetCustomProperty("##CATALOG", ref tagId2);
-
-        //    // Then read the xml
-        //    var outputXmlDoc = workbook.GetCustomXMLById(Convert.ToString(tagId2));
-        //    Assert.Equal("CATALOG", outputXmlDoc.DocumentElement.Name);
-
-        //    Assert.Equal(36, outputXmlDoc.DocumentElement.ChildNodes.Count);
-
-        //}
+            Assert.Equal(36, outputXmlDoc.DocumentElement.ChildNodes.Count);
+        }
 
         [Fact]
         public void DeleteCustomXMLParts()

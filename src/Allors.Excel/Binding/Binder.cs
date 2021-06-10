@@ -3,13 +3,13 @@
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace Allors.Excel
 {
+    using System;
+    using System.Collections.Concurrent;
+    using System.Collections.Generic;
+    using System.Linq;
+
     public class Binder
     {
         public IWorksheet Worksheet { get; }
@@ -30,7 +30,7 @@ namespace Allors.Excel
         {
             this.Worksheet = worksheet;
             this.Worksheet.CellsChanged += this.Worksheet_CellsChanged;
- 
+
             this.changedStyle = changedStyle;
             if (this.changedStyle != null)
             {
@@ -38,10 +38,7 @@ namespace Allors.Excel
             }
         }
 
-        public void Set(int row, int column, IBinding binding)
-        {
-            this.Set(this.Worksheet[row, column], binding);
-        }
+        public void Set(int row, int column, IBinding binding) => this.Set(this.Worksheet[row, column], binding);
 
         public void Set(ICell cell, IBinding binding)
         {
@@ -114,9 +111,6 @@ namespace Allors.Excel
             }
         }
 
-        public bool ExistBinding(int row, int column)
-        {
-            return this.bindingCells.Any(v => v.Row.Index == row && v.Column.Index == column);
-        }
+        public bool ExistBinding(int row, int column) => this.bindingCells.Any(v => v.Row.Index == row && v.Column.Index == column);
     }
 }

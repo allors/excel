@@ -1,10 +1,10 @@
-﻿namespace Allors.Excel
+namespace Allors.Excel
 {
     /// <summary>
     /// PageHeaderFooter defines the header and footer style.
     /// </summary>
     public class PageHeaderFooter
-    {       
+    {
         /// <summary>
         /// Margin in Points from either the top (Header) or bottom (Footer)
         /// </summary>

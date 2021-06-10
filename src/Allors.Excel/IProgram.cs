@@ -3,10 +3,10 @@
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-using System.Threading.Tasks;
-
 namespace Allors.Excel
 {
+    using System.Threading.Tasks;
+
     public interface IProgram
     {
         Task OnStart(IAddIn addIn);

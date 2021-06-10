@@ -1,4 +1,4 @@
-﻿namespace Allors.Excel
+namespace Allors.Excel
 {
     /// <summary>
     /// sss
@@ -18,7 +18,7 @@
         public int PaperSize { get; set; } = 9; // A4
 
         public PageHeaderFooter Header { get; set; }
-             
+
         public PageHeaderFooter Footer { get; set; }
     }
 }

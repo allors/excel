@@ -3,10 +3,10 @@
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-using System.Drawing;
-
 namespace Allors.Excel
 {
+    using System.Drawing;
+
     public class Style
     {
         public Style(Color backgroundColor, Color textColor)
@@ -25,9 +25,6 @@ namespace Allors.Excel
             return this.BackgroundColor == that?.BackgroundColor && this.TextColor == that?.TextColor;
         }
 
-        public override int GetHashCode()
-        {
-            return this.BackgroundColor.GetHashCode() + this.TextColor.GetHashCode();
-        }
+        public override int GetHashCode() => this.BackgroundColor.GetHashCode() + this.TextColor.GetHashCode();
     }
 }

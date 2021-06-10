@@ -3,16 +3,13 @@
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-using System;
-
 namespace Allors.Excel
 {
+    using System;
+
     public class Range
     {
-        public override string ToString()
-        {
-            return $"{this.Worksheet?.Name ?? "null"}!{this.Name ?? "null"} (row:{this.Row}, col:{this.Column}, rows:{this.Rows}, cols:{this.Columns})";
-        }
+        public override string ToString() => $"{this.Worksheet?.Name ?? "null"}!{this.Name ?? "null"} (row:{this.Row}, col:{this.Column}, rows:{this.Rows}, cols:{this.Columns})";
 
 
         public Range(int row, int column, int? rows = null, int? columns = null, IWorksheet worksheet = null, string name = null)
