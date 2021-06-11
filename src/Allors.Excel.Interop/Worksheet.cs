@@ -12,13 +12,13 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.Office.Core;
 using Microsoft.Office.Interop.Excel;
-using Polly;
 using Action = System.Action;
 using Rectangle = System.Drawing.Rectangle;
 using XlColorIndex = Microsoft.Office.Interop.Excel.XlColorIndex;
 
 namespace Allors.Excel.Interop
 {
+    using System.Threading;
     using InteropDocEvents_Event = DocEvents_Event;
     using InteropName = Name;
     using InteropPivotTable = PivotTable;
@@ -666,34 +666,6 @@ namespace Allors.Excel.Interop
                         range.EntireRow.Hidden = hidden;
                     });
                 });
-        }
-
-        private void WaitAndRetry(Action method, int waitTime = 100, int maxRetries = 10)
-        {
-            Policy
-            .Handle<COMException>()
-            .WaitAndRetry(
-                maxRetries,
-                retryCount =>
-                {
-                    // returns the waitTime for the onRetry
-                    return TimeSpan.FromMilliseconds(waitTime * retryCount);
-                })
-                .Execute(method);
-        }
-
-        private T WaitAndRetry<T>(Func<T> method, int waitTime = 100, int maxRetries = 10)
-        {
-            return Policy
-             .Handle<COMException>()
-             .WaitAndRetry(
-                 maxRetries,
-                 retryCount =>
-                 {
-                     // returns the waitTime for the onRetry
-                     return TimeSpan.FromMilliseconds(waitTime * retryCount);
-                 })
-             .Execute(method);
         }
 
         /// <summary>
@@ -1440,6 +1412,58 @@ namespace Allors.Excel.Interop
 
             chart.SetSourceData(interopPivotTable.TableRange1);
             chart.Refresh();
+        }
+
+        private void WaitAndRetry(Action action, int waitTime = 100, int maxRetries = 10)
+        {
+            Exception exception = null;
+
+            for (var i = 0; i < maxRetries; i++)
+            {
+                try
+                {
+                    action();
+                    exception = null;
+                }
+                catch (COMException e)
+                {
+                    exception = e;
+                    Thread.Sleep(waitTime);
+                }
+            }
+
+
+            if (exception != null)
+            {
+                throw exception;
+            }
+        }
+
+        private T WaitAndRetry<T>(Func<T> func, int waitTime = 100, int maxRetries = 10)
+        {
+            T result = default;
+            Exception exception = null;
+
+            for (var i = 0; i < maxRetries; i++)
+            {
+                try
+                {
+                    result = func();
+                    exception = null;
+                }
+                catch (COMException e)
+                {
+                    exception = e;
+                    Thread.Sleep(waitTime);
+                }
+            }
+
+            if (exception != null)
+            {
+                throw exception;
+            }
+
+            return result;
         }
     }
 }

@@ -16,9 +16,9 @@ namespace Allors.Excel.Interop
     {
         private readonly Dictionary<InteropWorkbook, Workbook> workbookByInteropWorkbook;
 
-        public AddIn(object application, IProgram program)
+        public AddIn(InteropApplication application, IProgram program)
         {
-            this.Application = (InteropApplication)application;
+            this.Application = application;
             this.Program = program;
 
             this.workbookByInteropWorkbook = new Dictionary<InteropWorkbook, Workbook>();
