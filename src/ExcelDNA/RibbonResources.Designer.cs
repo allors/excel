@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ExcelAddIn.DNA {
+namespace ExcelDNA {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace ExcelAddIn.DNA {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ExcelAddIn.DNA.RibbonResources", typeof(RibbonResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ExcelDNA.RibbonResources", typeof(RibbonResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -75,7 +75,7 @@ namespace ExcelAddIn.DNA {
         ///&lt;customUI xmlns=&apos;http://schemas.microsoft.com/office/2009/07/customui&apos; loadImage=&apos;LoadImage&apos;&gt;
         ///	&lt;ribbon&gt;
         ///		&lt;tabs&gt;
-        ///			&lt;tab id=&apos;tab1&apos; label=&apos;ExcelAddIn.DNA&apos;&gt;
+        ///			&lt;tab id=&apos;tab1&apos; label=&apos;ExcelDNA&apos;&gt;
         ///				&lt;group id=&apos;group1&apos; label=&apos;My Group&apos;&gt;
         ///					&lt;button id=&apos;button1&apos; label=&apos;My Button&apos; onAction=&apos;OnButtonPressed&apos; image=&apos;Image1&apos;/&gt;
         ///				&lt;/group&gt;

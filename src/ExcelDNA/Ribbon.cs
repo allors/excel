@@ -1,13 +1,14 @@
-﻿using System;
 using ExcelDna.Integration.CustomUI;
 using System.Runtime.InteropServices;
-using Allors.Excel.Interop;
-using Application;
-using ExcelAddIn.DNA;
-using ExcelDna.Integration;
+using InteropApplication = Microsoft.Office.Interop.Excel.Application;
 
-namespace ExcelAddin.DNA
+namespace ExcelDNA
 {
+    using System;
+    using Allors.Excel.Interop;
+    using Application;
+    using ExcelDna.Integration;
+
     [ComVisible(true)]
     public class Ribbon : ExcelRibbon
     {
@@ -16,7 +17,7 @@ namespace ExcelAddin.DNA
             var application = ExcelDnaUtil.Application;
             var serviceLocator = new ServiceLocator();
             this.Program = new Program(serviceLocator);
-            this.AddIn = new AddIn(application, this.Program);
+            this.AddIn = new AddIn((InteropApplication)application, this.Program);
             return RibbonResources.Ribbon;
         }
 
@@ -37,6 +38,7 @@ namespace ExcelAddin.DNA
 
         public override object LoadImage(string imageId)
         {
+            // This will return the image resource with the name specified in the image='xxxx' tag
             return RibbonResources.ResourceManager.GetObject(imageId);
         }
 
