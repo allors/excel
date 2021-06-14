@@ -5,10 +5,8 @@
 
 namespace Allors.Excel
 {
-    public interface IAddIn
+    public interface IRibbon
     {
-        IRibbon Ribbon { get; }
-
-        IWorkbook[] Workbooks { get; }
+        void Invalidate();
     }
 }

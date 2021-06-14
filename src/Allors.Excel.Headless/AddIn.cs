@@ -10,10 +10,9 @@ namespace Allors.Excel.Headless
 
     public class AddIn : IAddIn
     {
-        public AddIn()
-        {
-            this.WorkbookList = new List<Workbook>();
-        }
+        public AddIn() => this.WorkbookList = new List<Workbook>();
+
+        public IRibbon Ribbon { get; set; }
 
         public IWorkbook[] Workbooks => this.WorkbookList.Cast<IWorkbook>().ToArray();
 
@@ -27,9 +26,6 @@ namespace Allors.Excel.Headless
             return workbook;
         }
 
-        public void Remove(Workbook workbook)
-        {
-            this.WorkbookList.Remove(workbook);
-        }
+        public void Remove(Workbook workbook) => this.WorkbookList.Remove(workbook);
     }
 }

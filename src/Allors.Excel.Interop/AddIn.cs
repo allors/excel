@@ -16,10 +16,11 @@ namespace Allors.Excel.Interop
     {
         private readonly Dictionary<InteropWorkbook, Workbook> workbookByInteropWorkbook;
 
-        public AddIn(InteropApplication application, IProgram program)
+        public AddIn(InteropApplication application, IProgram program, IRibbon ribbon)
         {
             this.Application = application;
             this.Program = program;
+            this.Ribbon = ribbon;
 
             this.workbookByInteropWorkbook = new Dictionary<InteropWorkbook, Workbook>();
 
@@ -98,6 +99,8 @@ namespace Allors.Excel.Interop
         public IProgram Program { get; }
 
         public IReadOnlyDictionary<InteropWorkbook, Workbook> WorkbookByInteropWorkbook => this.workbookByInteropWorkbook;
+
+        public IRibbon Ribbon { get; }
 
         public IWorkbook[] Workbooks => this.WorkbookByInteropWorkbook.Values.Cast<IWorkbook>().ToArray();
 
