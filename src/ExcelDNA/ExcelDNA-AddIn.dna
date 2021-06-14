@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<DnaLibrary Name="ExcelAddIn.DNA Add-In" RuntimeVersion="v4.0" xmlns="http://schemas.excel-dna.net/addin/2018/05/dnalibrary">
-  <ExternalLibrary Path="ExcelAddIn.DNA.dll" ExplicitExports="false" LoadFromBytes="true" Pack="true" IncludePdb="false" />
+<DnaLibrary Name="ExcelDNA Add-In" RuntimeVersion="v4.0" xmlns="http://schemas.excel-dna.net/addin/2018/05/dnalibrary">
+    <ExternalLibrary Path="ExcelDNA.dll" ExplicitExports="false" LoadFromBytes="true" Pack="true" IncludePdb="false" />
+    <Reference Path="Allors.Excel.dll" Pack="true" />
+    <Reference Path="Allors.Excel.Interop.dll" Pack="true" />
+    <Reference Path="Application.dll" Pack="true" />
+    <Reference Path="Microsoft.Office.Interop.Excel.dll" Pack="true" />
+    <Reference Path="NLog.dll" Pack="true" />
 
-  <!--
+    <!--
        The RuntimeVersion attribute above allows two settings:
        * RuntimeVersion="v4.0" - for .NET 4 and 4.5
        * RuntimeVersion="v2.0" - for .NET 2.0, 3.0 and 3.5
