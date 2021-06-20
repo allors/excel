@@ -825,8 +825,9 @@ namespace Allors.Excel.Interop
                             var cell = item.Value;
                             this.CellByCoordinates.Remove(item.Key);
 
-                            // Shift rows up with the numberofrows that were deleted.
-                            cell.Row.Index += numberOfRows;
+                            // Make new or use existing row
+                            var row = this.Row(item.Value.Row.Index + numberOfRows);
+                            cell.Row = row;
 
                             // Add the existing cell with its new key
                             var coordinates = (cell.Row.Index, cell.Column.Index);
@@ -885,7 +886,7 @@ namespace Allors.Excel.Interop
                             var rowIndex = cell.Row.Index - numberOfRows;
 
                             // Link the cell to the new Row that already exists
-                            cell.Row = this.RowByIndex[rowIndex];
+                            cell.Row = this.Row(rowIndex);
 
                             // Add the existing cell with its new key
                             var coordinates = (cell.Row.Index, cell.Column.Index);
@@ -934,8 +935,10 @@ namespace Allors.Excel.Interop
                             var cell = item.Value;
                             this.CellByCoordinates.Remove(item.Key);
 
+                            var column = this.Column(item.Value.Column.Index + numberOfColumns);
+
                             // Shift rows up with the numberofrows that were deleted.
-                            cell.Column.Index += numberOfColumns;
+                            cell.Column = column;
 
                             // Add the existing cell with its new key
                             var coordinates = (cell.Row.Index, cell.Column.Index);
