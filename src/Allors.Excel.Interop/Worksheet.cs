@@ -68,6 +68,7 @@ namespace Allors.Excel.Interop
 
             this.Reset();
         }
+               
 
         public event EventHandler<CellChangedEvent> CellsChanged;
 
@@ -1427,6 +1428,7 @@ namespace Allors.Excel.Interop
                 {
                     action();
                     exception = null;
+                    break;
                 }
                 catch (COMException e)
                 {
@@ -1434,7 +1436,6 @@ namespace Allors.Excel.Interop
                     Thread.Sleep(waitTime);
                 }
             }
-
 
             if (exception != null)
             {
@@ -1453,6 +1454,7 @@ namespace Allors.Excel.Interop
                 {
                     result = func();
                     exception = null;
+                    break;
                 }
                 catch (COMException e)
                 {
