@@ -28,6 +28,8 @@ namespace Allors.Excel.Headless
 
         public Dictionary<string, Range> NamedRangeByName { get; } = new Dictionary<string, Range>();
 
+        public event EventHandler<Allors.Excel.Hyperlink> OnHyperlinkClicked;
+
         public IWorksheet AddWorksheet(int? index = null, IWorksheet before = null, IWorksheet after = null)
         {
             var worksheet = new Worksheet(this);
@@ -108,5 +110,7 @@ namespace Allors.Excel.Headless
         {
             throw new NotImplementedException();
         }
+
+        public void HyperlinkClicked(Allors.Excel.Hyperlink hyperlink) => throw new NotImplementedException();
     }
 }

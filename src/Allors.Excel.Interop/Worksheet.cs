@@ -55,6 +55,7 @@ namespace Allors.Excel.Interop
             this.DirtyRows = new HashSet<Row>();
 
             interopWorksheet.Change += this.InteropWorksheet_Change;
+            interopWorksheet.FollowHyperlink += this.InteropWorksheet_FollowHyperlink;
 
             ((InteropDocEvents_Event)interopWorksheet).Activate += () =>
             {
@@ -68,11 +69,22 @@ namespace Allors.Excel.Interop
 
             this.Reset();
         }
-               
 
         public event EventHandler<CellChangedEvent> CellsChanged;
 
         public event EventHandler<string> SheetActivated;
+
+        public event EventHandler<Allors.Excel.Hyperlink> HyperlinkClicked;
+
+        private void InteropWorksheet_FollowHyperlink(Microsoft.Office.Interop.Excel.Hyperlink target)
+        {
+            var hyperlink = new Allors.Excel.Hyperlink();
+            hyperlink.Address = target.Address;
+            hyperlink.DisplayName = target.TextToDisplay;
+            hyperlink.SubAddress = target.SubAddress;
+
+            this.HyperlinkClicked?.Invoke(this, hyperlink);
+        }
 
         private Range FreezeRange { get; set; }
 
@@ -552,10 +564,7 @@ namespace Allors.Excel.Interop
                         return this.InteropWorksheet.Range[from, to];
                     });
 
-                    this.WaitAndRetry(() =>
-                    {
-                        range.NumberFormat = chunk[0][0].NumberFormat;
-                    });
+                    this.WaitAndRetry(() => range.NumberFormat = chunk[0][0].NumberFormat);
                 });
         }
 
@@ -688,6 +697,8 @@ namespace Allors.Excel.Interop
                 // left blank: delete temp file may fail.
             }
         }
+
+        public void AddHyperLink(string textToDisplay, ICell cell) => _ = this.InteropWorksheet.Hyperlinks.Add(this.InteropWorksheet.Cells[cell.Row.Index+1, cell.Column.Index+1], string.Empty, string.Empty, string.Empty, textToDisplay);
 
         /// <summary>
         /// Gets the Rectangle of a namedRange (uses the Range.MergeArea as reference). 

@@ -5,10 +5,20 @@
 
 namespace Allors.Excel
 {
+    using System;
     using System.Xml;
 
     public interface IWorkbook
     {
+
+        event EventHandler<Allors.Excel.Hyperlink> OnHyperlinkClicked;
+
+        /// <summary>
+        /// Event FollowHyperLink triggers to method call.
+        /// </summary>
+        /// <param name="textToDisplay">the textpart of the hyperlink</param>
+        void HyperlinkClicked(Allors.Excel.Hyperlink hyperlink);
+
         /// <summary>
         /// Gets the IsActive value.
         /// </summary>

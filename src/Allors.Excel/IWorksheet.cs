@@ -25,6 +25,9 @@ namespace Allors.Excel
         /// </returns>
         event EventHandler<string> SheetActivated;
 
+
+        event EventHandler<Allors.Excel.Hyperlink> HyperlinkClicked;
+
         /// <summary>
         /// Gets the workbook for this worksheet
         /// </summary>
@@ -115,6 +118,9 @@ namespace Allors.Excel
         /// <param name="uri"></param>
         /// <param name="rectangle"></param>
         void AddPicture(string uri, Rectangle rectangle);
+
+
+        void AddHyperLink(string uri, ICell cell);
 
         /// <summary>
         /// Gets the rectange from the namedRange (the location of the namedrange in the worksheet)

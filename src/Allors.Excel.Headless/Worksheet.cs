@@ -34,6 +34,7 @@ namespace Allors.Excel.Headless
 
         public event EventHandler<CellChangedEvent> CellsChanged;
         public event EventHandler<string> SheetActivated;
+        public event EventHandler<Allors.Excel.Hyperlink> HyperlinkClicked;
 
         public string Name { get; set; }
 
@@ -232,5 +233,7 @@ namespace Allors.Excel.Headless
         public void SetChartObjectSourceData(object chartObject, object pivotTable)
         {
         }
+
+        public void AddHyperLink(string uri, ICell cell) => throw new NotImplementedException();
     }
 }

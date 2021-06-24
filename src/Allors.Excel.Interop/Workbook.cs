@@ -267,5 +267,12 @@ namespace Allors.Excel.Interop
                 return false;
             }
         }
+
+        public event EventHandler<Allors.Excel.Hyperlink> OnHyperlinkClicked;
+
+        public void HyperlinkClicked(Allors.Excel.Hyperlink hyperlink)
+        {
+            this.OnHyperlinkClicked.Invoke(this, hyperlink);
+        }
     }
 }
