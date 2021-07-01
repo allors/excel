@@ -46,6 +46,7 @@ namespace Allors.Excel.Interop
             this.RowByIndex = new Dictionary<int, Row>();
             this.ColumnByIndex = new Dictionary<int, Column>();
             this.CellByCoordinates = new Dictionary<(int, int), Cell>();
+            this.HyperlinksByCell = new Dictionary<ICell, string>();
             this.DirtyValueCells = new HashSet<Cell>();
             this.DirtyCommentCells = new HashSet<Cell>();
             this.DirtyStyleCells = new HashSet<Cell>();
@@ -307,6 +308,9 @@ namespace Allors.Excel.Interop
 
             try
             {
+                this.RenderHyperlinks();
+                this.HyperlinksByCell = new Dictionary<ICell, string>();
+
                 this.RenderNumberFormat(this.DirtyNumberFormatCells);
                 this.DirtyNumberFormatCells = new HashSet<Cell>();
 
@@ -698,7 +702,20 @@ namespace Allors.Excel.Interop
             }
         }
 
-        public void AddHyperLink(string textToDisplay, ICell cell) => _ = this.InteropWorksheet.Hyperlinks.Add(this.InteropWorksheet.Cells[cell.Row.Index+1, cell.Column.Index+1], string.Empty, string.Empty, string.Empty, textToDisplay);
+        private Dictionary<ICell, string> HyperlinksByCell { get; set; }
+
+        private void RenderHyperlinks()
+        {
+            if (this.HyperlinksByCell.Any())
+            {
+                foreach (var entry in this.HyperlinksByCell)
+                {
+                    this.InteropWorksheet.Hyperlinks.Add(this.InteropWorksheet.Cells[entry.Key.Row.Index + 1, entry.Key.Column.Index + 1], string.Empty, string.Empty, string.Empty, entry.Value);
+                }
+            }
+        }
+
+        public void AddHyperLink(string textToDisplay, ICell cell) => this.HyperlinksByCell.Add(cell, textToDisplay);
 
         /// <summary>
         /// Gets the Rectangle of a namedRange (uses the Range.MergeArea as reference). 
