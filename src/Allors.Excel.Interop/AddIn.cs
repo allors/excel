@@ -115,6 +115,11 @@ namespace Allors.Excel.Interop
             return workbook;
         }
 
-        public void Close(InteropWorkbook interopWorkbook) => this.workbookByInteropWorkbook.Remove(interopWorkbook);
+        public void Close(InteropWorkbook interopWorkbook)
+        {
+            this.workbookByInteropWorkbook.Remove(interopWorkbook);
+        }
+
+        public void DisplayAlerts(bool displayAlerts) => this.Application.DisplayAlerts = displayAlerts;
     }
 }

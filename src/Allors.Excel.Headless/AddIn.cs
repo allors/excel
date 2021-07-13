@@ -26,6 +26,8 @@ namespace Allors.Excel.Headless
             return workbook;
         }
 
+        public void DisplayAlerts(bool displayAlerts) => throw new System.NotImplementedException();
+
         public void Remove(Workbook workbook) => this.WorkbookList.Remove(workbook);
     }
 }

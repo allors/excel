@@ -10,5 +10,7 @@ namespace Allors.Excel
         IRibbon Ribbon { get; }
 
         IWorkbook[] Workbooks { get; }
+
+        void DisplayAlerts(bool displayAlerts);
     }
 }
