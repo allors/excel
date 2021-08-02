@@ -6,12 +6,13 @@ namespace ExcelDNA
 {
     using System;
     using System.Windows.Forms;
+    using Allors.Excel;
     using Allors.Excel.Interop;
     using Application;
     using ExcelDna.Integration;
 
     [ComVisible(true)]
-    public class Ribbon : ExcelRibbon
+    public class Ribbon : ExcelRibbon, IRibbon
     {
         public override string GetCustomUI(string _)
         {
@@ -20,7 +21,7 @@ namespace ExcelDNA
                 var application = ExcelDnaUtil.Application;
                 var serviceLocator = new ServiceLocator();
                 this.Program = new Program(serviceLocator);
-                this.AddIn = new AddIn((InteropApplication)application, this.Program);
+                this.AddIn = new AddIn((InteropApplication)application, this.Program, this);
                 return RibbonResources.Ribbon;
             }
             catch (Exception e)
@@ -56,5 +57,7 @@ namespace ExcelDNA
             RibbonResources.ResourceManager.GetObject(imageId);
 
         public void OnButtonPressed(IRibbonControl control) => System.Windows.Forms.MessageBox.Show("Hello!");
+
+        public void Invalidate() => this.RibbonUI.Invalidate();
     }
 }

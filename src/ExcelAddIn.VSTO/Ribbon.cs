@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -7,14 +7,18 @@ using Office = Microsoft.Office.Core;
 
 namespace ExcelAddIn.VSTO
 {
+    using Allors.Excel;
+
     [ComVisible(true)]
-    public class Ribbon : Office.IRibbonExtensibility
+    public class Ribbon : Office.IRibbonExtensibility, IRibbon
     {
         private Office.IRibbonUI ribbon;
 
         private string doSomethingLabel = "Do Something";
 
         public AddIn AddIn { get; set; }
+
+        public void Invalidate() => this.ribbon.Invalidate();
 
         #region IRibbonExtensibility Members
 

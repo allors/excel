@@ -17,7 +17,8 @@ namespace ExcelAddIn.VSTO
         {
             this.serviceLocator = new ServiceLocator();
             var program = new Program(this.serviceLocator);
-            this.addIn = new AddIn(this.Application, program);
+
+            this.addIn = new AddIn(this.Application, program, this.Ribbon);
 
             this.Ribbon.AddIn = this.addIn;
             await program.OnStart(this.addIn);
