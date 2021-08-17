@@ -33,6 +33,7 @@ namespace Allors.Excel.Headless
         }
 
         public event EventHandler<CellChangedEvent> CellsChanged;
+        public event EventHandler<CellChangedEvent> SheetChanged;
         public event EventHandler<string> SheetActivated;
         public event EventHandler<Allors.Excel.Hyperlink> HyperlinkClicked;
 

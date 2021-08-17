@@ -73,6 +73,8 @@ namespace Allors.Excel.Interop
 
         public event EventHandler<CellChangedEvent> CellsChanged;
 
+        public event EventHandler<CellChangedEvent> SheetChanged;
+
         public event EventHandler<string> SheetActivated;
 
         public event EventHandler<Allors.Excel.Hyperlink> HyperlinkClicked;
@@ -407,6 +409,7 @@ namespace Allors.Excel.Interop
                 if (cells != null)
                 {
                     this.CellsChanged?.Invoke(this, new CellChangedEvent(cells.Cast<ICell>().ToArray()));
+                    this.SheetChanged?.Invoke(this, new CellChangedEvent(cells.Cast<ICell>().ToArray()));
                 }
             }
         }

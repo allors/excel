@@ -18,6 +18,11 @@ namespace Allors.Excel
         event EventHandler<CellChangedEvent> CellsChanged;
 
         /// <summary>
+        /// Event raised when cell values change.
+        /// </summary>
+        event EventHandler<CellChangedEvent> SheetChanged;
+
+        /// <summary>
         /// Event raised when the sheet is activated. It becomes the active sheet.
         /// </summary>
         /// <returns>
