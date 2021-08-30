@@ -15,6 +15,7 @@ using Microsoft.Office.Interop.Excel;
 using Action = System.Action;
 using Rectangle = System.Drawing.Rectangle;
 using XlColorIndex = Microsoft.Office.Interop.Excel.XlColorIndex;
+using XlDataLabelPosition = Microsoft.Office.Interop.Excel.XlDataLabelPosition;
 
 namespace Allors.Excel.Interop
 {
@@ -1438,6 +1439,41 @@ namespace Allors.Excel.Interop
             this.InteropWorksheet.PageSetup.LeftFooter = pageSetup.Footer?.Left;
             this.InteropWorksheet.PageSetup.CenterFooter = pageSetup.Footer?.Center;
             this.InteropWorksheet.PageSetup.RightFooter = pageSetup.Footer?.Right;
+        }
+
+        public void SetChartObjectDataLabels(
+            object chartObject,
+            int seriesIndex,
+            object seriesXValues,
+            object seriesValues,
+            bool showValues,
+            bool showRange,
+            string chartFieldRange,
+            float baselineOffset,
+            bool bold,
+            bool italic,
+            Color foreColor,
+            object size)
+        {
+            var chart = ((ChartObject)this.InteropWorksheet.ChartObjects(chartObject)).Chart;
+            var series = (Series)chart.FullSeriesCollection(seriesIndex);
+            series.XValues = seriesXValues;
+            series.Values = seriesValues;
+
+            series.HasDataLabels = true;
+            dynamic dataLabels = series.DataLabels();
+
+            dataLabels.ShowValue = showValues;
+            dataLabels.ShowRange = showRange;
+            dataLabels.Position = XlDataLabelPosition.xlLabelPositionRight;
+            dataLabels.Format.TextFrame2.TextRange.InsertChartField(MsoChartFieldType.msoChartFieldRange, chartFieldRange);
+            dataLabels.Format.TextFrame2.TextRange.Font.BaselineOffset = baselineOffset;
+            dataLabels.Format.TextFrame2.TextRange.Font.Bold = bold;
+            dataLabels.Format.TextFrame2.TextRange.Font.Italic = italic;
+            dataLabels.Format.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = foreColor;
+            dataLabels.Format.TextFrame2.TextRange.Font.Size = size;
+
+            chart.Refresh();
         }
 
         public void SetChartObjectSourceData(object chartObject, object pivotTable)

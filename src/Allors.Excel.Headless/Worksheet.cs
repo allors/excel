@@ -231,6 +231,22 @@ namespace Allors.Excel.Headless
         {
         }
 
+        public void SetChartObjectDataLabels(
+            object chartObject,
+            int seriesIndex,
+            object seriesXValues,
+            object seriesValues,
+            bool showValues,
+            bool showRange,
+            string chartFieldRange,
+            float baselineOffset,
+            bool bold,
+            bool italic,
+            Color foreColor,
+            object size)
+        {
+        }
+
         public void SetChartObjectSourceData(object chartObject, object pivotTable)
         {
         }

@@ -195,6 +195,20 @@ namespace Allors.Excel
 
         void AutoFit();
 
+        void SetChartObjectDataLabels(
+            object chartObject,
+            int seriesIndex,
+            object seriesXValues,
+            object seriesValues,
+            bool showValues,
+            bool showRange,
+            string chartFieldRange,
+            float baselineOffset,
+            bool bold,
+            bool italic,
+            Color foreColor,
+            object size);
+
         void SetChartObjectSourceData(object chartObject, object pivotTable);
 
         bool IsVisible { get; set; }
