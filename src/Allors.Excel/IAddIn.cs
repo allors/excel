@@ -11,6 +11,8 @@ namespace Allors.Excel
 
         IWorkbook[] Workbooks { get; }
 
+        string ExistentialAttribute { get; set; }
+
         void DisplayAlerts(bool displayAlerts);
     }
 }

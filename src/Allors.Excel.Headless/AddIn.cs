@@ -18,6 +18,8 @@ namespace Allors.Excel.Headless
 
         public IList<Workbook> WorkbookList { get; }
 
+        public string ExistentialAttribute { get; set; }
+
         public Workbook AddWorkbook()
         {
             var workbook = new Workbook(this);

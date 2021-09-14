@@ -34,5 +34,6 @@ namespace Allors.Excel
 
             this.Properties.Add(key, false, type, value, null);
         }
+
     }
 }

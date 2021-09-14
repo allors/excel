@@ -38,6 +38,8 @@ namespace Allors.Excel
 
         public void Remove(string key) => this.Get(key)?.Delete();
 
+        internal bool Exist(string key) => this.Get(key) != null;
+
         protected dynamic Get(string key)
         {
             foreach (var property in this.Properties)

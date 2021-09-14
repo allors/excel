@@ -26,6 +26,15 @@ namespace Allors.Excel.Interop
 
             ((InteropAppEvents_Event)this.Application).NewWorkbook += async interopWorkbook =>
             {
+                if (!string.IsNullOrWhiteSpace(this.ExistentialAttribute))
+                {
+                    var customProperties = new CustomProperties(interopWorkbook.CustomDocumentProperties);
+                    if (!customProperties.Exist(this.ExistentialAttribute))
+                    {
+                        return;
+                    }
+                }
+
                 var workbook = this.New(interopWorkbook);
                 for (var i = 1; i <= interopWorkbook.Worksheets.Count; i++)
                 {
@@ -43,6 +52,16 @@ namespace Allors.Excel.Interop
 
             this.Application.WorkbookOpen += async interopWorkbook =>
             {
+
+                if (!string.IsNullOrWhiteSpace(this.ExistentialAttribute))
+                {
+                    var customProperties = new CustomProperties(interopWorkbook.CustomDocumentProperties);
+                    if (!customProperties.Exist(this.ExistentialAttribute))
+                    {
+                        return;
+                    }
+                }
+
                 var workbook = this.New(interopWorkbook);
                 for (var i = 1; i <= interopWorkbook.Worksheets.Count; i++)
                 {
@@ -58,6 +77,33 @@ namespace Allors.Excel.Interop
                 }
             };
 
+            this.Application.WorkbookActivate += interopWorkbook =>
+            {
+                if (!string.IsNullOrWhiteSpace(this.ExistentialAttribute))
+                {
+                    var customProperties = new CustomProperties(interopWorkbook.CustomDocumentProperties);
+                    if (!customProperties.Exist(this.ExistentialAttribute))
+                    {
+                        return;
+                    }
+                }
+
+                if (!this.WorkbookByInteropWorkbook.TryGetValue(interopWorkbook, out var workbook))
+                {
+                    workbook = this.New(interopWorkbook);
+                }
+
+                workbook.IsActive = true;
+            };
+
+            this.Application.WorkbookDeactivate += wb =>
+            {
+                // Could already be gone by the WorkbookBeforeClose event
+                if (this.WorkbookByInteropWorkbook.TryGetValue(wb, out _))
+                {
+                    this.WorkbookByInteropWorkbook[wb].IsActive = false;
+                }
+            };
 
             void WorkbookBeforeClose(InteropWorkbook interopWorkbook, ref bool cancel)
             {
@@ -71,28 +117,10 @@ namespace Allors.Excel.Interop
                 }
             }
 
-            this.Application.WorkbookActivate += wb =>
-            {
-                if (!this.WorkbookByInteropWorkbook.TryGetValue(wb, out var workbook))
-                {
-                    workbook = this.New(wb);
-                }
-
-                workbook.IsActive = true;
-            };
-
-
-            this.Application.WorkbookDeactivate += wb =>
-            {
-                // Could already be gone by the WorkbookBeforeClose event
-                if (this.WorkbookByInteropWorkbook.TryGetValue(wb, out _))
-                {
-                    this.WorkbookByInteropWorkbook[wb].IsActive = false;
-                }
-            };
-
             this.Application.WorkbookBeforeClose += WorkbookBeforeClose;
         }
+
+        public string ExistentialAttribute { get; set; }
 
         public InteropApplication Application { get; }
 
