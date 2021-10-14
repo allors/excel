@@ -14,24 +14,34 @@ namespace Allors.Excel
             {
                 if (cell.Value is decimal && excelValue is double @double)
                 {
-                    return @double switch
+                    if (@double < (double)decimal.MinValue)
                     {
-                        < (double)decimal.MinValue => (double)decimal.MinValue,
-                        > (double)decimal.MaxValue => (double)decimal.MaxValue,
-                        _ => System.Convert.ToDecimal(excelValue)
-                    };
+                        return (double)decimal.MinValue;
+                    }
+
+                    if (@double > (double)decimal.MaxValue)
+                    {
+                        return (double)decimal.MaxValue;
+                    }
+
+                    return System.Convert.ToDecimal(excelValue);
                 }
             }
 
             {
                 if (cell.Value is int && excelValue is double @double)
                 {
-                    return @double switch
+                    if (@double < int.MinValue)
                     {
-                        < int.MinValue => int.MinValue,
-                        > int.MaxValue => int.MaxValue,
-                        _ => System.Convert.ToInt32(excelValue)
-                    };
+                        return int.MinValue;
+                    }
+
+                    if (@double > int.MaxValue)
+                    {
+                        return int.MaxValue;
+                    }
+
+                    return System.Convert.ToInt32(excelValue);
                 }
             }
 
@@ -42,12 +52,17 @@ namespace Allors.Excel
                 }
             }
 
-            return cell.Value switch
+            if (cell.Value is string && excelValue == null)
             {
-                string when excelValue == null => string.Empty,
-                string when excelValue is not string => excelValue.ToString(),
-                _ => excelValue
-            };
+                return string.Empty;
+            }
+
+            if (cell.Value is string && !(excelValue is string))
+            {
+                return excelValue.ToString();
+            }
+
+            return excelValue;
         }
     }
 }

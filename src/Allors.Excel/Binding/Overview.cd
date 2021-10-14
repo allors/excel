@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Allors.Excel.Binder">
+    <Position X="0.5" Y="1.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAQABAAAAECAAAEBAQIAAAAAIAAgAAAAAAA=</HashCode>
+      <FileName>Binding\Binder.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="bindingCells" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Allors.Excel.Binding">
+    <Position X="6.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQAAAAAAAAAEAAABBAAAAQAAAAkAAAAAAA=</HashCode>
+      <FileName>Binding\Binding.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Interface Name="Allors.Excel.IBinding">
+    <Position X="6.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQAAAAAAAAAEAAABAAAAAQAAAAAAAAAAAA=</HashCode>
+      <FileName>Binding\IBinding.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Allors.Excel.ICell">
+    <Position X="4" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABQAAAAEAAAgAAAAAABAAgAhAAAABgAABACgAABAAAA=</HashCode>
+      <FileName>ICell.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
