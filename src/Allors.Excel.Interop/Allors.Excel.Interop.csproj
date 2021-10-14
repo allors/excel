@@ -21,7 +21,7 @@
 
 	<!-- AssemblySearchPaths is needed in order to use office.dll-->
 	<PropertyGroup>
-		<AssemblySearchPaths>$(AssemblySearchPaths);{GAC}</AssemblySearchPaths>
+		<AssemblySearchPaths>$(AssemblySearchPaths);{GAC};C:\Program Files (x86)\Microsoft Visual Studio\Shared\Visual Studio Tools for Office\PIA\Office15\</AssemblySearchPaths>
 		<AppDesignerFolder>Properties</AppDesignerFolder>
 	</PropertyGroup>
 
