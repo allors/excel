@@ -42,15 +42,7 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          $pfxpath = '$(Build.SourcesDirectory)/src/ExcelAddIn.Interop/ExcelAddIn.Interop_TemporaryKey.pfx'
-          
-          Add-Type -AssemblyName System.Security
-          $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
-          $cert.Import($pfxpath, "", [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]"PersistKeySet")
-          $store = new-object system.security.cryptography.X509Certificates.X509Store -argumentlist "MY", CurrentUser
-          $store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]"ReadWrite")
-          $store.Add($cert)
-          $store.Close()
+          Import-PfxCertificate -FilePath $(Build.SourcesDirectory)/src/ExcelAddIn.Interop/ExcelAddIn.Interop_TemporaryKey.pfx -CertStoreLocation Cert:\CurrentUser\My
         failOnStderr: true
       displayName: 'Add Excel PFX file to the certificate store.'
     - task: PowerShell@2
