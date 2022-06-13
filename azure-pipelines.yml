@@ -25,7 +25,7 @@ stages:
       maxParallel: 2
 
     steps:
-   - task: UseDotNet@2
+    - task: UseDotNet@2
       displayName: 'Use .NET 6.0 sdk'
       inputs:
         packageType: sdk
