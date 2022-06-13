@@ -219,7 +219,7 @@
     <ManifestKeyFile>ExcelAddIn.VSTO_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>095E5B403791DD3D0A0E0BC81191583DD1BBCE4F</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>40ABDF4C98E83A492AF602EE4718A5D866FC11D6</ManifestCertificateThumbprint>
   </PropertyGroup>
   <!-- Include the build rules for a C# project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

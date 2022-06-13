@@ -1,17 +1,19 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
-  </PropertyGroup>
 
-  <PropertyGroup>
-    <ExcelDnaAllowPackageReferenceProjectStyle>true</ExcelDnaAllowPackageReferenceProjectStyle>
-    <RunExcelDnaSetDebuggerOptions>false</RunExcelDnaSetDebuggerOptions>
+    <!-- We don't need the extra 'ref' directory and reference assemblies for the Excel add-in -->
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+
+    <!-- We need all dependencies to be copied to the output directory, as-if we are an 'application' and not a 'library'.
+         This property also sets the CopyLockFileAssemblies property to true. -->
+    <EnableDynamicLoading>true</EnableDynamicLoading>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ExcelDna.AddIn" Version="1.5.0" PrivateAssets="All" />
-    <PackageReference Include="NLog" Version="4.7.12" PrivateAssets="All" />
+    <PackageReference Include="ExcelDna.AddIn" Version="1.6.0-preview3" PrivateAssets="All" />
+    <PackageReference Include="NLog" Version="5.0.1" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
