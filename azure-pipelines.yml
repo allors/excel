@@ -16,13 +16,19 @@ stages:
 
     strategy:
       matrix:
-        Excel32:
-          options: '--forcex86'
+        Excel32-nl-BE:
+          options: '--forcex86 /language:"nl-BE"'
           target: 'CiTests'
-        Excel64:
-          options: ''
-          target: 'Ci'
-      maxParallel: 2
+        Excel64-nl-BE:
+          options: '/language:"nl-BE"'
+          target: 'CiTests'
+        Excel32-en-US:
+          options: '--forcex86 /language:"en-US"'
+          target: 'CiTests'
+        Excel64-en-US:
+          options: '/language:"en-US"'
+          target: 'CiTests'
+      maxParallel: 4
 
     steps:
     - task: UseDotNet@2
@@ -35,7 +41,7 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          choco install office365business $(options)
+          choco install office365business $(options) /exclude:"Access Groove Lync OneDrive OneNote Outlook Publisher Word" /updates:"FALSE"
         failOnStderr: true
       displayName: 'Install Excel'
     - task: PowerShell@2
