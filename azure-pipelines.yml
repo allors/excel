@@ -42,7 +42,7 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          Import-PfxCertificate -FilePath $(Build.SourcesDirectory)/src/ExcelAddIn.Interop/ExcelAddIn.Interop_TemporaryKey.pfx -CertStoreLocation Cert:\CurrentUser\My
+          Import-PfxCertificate -FilePath $(Build.SourcesDirectory)/src/ExcelAddIn.VSTO/ExcelAddIn.VSTO_TemporaryKey.pfx -CertStoreLocation Cert:\CurrentUser\My
         failOnStderr: true
       displayName: 'Add Excel PFX file to the certificate store.'
     - task: PowerShell@2
