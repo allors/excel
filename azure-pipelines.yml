@@ -41,7 +41,7 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          choco install office365business $(options) /exclude:"Access Groove Lync OneDrive OneNote Outlook Publisher Word" /updates:"FALSE"
+          choco install office365business $(options)
         failOnStderr: true
       displayName: 'Install Excel'
     - task: PowerShell@2
