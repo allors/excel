@@ -16,17 +16,11 @@ stages:
 
     strategy:
       matrix:
-        Excel32-nl-BE:
-          options: '--forcex86 /language:"nl-BE"'
+        Excel32:
+          options: '--forcex86'
           target: 'CiTests'
-        Excel64-nl-BE:
-          options: '/language:"nl-BE"'
-          target: 'CiTests'
-        Excel32-en-US:
-          options: '--forcex86 /language:"en-US"'
-          target: 'CiTests'
-        Excel64-en-US:
-          options: '/language:"en-US"'
+        Excel64:
+          options: ''
           target: 'CiTests'
       maxParallel: 4
 
