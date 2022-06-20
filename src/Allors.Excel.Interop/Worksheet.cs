@@ -393,19 +393,61 @@ namespace Allors.Excel.Interop
             else
             {
                 List<Cell> cells = null;
-                foreach (InteropRange targetCell in target.Cells)
-                {
-                    var cell = this[targetCell.Coordinates()];
-                    if (cell.UpdateValue(targetCell.Value2))
-                    {
-                        if (cells == null)
-                        {
-                            cells = new List<Cell>();
-                        }
 
-                        cells.Add(cell);
+                // Get the Top Left cell in Excel ranges:
+                // e.g changed cells start at (row, column) (3,5)
+                // With that we can find the excel coordinates of our cells
+                var rowStartIndex = target.Row;
+                var columnStartIndex = target.Column;
+
+                // this starts at row = 1 and column = 1 (relative position, not absolute!)
+                // and is the first top-left cell that has been changed.
+                // All other cells are positioned relative to that first cell
+                var rawValue = target.get_Value(XlRangeValueDataType.xlRangeValueDefault);
+
+                if (rawValue is object[,] objectArray)
+                {
+                    for (var row = 0; row < objectArray.GetLength(0); row++)
+                    {
+                        for (var col = 0; col < objectArray.GetLength(1); col++)
+                        {
+                            // Starts with (1,1) for the first changed cell.
+                            var rawExcelValue = objectArray[row + 1, col + 1];
+
+                            // We store the absolute row/column indexes on 0-based, so minus 1
+                            var cell = this[(rowStartIndex + row - 1, columnStartIndex + col - 1)];
+
+                            if (cell.UpdateValue(rawExcelValue))
+                            {
+                                if (cells == null)
+                                {
+                                    cells = new List<Cell>();
+                                }
+
+                                cells.Add(cell);
+                            }
+                        }
                     }
                 }
+                else
+                {
+                    // A Single cell has been changed. (Foreach Loop probably not required)
+                    foreach (InteropRange targetCell in target.Cells)
+                    {
+                        var cell = this[(targetCell.Row - 1, targetCell.Column - 1)];
+
+                        if (cell.UpdateValue(targetCell.Value2))
+                        {
+                            if (cells == null)
+                            {
+                                cells = new List<Cell>();
+                            }
+
+                            cells.Add(cell);
+                        }
+                    }
+                }
+
 
                 if (cells != null)
                 {
@@ -1372,38 +1414,57 @@ namespace Allors.Excel.Interop
         {
             var deletedCells = new HashSet<Cell>(this.CellByCoordinates.Values);
             var changedCells = new List<ICell>();
-            foreach (InteropRange interopCell in this.InteropWorksheet.UsedRange)
+
+            // Will always be a 2-dimensional array
+            var rawValue = this.InteropWorksheet.UsedRange.get_Value(XlRangeValueDataType.xlRangeValueDefault);
+
+            if (rawValue is object[,] objectArray)
             {
-                var coordinates = interopCell.Coordinates();
-                if (!this.CellByCoordinates.TryGetValue(coordinates, out var cell))
+                var rangeRowIndex = this.InteropWorksheet.UsedRange.Row;
+                var rangeColumnIndex = this.InteropWorksheet.UsedRange.Column;
+
+                for (var row = 0; row < objectArray.GetLength(0); row++)
                 {
-                    if (interopCell.Value2 == null)
+                    for (var col = 0; col < objectArray.GetLength(1); col++)
                     {
-                        // There was no cell, so no need to create one
-                        continue;
+                        // 1-Based
+                        var rawExcelValue = objectArray[row + 1, col + 1];
+
+                        var rowIndexCell = rangeRowIndex + row - 1;
+                        var columnIndexCell = rangeColumnIndex + col - 1;
+
+                        if (!this.CellByCoordinates.TryGetValue((rowIndexCell, columnIndexCell), out var cell))
+                        {
+                            if (rawExcelValue == null)
+                            {
+                                // There was no cell, so no need to create one
+                                continue;
+                            }
+
+                            cell = this[(rowIndexCell, columnIndexCell)];
+                        }
+
+                        deletedCells.Remove(cell);
+
+                        if (cell.UpdateValue(rawExcelValue))
+                        {
+                            changedCells.Add(cell);
+                        }
                     }
-
-                    cell = this[coordinates];
                 }
 
-                deletedCells.Remove(cell);
-
-                if (cell.UpdateValue(interopCell.Value2))
+                changedCells.AddRange(deletedCells);
+                foreach (var deletedCell in deletedCells)
                 {
-                    changedCells.Add(cell);
+                    deletedCell.Clear();
+                }
+
+                if (changedCells.Count > 0)
+                {
+                    this.CellsChanged?.Invoke(this, new CellChangedEvent(changedCells.ToArray()));
                 }
             }
 
-            changedCells.AddRange(deletedCells);
-            foreach (var deletedCell in deletedCells)
-            {
-                deletedCell.Clear();
-            }
-
-            if (changedCells.Count > 0)
-            {
-                this.CellsChanged?.Invoke(this, new CellChangedEvent(changedCells.ToArray()));
-            }
         }
 
         public void SetPageSetup(PageSetup pageSetup)
