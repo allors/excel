@@ -12,8 +12,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ExcelDna.AddIn" Version="1.6.0-preview3" PrivateAssets="All" />
-    <PackageReference Include="NLog" Version="5.0.1" PrivateAssets="All" />
+    <PackageReference Include="ExcelDna.AddIn" Version="1.6.0" PrivateAssets="All" />
+    <PackageReference Include="NLog" Version="5.0.5" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
