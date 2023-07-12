@@ -690,7 +690,7 @@ namespace Allors.Excel.Interop
                         (acc, w) =>
                         {
                             var list = acc[acc.Count - 1];
-                            if (list.Count == 0 || (list[list.Count - 1].Hidden == w.Hidden))
+                            if (list.Count == 0 || list[list.Count - 1].Hidden == w.Hidden)
                             {
                                 list.Add(w);
                             }
