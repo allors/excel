@@ -1,22 +1,23 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<OutputType>Exe</OutputType>
-		<TargetFramework>net6.0</TargetFramework>
-		<RootNamespace></RootNamespace>
-		<NoWarn>CS0649;CS0169</NoWarn>
-		<NukeRootDirectory>..</NukeRootDirectory>
-		<NukeScriptDirectory>..</NukeScriptDirectory>
-		<NukeTelemetryVersion>1</NukeTelemetryVersion>
-	</PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace></RootNamespace>
+    <NoWarn>CS0649;CS0169;CA1050;CA1822;CA2211;IDE1006</NoWarn>
+    <NukeRootDirectory>..</NukeRootDirectory>
+    <NukeScriptDirectory>..</NukeScriptDirectory>
+    <NukeTelemetryVersion>1</NukeTelemetryVersion>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Nuke.Common" Version="6.2.1" />
-		<PackageReference Include="xunit.runner.console" Version="2.4.2">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageDownload Include="GitVersion.Tool" Version="[5.11.1]" />
-	</ItemGroup>
+  <ItemGroup>
+	  <PackageReference Include="GitVersion.CommandLine" Version="5.12.0" />
+	  <PackageReference Include="Nuke.Common" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageDownload Include="xunit.runner.console" Version="[2.7.0]" />
+  </ItemGroup>
 
 </Project>
