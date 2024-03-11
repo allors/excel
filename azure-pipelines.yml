@@ -1,6 +1,7 @@
 trigger:
 - master
 - feature/*
+- issue/*
 
 variables:
   buildConfiguration: 'Release'
@@ -26,11 +27,11 @@ stages:
 
     steps:
     - task: UseDotNet@2
-      displayName: 'Use .NET 6.0 sdk'
       inputs:
         packageType: sdk
-        version: 6.0.x
-        installationPath: $(Agent.ToolsDirectory)/dotnet
+        version: 8.0.x
+        includePreviewVersions: true
+      displayName: 'Use .NET 8.0 sdk'
     - task: PowerShell@2
       inputs:
         targetType: 'inline'
