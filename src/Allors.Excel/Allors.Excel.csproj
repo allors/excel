@@ -9,6 +9,7 @@
     <PackageProjectUrl>https://github.com/Allors/Documents</PackageProjectUrl>
     <PackageDescription>Speed up access to excel by using a virtual DOM.</PackageDescription>
     <PackageIcon>icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
     <PackageTags>excel;virtual;dom;document object model;speed;optimization;performance</PackageTags>
