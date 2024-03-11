@@ -27,7 +27,7 @@ class Build : NukeBuild
         .Before(Restore)
         .Executes(() =>
         {
-            DotNetClean(v => v.SetProject(SourceDirectory));
+            // DotNetClean(v => v.SetProject(SourceDirectory));
             ArtifactsDirectory.CreateOrCleanDirectory();
         });
 
