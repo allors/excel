@@ -59,7 +59,7 @@ stages:
         testResultsFiles: '*.xml'
         searchFolder: '$(Build.SourcesDirectory)/artifacts/tests'
       displayName: 'Publish Test results'
-    - task: NuGetAuthenticate@0
+    - task: NuGetAuthenticate@1
       displayName: 'NuGet Authenticate'
     - task: NuGetCommand@2
       displayName: 'NuGet push'
