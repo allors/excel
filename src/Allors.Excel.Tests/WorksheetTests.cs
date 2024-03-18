@@ -9,14 +9,12 @@ namespace Allors.Excel.Tests.Interop
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Runtime.InteropServices;
     using System.Threading;
-    using Allors.Excel.Interop;
     using Moq;
     using Xunit;
     using Range = Excel.Range;
 
-    public abstract class WorksheetTests : InteropTest
+    public abstract class WorksheetTests : ExcelTest
     {
         private DirectoryInfo tempDirectory;
 
@@ -46,9 +44,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -64,9 +62,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -89,9 +87,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -114,9 +112,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -146,9 +144,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -172,9 +170,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -200,7 +198,7 @@ namespace Allors.Excel.Tests.Interop
 
         //    var addIn = new AddIn(this.application, program.Object);
 
-        //    this.application.Workbooks.Add();
+        //    this.AddWorkbook();
 
         //    var workbook = addIn.Workbooks[0];
 
@@ -265,9 +263,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -282,9 +280,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -319,9 +317,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -359,9 +357,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -393,9 +391,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -416,9 +414,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -435,9 +433,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -468,9 +466,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -491,9 +489,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -517,9 +515,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -545,9 +543,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -628,9 +626,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -643,27 +641,27 @@ namespace Allors.Excel.Tests.Interop
             // 1  | 2
 
             // Add before "1"
-            var worksheet = (Worksheet)workbook.AddWorksheet(null, sheet1);
+            var worksheet = workbook.AddWorksheet(null, sheet1);
             worksheet.Name = "#3";
 
             // Expected order => #3 | 1  | 2
             Assert.Equal(3, workbook.Worksheets.Length);
-            Assert.Equal(3, ((Workbook)workbook).WorksheetsByIndex.Length);
+            Assert.Equal(3, ((IWorkbook)workbook).WorksheetsByIndex.Length);
             Assert.Equal(1, worksheet.Index);
 
-            var worksheetsByIndex = ((Workbook)workbook).WorksheetsByIndex;
+            var worksheetsByIndex = ((IWorkbook)workbook).WorksheetsByIndex;
             Assert.Equal("#3", worksheetsByIndex[0].Name);
             Assert.Equal("1", worksheetsByIndex[1].Name);
             Assert.Equal("2", worksheetsByIndex[2].Name);
 
             // Add before "2"
-            worksheet = (Worksheet)workbook.AddWorksheet(null, sheet2);
+            worksheet = workbook.AddWorksheet(null, sheet2);
             worksheet.Name = "#4";
 
             // Expected order => #3 | 1  | #4 | 2
-            worksheetsByIndex = ((Workbook)workbook).WorksheetsByIndex;
+            worksheetsByIndex = ((IWorkbook)workbook).WorksheetsByIndex;
             Assert.Equal(4, workbook.Worksheets.Length);
-            Assert.Equal(4, ((Workbook)workbook).WorksheetsByIndex.Length);
+            Assert.Equal(4, ((IWorkbook)workbook).WorksheetsByIndex.Length);
             Assert.Equal(3, worksheet.Index);
             Assert.Equal("#3", worksheetsByIndex[0].Name);
             Assert.Equal("1", worksheetsByIndex[1].Name);
@@ -671,13 +669,13 @@ namespace Allors.Excel.Tests.Interop
             Assert.Equal("2", worksheetsByIndex[3].Name);
 
             // Add after "1"
-            worksheet = (Worksheet)workbook.AddWorksheet(null, null, sheet1);
+            worksheet = (IWorksheet)workbook.AddWorksheet(null, null, sheet1);
             worksheet.Name = "#5";
 
             // Expected order => #3 | 1 | #5 | #4 | 2
-            worksheetsByIndex = ((Workbook)workbook).WorksheetsByIndex;
+            worksheetsByIndex = ((IWorkbook)workbook).WorksheetsByIndex;
             Assert.Equal(5, workbook.Worksheets.Length);
-            Assert.Equal(5, ((Workbook)workbook).WorksheetsByIndex.Length);
+            Assert.Equal(5, ((IWorkbook)workbook).WorksheetsByIndex.Length);
             Assert.Equal(3, worksheet.Index);
             Assert.Equal("#3", worksheetsByIndex[0].Name);
             Assert.Equal("1", worksheetsByIndex[1].Name);
@@ -686,13 +684,13 @@ namespace Allors.Excel.Tests.Interop
             Assert.Equal("2", worksheetsByIndex[4].Name);
 
             // Add after "2"
-            worksheet = (Worksheet)workbook.AddWorksheet(null, null, sheet2);
+            worksheet = (IWorksheet)workbook.AddWorksheet(null, null, sheet2);
             worksheet.Name = "#6";
 
             // Expected order => #3 | 1 | #5 | #4 | 2 | #6
-            worksheetsByIndex = ((Workbook)workbook).WorksheetsByIndex;
+            worksheetsByIndex = ((IWorkbook)workbook).WorksheetsByIndex;
             Assert.Equal(6, workbook.Worksheets.Length);
-            Assert.Equal(6, ((Workbook)workbook).WorksheetsByIndex.Length);
+            Assert.Equal(6, ((IWorkbook)workbook).WorksheetsByIndex.Length);
             Assert.Equal(6, worksheet.Index);
             Assert.Equal("#3", worksheetsByIndex[0].Name);
             Assert.Equal("1", worksheetsByIndex[1].Name);
@@ -707,9 +705,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -719,8 +717,8 @@ namespace Allors.Excel.Tests.Interop
             Assert.Equal("2", last.Name);
 
             // At before index 1
-            var worksheet = (Worksheet)workbook.AddWorksheet(1);
-            var worksheetsByIndex = ((Workbook)workbook).WorksheetsByIndex;
+            var worksheet = (IWorksheet)workbook.AddWorksheet(1);
+            var worksheetsByIndex = ((IWorkbook)workbook).WorksheetsByIndex;
             Assert.Equal(3, workbook.Worksheets.Length);
             Assert.Equal(3, worksheetsByIndex.Length);
             Assert.Equal(1, worksheet.Index);
@@ -732,8 +730,8 @@ namespace Allors.Excel.Tests.Interop
             Assert.Equal("2", worksheetsByIndex[2].Name);
 
             // Add before index 2
-            worksheet = (Worksheet)workbook.AddWorksheet(2);
-            worksheetsByIndex = ((Workbook)workbook).WorksheetsByIndex;
+            worksheet = (IWorksheet)workbook.AddWorksheet(2);
+            worksheetsByIndex = ((IWorkbook)workbook).WorksheetsByIndex;
 
             Assert.Equal(4, workbook.Worksheets.Length);
             Assert.Equal(4, worksheetsByIndex.Length);
@@ -746,8 +744,8 @@ namespace Allors.Excel.Tests.Interop
             Assert.Equal("2", worksheetsByIndex[3].Name);
 
             // 0 Adds Before the Active Sheet (being the last added sheet here)
-            worksheet = (Worksheet)workbook.AddWorksheet(0);
-            worksheetsByIndex = ((Workbook)workbook).WorksheetsByIndex;
+            worksheet = (IWorksheet)workbook.AddWorksheet(0);
+            worksheetsByIndex = ((IWorkbook)workbook).WorksheetsByIndex;
 
             Assert.Equal(5, workbook.Worksheets.Length);
             Assert.Equal(5, worksheetsByIndex.Length);
@@ -768,15 +766,15 @@ namespace Allors.Excel.Tests.Interop
 
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
             Assert.Equal(2, workbook.Worksheets.Length);
 
-            var worksheet = (Worksheet)workbook.AddWorksheet(null, null, workbook.Worksheets.Last());
+            var worksheet = (IWorksheet)workbook.AddWorksheet(null, null, workbook.Worksheets.Last());
 
             worksheet.CellsChanged += this.Worksheet_CellsChanged;
 
@@ -792,14 +790,16 @@ namespace Allors.Excel.Tests.Interop
 
             // Change the cell will trigger the Change Event
             this.ExpectedContextTag = tag1;
-            worksheet.InteropWorksheet.Cells[1, 1] = "i am cell00";
+
+            worksheet[1, 1].Value = "i am cell00";
 
             var cell01 = worksheet[(0, 1)];
             cell01.Tag = tag2;
 
             // Change the cell will trigger the Change Event
             this.ExpectedContextTag = tag2;
-            worksheet.InteropWorksheet.Cells[1, 2] = "i am cell01";
+
+            worksheet[1, 2].Value = "i am cell01";
 
             Assert.Empty(this.ExpectedContextTags);
         }
@@ -827,9 +827,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -849,13 +849,13 @@ namespace Allors.Excel.Tests.Interop
 
 
         [Fact]
-        public async void AddWorkbook()
+        public async void AddWorkbookTest()
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -870,9 +870,9 @@ namespace Allors.Excel.Tests.Interop
 
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -916,9 +916,9 @@ namespace Allors.Excel.Tests.Interop
 
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -956,9 +956,9 @@ namespace Allors.Excel.Tests.Interop
 
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -998,9 +998,9 @@ namespace Allors.Excel.Tests.Interop
 
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -1043,9 +1043,9 @@ namespace Allors.Excel.Tests.Interop
 
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -1100,9 +1100,9 @@ namespace Allors.Excel.Tests.Interop
 
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -1153,9 +1153,9 @@ namespace Allors.Excel.Tests.Interop
 
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -1176,9 +1176,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -1262,9 +1262,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -1332,9 +1332,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -1368,7 +1368,7 @@ namespace Allors.Excel.Tests.Interop
 
             await sheet1.Flush().ConfigureAwait(false);
 
-            var columnName = Worksheet.ExcelColumnFromNumber(31);
+            var columnName = Utils.ExcelColumnFromNumber(31);
 
             range = sheet1.GetUsedRange(columnName);
             Assert.Equal(50, range.Row);
@@ -1395,9 +1395,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -1443,9 +1443,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 
@@ -1464,9 +1464,9 @@ namespace Allors.Excel.Tests.Interop
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
-            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            var addIn = this.NewAddIn();
 
-            this.application.Workbooks.Add();
+            this.AddWorkbook();
 
             var workbook = addIn.Workbooks[0];
 

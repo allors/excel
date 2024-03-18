@@ -70,6 +70,7 @@ namespace Allors.Excel
 
         ICustomProperties CustomProperties { get; }
 
+        IWorksheet[] WorksheetsByIndex { get; }
 
         /// <summary>
         /// Sets the content of the xmldocument in the customxmlparts, and returns the id of the xmlpart.

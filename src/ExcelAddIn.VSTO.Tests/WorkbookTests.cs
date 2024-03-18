@@ -8,12 +8,15 @@ using InteropWorkbook = Microsoft.Office.Interop.Excel.Workbook;
 
 namespace ExcelAddIn.VSTO.Tests
 {
+    using Allors.Excel;
+    using Allors.Excel.Interop;
+    using Moq;
+
     public class WorkbookTests : Allors.Excel.Tests.Interop.WorkbookTests
     {
-        public WorkbookTests()
-        {
-            this.application = new InteropApplication { Visible = true };
-        }
+        private readonly InteropApplication application;
+
+        public WorkbookTests() => this.application = new InteropApplication { Visible = true };
 
         public override void Dispose()
         {
@@ -26,5 +29,15 @@ namespace ExcelAddIn.VSTO.Tests
 
             this.application.Quit();
         }
+
+        protected override IAddIn NewAddIn()
+        {
+            var program = new Mock<IProgram>();
+            var ribbon = new Mock<IRibbon>();
+            var addIn = new AddIn(this.application, program.Object, ribbon.Object);
+            return addIn;
+        }
+
+        protected override void AddWorkbook() => this.application.Workbooks.Add();
     }
 }

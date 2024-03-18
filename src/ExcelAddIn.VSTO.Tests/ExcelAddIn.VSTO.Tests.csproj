@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
   </PropertyGroup>
@@ -17,7 +17,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Allors.Excel.Interop.Tests\Allors.Excel.Interop.Tests.csproj" />
+    <ProjectReference Include="..\Allors.Excel.Tests\Allors.Excel.Tests.csproj" />
     <ProjectReference Include="..\ExcelAddIn.VSTO\ExcelAddIn.VSTO.csproj" />
   </ItemGroup>
   <ItemGroup>

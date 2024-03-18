@@ -17,6 +17,12 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Allors.Excel.Interop\Allors.Excel.Interop.csproj" />
+    <ProjectReference Include="..\Allors.Excel.Headless\Allors.Excel.Headless.csproj" />
+    <ProjectReference Include="..\Allors.Excel.Tests\Allors.Excel.Tests.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="data\Catalog.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

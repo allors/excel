@@ -189,44 +189,10 @@ namespace Allors.Excel.Interop
                 return cell;
             }
         }
+        
+        IRow Excel.IWorksheet.Row(int index) => this.Row(index);
 
-        public static string ExcelColumnFromNumber(int column)
-        {
-            var columnString = string.Empty;
-            decimal columnNumber = column;
-            while (columnNumber > 0)
-            {
-                var currentLetterNumber = (columnNumber - 1) % 26;
-                var currentLetter = (char)(currentLetterNumber + 65);
-                columnString = currentLetter + columnString;
-                columnNumber = (columnNumber - (currentLetterNumber + 1)) / 26;
-            }
-
-            return columnString;
-        }
-
-        public static int ExcelColumnFromLetter(string column)
-        {
-            var retVal = 0;
-            var col = column.ToUpper();
-            for (var iChar = col.Length - 1; iChar >= 0; iChar--)
-            {
-                var colPiece = col[iChar];
-                var colNum = colPiece - 64;
-                retVal = retVal + colNum * (int)Math.Pow(26, col.Length - (iChar + 1));
-            }
-            return retVal;
-        }
-
-        IRow Excel.IWorksheet.Row(int index)
-        {
-            return this.Row(index);
-        }
-
-        IColumn Excel.IWorksheet.Column(int index)
-        {
-            return this.Column(index);
-        }
+        IColumn Excel.IWorksheet.Column(int index) => this.Column(index);
 
         public Row Row(int index)
         {
@@ -649,11 +615,11 @@ namespace Allors.Excel.Interop
                             {
                                 if (cc.Options.Columns.HasValue)
                                 {
-                                    validationRange = $"{cc.Options.Worksheet.Name}!${ExcelColumnFromNumber(cc.Options.Column + 1)}${cc.Options.Row + 1}:${ExcelColumnFromNumber(cc.Options.Column + cc.Options.Columns.Value)}${cc.Options.Row + 1}";
+                                    validationRange = $"{cc.Options.Worksheet.Name}!${Utils.ExcelColumnFromNumber(cc.Options.Column + 1)}${cc.Options.Row + 1}:${Utils.ExcelColumnFromNumber(cc.Options.Column + cc.Options.Columns.Value)}${cc.Options.Row + 1}";
                                 }
                                 else if (cc.Options.Rows.HasValue)
                                 {
-                                    validationRange = $"{cc.Options.Worksheet.Name}!${ExcelColumnFromNumber(cc.Options.Column + 1)}${cc.Options.Row + 1}:${ExcelColumnFromNumber(cc.Options.Column + 1)}${cc.Options.Row + cc.Options.Rows}";
+                                    validationRange = $"{cc.Options.Worksheet.Name}!${Utils.ExcelColumnFromNumber(cc.Options.Column + 1)}${cc.Options.Row + 1}:${Utils.ExcelColumnFromNumber(cc.Options.Column + 1)}${cc.Options.Row + cc.Options.Rows}";
                                 }
                             }
 
@@ -984,8 +950,8 @@ namespace Allors.Excel.Interop
 
                 try
                 {
-                    var startColumnName = ExcelColumnFromNumber(startColumnIndex + 2);
-                    var endColumnName = ExcelColumnFromNumber(startColumnIndex + 1 + numberOfColumns);
+                    var startColumnName = Utils.ExcelColumnFromNumber(startColumnIndex + 2);
+                    var endColumnName = Utils.ExcelColumnFromNumber(startColumnIndex + 1 + numberOfColumns);
 
                     var rows = this.InteropWorksheet.Range[$"{startColumnName}1:{endColumnName}1"];
 
@@ -1036,8 +1002,8 @@ namespace Allors.Excel.Interop
 
                 try
                 {
-                    var startColumnName = ExcelColumnFromNumber(startColumnIndex + 1);
-                    var endColumnName = ExcelColumnFromNumber(startColumnIndex + numberOfColumns);
+                    var startColumnName = Utils.ExcelColumnFromNumber(startColumnIndex + 1);
+                    var endColumnName = Utils.ExcelColumnFromNumber(startColumnIndex + numberOfColumns);
 
                     var range = this.InteropWorksheet.Range[$"{startColumnName}1:{endColumnName}1"];
 
@@ -1194,7 +1160,7 @@ namespace Allors.Excel.Interop
                 return null;
             }
 
-            var columnIndex = ExcelColumnFromLetter(column);
+            var columnIndex = Utils.ExcelColumnFromLetter(column);
             var columnRange = (InteropRange)this.InteropWorksheet.Columns[columnIndex];
 
             var beginRowIndex = columnRange.Row;
@@ -1373,10 +1339,10 @@ namespace Allors.Excel.Interop
             {
                 // row 3, column 5, rows 6 column 2
                 // => A1 Style = F4:H10
-                var startColumn = ExcelColumnFromNumber(range.Column + 1); // !zero-based
+                var startColumn = Utils.ExcelColumnFromNumber(range.Column + 1); // !zero-based
                 var startRow = range.Row + 1;
 
-                var endColumn = ExcelColumnFromNumber(range.Column + range.Columns.GetValueOrDefault());
+                var endColumn = Utils.ExcelColumnFromNumber(range.Column + range.Columns.GetValueOrDefault());
                 var endRow = range.Row + range.Rows.GetValueOrDefault();
 
                 printArea = $"{startColumn}{startRow}:{endColumn}{endRow}";

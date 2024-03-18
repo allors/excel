@@ -115,7 +115,7 @@ namespace Allors.Excel.Interop
 
         public Excel.IWorksheet[] Worksheets => this.worksheetByInteropWorksheet.Values.Cast<Excel.IWorksheet>().ToArray();
 
-        public Worksheet[] WorksheetsByIndex => this.worksheetByInteropWorksheet.Values.OrderBy(v => v.Index).ToArray();
+        public Excel.IWorksheet[] WorksheetsByIndex => this.worksheetByInteropWorksheet.Values.OrderBy(v => v.Index).Cast<Excel.IWorksheet>().ToArray();
 
         /// <inheritdoc/>
         public bool IsActive { get; internal set; }

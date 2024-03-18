@@ -16,6 +16,8 @@ namespace Allors.Excel.Headless
         {
             this.AddIn = addIn;
             this.WorksheetList = new List<Worksheet>();
+            this.BuiltinProperties = new BuiltinProperties();
+            this.CustomProperties = new CustomProperties();
         }
 
         public AddIn AddIn { get; }
@@ -90,7 +92,8 @@ namespace Allors.Excel.Headless
 
         public ICustomProperties CustomProperties { get; }
 
-
+        public IWorksheet[] WorksheetsByIndex => this.Worksheets;
+        
         public string SetCustomXML(XmlDocument xmlDocument)
         {
             throw new NotImplementedException();
