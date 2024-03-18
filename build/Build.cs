@@ -51,24 +51,36 @@ class Build : NukeBuild
                 .SetFileVersion(GitVersion.AssemblySemFileVer)
                 .SetInformationalVersion(GitVersion.InformationalVersion));
 
+            MSBuild(s => s
+                .SetTargetPath(SourceDirectory / "ExcelAddIn.VSTO.Tests" / "ExcelAddIn.VSTO.Tests.csproj")
+                .SetTargets("Rebuild")
+                .SetConfiguration(Configuration)
+                .SetAssemblyVersion(GitVersion.AssemblySemVer)
+                .SetFileVersion(GitVersion.AssemblySemFileVer)
+                .SetInformationalVersion(GitVersion.InformationalVersion));
         });
 
     Target Tests => _ => _
        .DependsOn(Compile)
        .Executes(() =>
        {
-           var assembly = SourceDirectory.GlobFiles("**/Allors.Excel.Interop.Tests.dll").First();
+           {
+               var assembly = SourceDirectory.GlobFiles("**/Allors.Excel.Interop.Tests.dll").First();
 
-           Xunit2(v => v
-                 .SetFramework("net461")
-                 .AddTargetAssemblies(assembly)
-                 .SetResultReport(Xunit2ResultFormat.Xml, ArtifactsDirectory / "tests" / "results.xml"));
+               Xunit2(v => v
+                   .SetFramework("net461")
+                   .AddTargetAssemblies(assembly)
+                   .SetResultReport(Xunit2ResultFormat.Xml, ArtifactsDirectory / "tests" / "interop-results.xml"));
+           }
 
-           DotNetTest(s => s
-               .SetProjectFile(Solution.GetProject("ExcelAddIn.VSTO.Tests"))
-               .SetConfiguration(Configuration)
-               .AddLoggers("trx;LogFileName=ExcelAddInVSTOTests.trx")
-               .SetResultsDirectory(ArtifactsDirectory / "tests"));
+           {
+               var assembly = SourceDirectory.GlobFiles("**/ExcelAddIn.VSTO.Tests.dll").First();
+
+               Xunit2(v => v
+                   .SetFramework("net48")
+                   .AddTargetAssemblies(assembly)
+                   .SetResultReport(Xunit2ResultFormat.Xml, ArtifactsDirectory / "tests" / "vsto-results.xml"));
+           }
        });
 
     Target Pack => _ => _
