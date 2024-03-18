@@ -412,7 +412,7 @@ namespace Allors.Excel.Tests.Interop
         }
 
         [Fact]
-        public void SaveAsPDFThrowsComExceptionWhenEmpty()
+        public void SaveAsPDFThrowsNoExceptionWhenEmpty()
         {
             var program = new Mock<IProgram>();
             var ribbon = new Mock<IRibbon>();
@@ -424,9 +424,9 @@ namespace Allors.Excel.Tests.Interop
 
             var newSheet = workbook.AddWorksheet();
 
-            // There is nothing to print => exception
+            // There is nothing to print => no exception
             var file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(newSheet)}.pdf"));
-            Assert.Throws<COMException>(() => newSheet.SaveAsPDF(file));
+            newSheet.SaveAsPDF(file);
         }
 
 

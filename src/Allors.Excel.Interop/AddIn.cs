@@ -42,8 +42,9 @@ namespace Allors.Excel.Interop
                     workbook.New(interopWorksheet);
                 }
 
-                var worksheets = workbook.Worksheets;
                 await this.Program.OnNew(workbook);
+
+                var worksheets = workbook.Worksheets;
                 foreach (var worksheet in worksheets)
                 {
                     await program.OnNew(worksheet);

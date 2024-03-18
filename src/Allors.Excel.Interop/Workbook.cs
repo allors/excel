@@ -11,7 +11,6 @@ namespace Allors.Excel.Interop
     using System.Reflection;
     using System.Runtime.InteropServices;
     using System.Xml;
-    using Microsoft.Office.Core;
     using InteropWorkbook = Microsoft.Office.Interop.Excel.Workbook;
     using InteropWorksheet = Microsoft.Office.Interop.Excel.Worksheet;
     using InteropName = Microsoft.Office.Interop.Excel.Name;
