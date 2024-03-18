@@ -67,8 +67,6 @@ class Build : NukeBuild
            DotNetTest(s => s
                .SetProjectFile(Solution.GetProject("ExcelAddIn.VSTO.Tests"))
                .SetConfiguration(Configuration)
-               .EnableNoBuild()
-               .EnableNoRestore()
                .AddLoggers("trx;LogFileName=ExcelAddInVSTOTests.trx")
                .SetResultsDirectory(ArtifactsDirectory / "tests"));
        });
