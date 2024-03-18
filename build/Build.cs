@@ -63,6 +63,14 @@ class Build : NukeBuild
                  .SetFramework("net461")
                  .AddTargetAssemblies(assembly)
                  .SetResultReport(Xunit2ResultFormat.Xml, ArtifactsDirectory / "tests" / "results.xml"));
+
+           DotNetTest(s => s
+               .SetProjectFile(Solution.GetProject("ExcelAddIn.VSTO.Tests"))
+               .SetConfiguration(Configuration)
+               .EnableNoBuild()
+               .EnableNoRestore()
+               .AddLoggers("trx;LogFileName=ExcelAddInVSTOTests.trx")
+               .SetResultsDirectory(ArtifactsDirectory / "tests"));
        });
 
     Target Pack => _ => _
