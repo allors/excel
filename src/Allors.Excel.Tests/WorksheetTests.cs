@@ -42,8 +42,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public void SheetHasIndex()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -60,8 +58,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public void NewSheetAtActiveSheetHasIndex()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -85,8 +81,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public void NewSheetBeforeSheetHasIndex()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -110,8 +104,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public void NewSheetAtIndexHasIndex()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -142,8 +134,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public void NewSheetAfterSheetHasIndex()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -168,8 +158,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public void ShowInputMessage()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -261,8 +249,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public void SaveAsPDFWithNullThrowsException()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -278,8 +264,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public void SetPrintArea()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -315,8 +299,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public void SaveAsPDFWithHeader()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -355,8 +337,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public void PageSetupOrientationDefaultsToPortrait()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -389,8 +369,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public void SaveAsPDF()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -412,8 +390,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public void SaveAsPDFThrowsNoExceptionWhenEmpty()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -431,8 +407,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public async void SaveAsPDFThrowsExceptionWhenFileExists()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -464,8 +438,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public void SaveAsXPS()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -487,8 +459,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public void SaveAsXPSSetsExtensiontoXPS()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -513,8 +483,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public void SaveAsPDFSetsExtensiontoXPS()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -541,8 +509,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public async void FreezePanes()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -624,8 +590,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public async void AddWorksheetsBeforeAndAfter()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -703,8 +667,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public async void AddWorksheetsByIndex()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -764,8 +726,6 @@ namespace Allors.Excel.Tests.Interop
         {
             this.ExpectedContextTags = new List<ContextTag>();
 
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -825,8 +785,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public async void IsVisible()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -851,8 +809,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public async void AddWorkbookTest()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -868,8 +824,6 @@ namespace Allors.Excel.Tests.Interop
         {
             ICell cell = null;
 
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -914,8 +868,6 @@ namespace Allors.Excel.Tests.Interop
         {
             ICell cell = null;
 
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -954,8 +906,6 @@ namespace Allors.Excel.Tests.Interop
         {
             ICell cell = null;
 
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -996,8 +946,6 @@ namespace Allors.Excel.Tests.Interop
         {
             ICell cell = null;
 
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -1041,8 +989,6 @@ namespace Allors.Excel.Tests.Interop
         {
             ICell cell = null;
 
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -1098,8 +1044,6 @@ namespace Allors.Excel.Tests.Interop
         {
             ICell cell = null;
 
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -1151,8 +1095,6 @@ namespace Allors.Excel.Tests.Interop
         {
             ICell cell = null;
 
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -1174,8 +1116,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public void GetRange()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -1260,8 +1200,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public async void GetUsedRange()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -1330,8 +1268,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public async void GetUsedRangeColumn()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -1393,8 +1329,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public async void GetUsedRangeRow()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -1441,8 +1375,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public void GetRectangle()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -1462,8 +1394,6 @@ namespace Allors.Excel.Tests.Interop
         [Fact]
         public void NewSheetIsActive()
         {
-            var program = new Mock<IProgram>();
-            var ribbon = new Mock<IRibbon>();
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
