@@ -12,7 +12,7 @@ namespace ExcelAddIn.VSTO.Tests
 {
     using Allors.Excel.Interop;
 
-    public class WorksheetTests : Allors.Excel.Tests.Interop.WorksheetTests
+    public class WorksheetTests : Allors.Excel.Tests.WorksheetTests
     {
         private readonly InteropApplication application;
 

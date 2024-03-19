@@ -1,6 +1,6 @@
 using System;
 
-namespace Allors.Excel.Tests.Interop
+namespace Allors.Excel.Tests
 {
     public abstract class ExcelTest : IDisposable
     {

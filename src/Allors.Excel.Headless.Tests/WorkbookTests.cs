@@ -8,7 +8,7 @@ namespace Allors.Excel.Headless.Tests
     using Allors.Excel;
     using Allors.Excel.Headless;
 
-    public class WorkbookTests : Allors.Excel.Tests.Interop.WorkbookTests
+    public class WorkbookTests : Excel.Tests.WorkbookTests
     {
         private AddIn addIn;
 

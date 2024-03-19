@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Allors.Excel.Headless.AddIn">
+    <Position X="0.5" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAACAAAAAAAAAAFAAAAAAAAAAIAAAAgEAAAAA=</HashCode>
+      <FileName>AddIn.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="WorkbookList" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Allors.Excel.Headless.Workbook">
+    <Position X="4" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAYAAQAAAAAAAFEEAAACAABAgEgCACAAAkCgACAEAA=</HashCode>
+      <FileName>Workbook.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="WorksheetList" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Allors.Excel.Headless.Worksheet">
+    <Position X="8.25" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAIwAAAAMAQAEkdsGAHACAQMCQAAkggIgIkCAwAogAA=</HashCode>
+      <FileName>Worksheet.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="rowByIndex" />
+      <Field Name="columnByIndex" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Allors.Excel.Headless.CustomProperties">
+    <Position X="12" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAABAAACEAAgAAAEBABAQAAAAAAAAAABAAAAAAAAA=</HashCode>
+      <FileName>CustomProperties.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Allors.Excel.Headless.BuiltinProperties">
+    <Position X="12" Y="4.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>QACgABgACEGEEMSAgIgAgAAAAAgQBAAQAAAUFAAAqiA=</HashCode>
+      <FileName>BuiltinProperties.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Allors.Excel.Headless.Row">
+    <Position X="5.5" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAEAAAAEAAA=</HashCode>
+      <FileName>Row.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Allors.Excel.Headless.Column">
+    <Position X="5.5" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAEAAAAAAAA=</HashCode>
+      <FileName>Column.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
