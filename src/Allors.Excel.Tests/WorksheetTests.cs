@@ -830,41 +830,41 @@ namespace Allors.Excel.Tests
 
             var workbook = addIn.Workbooks[0];
 
-            var iWorksheet = workbook.Worksheets.FirstOrDefault(v => v.Name == "2");
+            var worksheet = workbook.Worksheets.FirstOrDefault(v => v.Name == "2");
 
             for (var i = 0; i < 10; i++)
             {
-                cell = iWorksheet[i, 0];
+                cell = worksheet[i, 0];
                 cell.Value = $"Cell A{i}";
             }
 
-            await iWorksheet.Flush().ConfigureAwait(true);
+            worksheet.Flush();
 
-            iWorksheet.InsertRows(3, 1);
+            worksheet.InsertRows(3, 1);
 
-            cell = iWorksheet[0, 0];
+            cell = worksheet[0, 0];
             Assert.True(cell.ValueAsString == "Cell A0");
 
-            cell = iWorksheet[1, 0];
+            cell = worksheet[1, 0];
             Assert.True(cell.ValueAsString == "Cell A1");
 
-            cell = iWorksheet[2, 0];
+            cell = worksheet[2, 0];
             Assert.True(cell.ValueAsString == "Cell A2");
 
-            cell = iWorksheet[3, 0];
+            cell = worksheet[3, 0];
             Assert.True(cell.ValueAsString == "Cell A3");
 
             // newly inserted cell has no value
-            cell = iWorksheet[4, 0];
+            cell = worksheet[4, 0];
             Assert.Null(cell.Value);
 
             // shifted cell 1 down. The cell that was at row 4 is now in Row 5
-            cell = iWorksheet[5, 0];
+            cell = worksheet[5, 0];
             Assert.True(cell.ValueAsString == "Cell A4");
         }
 
         [Fact]
-        public async void DeleteRows()
+        public void DeleteRows()
         {
             ICell cell = null;
 
@@ -874,30 +874,31 @@ namespace Allors.Excel.Tests
 
             var workbook = addIn.Workbooks[0];
 
-            var iWorksheet = workbook.Worksheets.FirstOrDefault(v => v.Name == "2");
+            var worksheet = workbook.Worksheets.FirstOrDefault(v => v.Name == "2");
 
             for (var i = 0; i < 10; i++)
             {
-                cell = iWorksheet[i, 0];
+                cell = worksheet[i, 0];
                 cell.Value = $"Cell A{i}";
             }
-            await iWorksheet.Flush().ConfigureAwait(true);
+
+            worksheet.Flush();
 
             // Delete rows 3, 4 and 5
-            iWorksheet.DeleteRows(2, 3); // Zero-Based!
+            worksheet.DeleteRows(2, 3); // Zero-Based!
 
-            await iWorksheet.Flush().ConfigureAwait(true);
+            worksheet.Flush();
 
-            cell = iWorksheet[0, 0];
+            cell = worksheet[0, 0];
             Assert.True(Convert.ToString(cell.Value) == "Cell A0");
 
-            cell = iWorksheet[1, 0];
+            cell = worksheet[1, 0];
             Assert.True(Convert.ToString(cell.Value) == "Cell A1");
 
-            cell = iWorksheet[2, 0];
+            cell = worksheet[2, 0];
             Assert.True(Convert.ToString(cell.Value) == "Cell A5");
 
-            cell = iWorksheet[3, 0];
+            cell = worksheet[3, 0];
             Assert.True(Convert.ToString(cell.Value) == "Cell A6");
         }
 
@@ -926,7 +927,7 @@ namespace Allors.Excel.Tests
                 cell.Value = $"Cell C{i}";
             }
 
-            await iWorksheet.Flush().ConfigureAwait(true);
+            iWorksheet.Flush();
 
             iWorksheet.InsertColumns(0, 1);
 
@@ -952,35 +953,35 @@ namespace Allors.Excel.Tests
 
             var workbook = addIn.Workbooks[0];
 
-            var iWorksheet = workbook.Worksheets.FirstOrDefault(v => v.Name == "2");
+            var worksheet = workbook.Worksheets.FirstOrDefault(v => v.Name == "2");
 
             for (var i = 0; i < 10; i++)
             {
-                cell = iWorksheet[i, 0];
+                cell = worksheet[i, 0];
                 cell.Value = $"Cell A{i}";
 
-                cell = iWorksheet[i, 1];
+                cell = worksheet[i, 1];
                 cell.Value = $"Cell B{i}";
 
-                cell = iWorksheet[i, 2];
+                cell = worksheet[i, 2];
                 cell.Value = $"Cell C{i}";
             }
 
-            await iWorksheet.Flush().ConfigureAwait(true);
+            worksheet.Flush();
 
-            iWorksheet.InsertColumns(0, 2);
+            worksheet.InsertColumns(0, 2);
 
-            cell = iWorksheet[0, 0];
+            cell = worksheet[0, 0];
             Assert.True(Convert.ToString(cell.Value) == "Cell A0");
 
             // newly inserted cell has no value
-            cell = iWorksheet[0, 1];
+            cell = worksheet[0, 1];
             Assert.Null(cell.Value);
 
-            cell = iWorksheet[0, 2];
+            cell = worksheet[0, 2];
             Assert.Null(cell.Value);
 
-            cell = iWorksheet[0, 3];
+            cell = worksheet[0, 3];
             Assert.True(Convert.ToString(cell.Value) == "Cell B0");
         }
 
@@ -995,47 +996,47 @@ namespace Allors.Excel.Tests
 
             var workbook = addIn.Workbooks[0];
 
-            var iWorksheet = workbook.Worksheets.FirstOrDefault(v => v.Name == "2");
+            var worksheet = workbook.Worksheets.FirstOrDefault(v => v.Name == "2");
 
             for (var i = 0; i < 10; i++)
             {
-                cell = iWorksheet[i, 0];
+                cell = worksheet[i, 0];
                 cell.Value = $"Cell A{i}";
 
-                cell = iWorksheet[i, 1];
+                cell = worksheet[i, 1];
                 cell.Value = $"Cell B{i}";
 
-                cell = iWorksheet[i, 2];
+                cell = worksheet[i, 2];
                 cell.Value = $"Cell C{i}";
 
-                cell = iWorksheet[i, 3];
+                cell = worksheet[i, 3];
                 cell.Value = $"Cell D{i}";
             }
 
-            await iWorksheet.Flush().ConfigureAwait(true);
+            worksheet.Flush();
 
             // Delete column B
-            iWorksheet.DeleteColumns(1, 1);
+            worksheet.DeleteColumns(1, 1);
 
-            cell = iWorksheet[0, 0];
+            cell = worksheet[0, 0];
             Assert.True(Convert.ToString(cell.Value) == "Cell A0");
 
-            cell = iWorksheet[1, 0];
+            cell = worksheet[1, 0];
             Assert.True(Convert.ToString(cell.Value) == "Cell A1");
 
 
             // B is Gone!
 
-            cell = iWorksheet[0, 1];
+            cell = worksheet[0, 1];
             Assert.True(Convert.ToString(cell.Value) == "Cell C0");
 
-            cell = iWorksheet[1, 1];
+            cell = worksheet[1, 1];
             Assert.True(Convert.ToString(cell.Value) == "Cell C1");
 
-            cell = iWorksheet[0, 2];
+            cell = worksheet[0, 2];
             Assert.True(Convert.ToString(cell.Value) == "Cell D0");
 
-            cell = iWorksheet[1, 2];
+            cell = worksheet[1, 2];
             Assert.True(Convert.ToString(cell.Value) == "Cell D1");
         }
 
@@ -1050,32 +1051,32 @@ namespace Allors.Excel.Tests
 
             var workbook = addIn.Workbooks[0];
 
-            var iWorksheet = workbook.Worksheets.FirstOrDefault(v => v.Name == "2");
+            var worksheet = workbook.Worksheets.FirstOrDefault(v => v.Name == "2");
 
             for (var i = 0; i < 10; i++)
             {
-                cell = iWorksheet[i, 0];
+                cell = worksheet[i, 0];
                 cell.Value = $"Cell A{i}";
 
-                cell = iWorksheet[i, 1];
+                cell = worksheet[i, 1];
                 cell.Value = $"Cell B{i}";
 
-                cell = iWorksheet[i, 2];
+                cell = worksheet[i, 2];
                 cell.Value = $"Cell C{i}";
 
-                cell = iWorksheet[i, 3];
+                cell = worksheet[i, 3];
                 cell.Value = $"Cell D{i}";
             }
 
-            await iWorksheet.Flush().ConfigureAwait(true);
+            worksheet.Flush();
 
             // Delete column B
-            iWorksheet.DeleteColumns(1, 2);
+            worksheet.DeleteColumns(1, 2);
 
-            cell = iWorksheet[0, 0];
+            cell = worksheet[0, 0];
             Assert.True(Convert.ToString(cell.Value) == "Cell A0");
 
-            cell = iWorksheet[1, 0];
+            cell = worksheet[1, 0];
             Assert.True(Convert.ToString(cell.Value) == "Cell A1");
 
 
@@ -1083,10 +1084,10 @@ namespace Allors.Excel.Tests
             // C is Gone!
 
 
-            cell = iWorksheet[0, 1];
+            cell = worksheet[0, 1];
             Assert.True(Convert.ToString(cell.Value) == "Cell D0");
 
-            cell = iWorksheet[1, 1];
+            cell = worksheet[1, 1];
             Assert.True(Convert.ToString(cell.Value) == "Cell D1");
         }
 
@@ -1255,7 +1256,7 @@ namespace Allors.Excel.Tests
             sheet1[50, 3].Value = "y";
             sheet1[50, 4].Value = "z";
 
-            await sheet1.Flush().ConfigureAwait(false);
+            sheet1.Flush();
 
             range = sheet1.GetUsedRange(50);
             Assert.Equal(50, range.Row);
@@ -1302,7 +1303,7 @@ namespace Allors.Excel.Tests
             sheet1[51, 30].Value = "y";
             sheet1[52, 30].Value = "z";
 
-            await sheet1.Flush().ConfigureAwait(false);
+            sheet1.Flush();
 
             var columnName = Utils.ExcelColumnFromNumber(31);
 
@@ -1316,7 +1317,7 @@ namespace Allors.Excel.Tests
             // Blank line is still counted as a row
             sheet1[54, 30].Value = "aa";
 
-            await sheet1.Flush().ConfigureAwait(false);
+            sheet1.Flush();
 
             range = sheet1.GetUsedRange(columnName);
             Assert.Equal(50, range.Row);
@@ -1362,7 +1363,7 @@ namespace Allors.Excel.Tests
             sheet1[50, 3].Value = "y";
             sheet1[50, 4].Value = "z";
 
-            await sheet1.Flush().ConfigureAwait(false);
+            sheet1.Flush();
 
             range = sheet1.GetUsedRange(50);
             Assert.Equal(50, range.Row);

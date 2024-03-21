@@ -8,7 +8,6 @@ namespace Allors.Excel
     using System;
     using System.Drawing;
     using System.IO;
-    using System.Threading.Tasks;
 
     public interface IWorksheet
     {
@@ -108,14 +107,14 @@ namespace Allors.Excel
         ///  - Hidden Rows
         /// </summary>
         /// <returns></returns>
-        Task Flush();
+        void Flush();
 
         /// <summary>
         /// Updates the data for each pivottable in the worksheet to the newRange
         /// </summary>
         /// <param></param>
         /// <returns></returns>
-        Task RefreshPivotTables();
+        void RefreshPivotTables();
 
         /// <summary>
         /// Inserts a picture (via url) in the given rectangle

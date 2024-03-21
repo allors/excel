@@ -10,7 +10,18 @@ namespace Allors.Excel.Headless
 
     public class AddIn : IAddIn
     {
-        public AddIn() => this.WorkbookList = new List<Workbook>();
+        public AddIn(IProgram program, IRibbon ribbon)
+        {
+            this.Program = program;
+            this.Ribbon = ribbon;
+            this.WorkbookList = new List<Workbook>();
+
+            this.AddWorkbook();
+
+            this.Program.OnStart(this).ConfigureAwait(false);
+        }
+
+        public IProgram Program { get; }
 
         public IRibbon Ribbon { get; set; }
 
@@ -25,6 +36,11 @@ namespace Allors.Excel.Headless
             var workbook = new Workbook(this);
             this.WorkbookList.Add(workbook);
             workbook.Activate();
+
+            workbook.AddWorksheet();
+
+            this.Program.OnNew(workbook).ConfigureAwait(false);
+
             return workbook;
         }
 

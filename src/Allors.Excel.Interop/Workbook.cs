@@ -269,9 +269,6 @@ namespace Allors.Excel.Interop
 
         public event EventHandler<Allors.Excel.Hyperlink> OnHyperlinkClicked;
 
-        public void HyperlinkClicked(Allors.Excel.Hyperlink hyperlink)
-        {
-            this.OnHyperlinkClicked.Invoke(this, hyperlink);
-        }
+        public void HyperlinkClicked(Allors.Excel.Hyperlink hyperlink) => this.OnHyperlinkClicked.Invoke(this, hyperlink);
     }
 }

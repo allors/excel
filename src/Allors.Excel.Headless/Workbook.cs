@@ -12,6 +12,8 @@ namespace Allors.Excel.Headless
 
     public class Workbook : IWorkbook
     {
+        private int counter;
+
         public Workbook(AddIn addIn)
         {
             this.AddIn = addIn;
@@ -34,7 +36,10 @@ namespace Allors.Excel.Headless
 
         public IWorksheet AddWorksheet(int? index = null, IWorksheet before = null, IWorksheet after = null)
         {
-            var worksheet = new Worksheet(this);
+            var worksheet = new Worksheet(this)
+            {
+                Name = $"Sheet{++this.counter}"
+            };
 
             if (index != null)
             {
@@ -55,13 +60,12 @@ namespace Allors.Excel.Headless
 
             worksheet.Activate();
 
+            this.AddIn.Program.OnNew(worksheet).ConfigureAwait(false);
+
             return worksheet;
         }
 
-        public void Close(bool? saveChanges = null, string fileName = null)
-        {
-            this.AddIn.Remove(this);
-        }
+        public void Close(bool? saveChanges = null, string fileName = null) => this.AddIn.Remove(this);
 
         public void Activate()
         {
@@ -73,46 +77,25 @@ namespace Allors.Excel.Headless
             this.IsActive = true;
         }
 
-        public Range[] GetNamedRanges(string refersToSheetName = null)
-        {
-            return this.NamedRangeByName.Values.ToArray();
-        }
+        public Range[] GetNamedRanges(string refersToSheetName = null) => this.NamedRangeByName.Values.ToArray();
 
-        public IWorksheet Copy(IWorksheet source, IWorksheet beforeWorksheet)
-        {
-            throw new NotImplementedException();
-        }
+        public IWorksheet Copy(IWorksheet source, IWorksheet beforeWorksheet) => throw new NotImplementedException();
 
-        public void SetNamedRange(string name, Range range)
-        {
-            this.NamedRangeByName[name] = range;
-        }
+        public void SetNamedRange(string name, Range range) => this.NamedRangeByName[name] = range;
 
         public IBuiltinProperties BuiltinProperties { get; }
 
         public ICustomProperties CustomProperties { get; }
 
         public IWorksheet[] WorksheetsByIndex => this.Worksheets;
-        
-        public string SetCustomXML(XmlDocument xmlDocument)
-        {
-            throw new NotImplementedException();
-        }
 
-        public XmlDocument GetCustomXMLById(string id)
-        {
-            throw new NotImplementedException();
-        }
+        public string SetCustomXML(XmlDocument xmlDocument) => throw new NotImplementedException();
 
-        public bool TrySetCustomProperty(string name, dynamic value)
-        {
-            throw new NotImplementedException();
-        }
+        public XmlDocument GetCustomXMLById(string id) => throw new NotImplementedException();
 
-        public bool TryDeleteCustomXMLById(string id)
-        {
-            throw new NotImplementedException();
-        }
+        public bool TryDeleteCustomXMLById(string id) => throw new NotImplementedException();
+
+        public bool TrySetCustomProperty(string name, dynamic value) => throw new NotImplementedException();
 
         public void HyperlinkClicked(Allors.Excel.Hyperlink hyperlink) => throw new NotImplementedException();
     }

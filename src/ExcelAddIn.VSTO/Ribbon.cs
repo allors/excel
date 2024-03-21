@@ -22,20 +22,14 @@ namespace ExcelAddIn.VSTO
 
         #region IRibbonExtensibility Members
 
-        public string GetCustomUI(string ribbonID)
-        {
-            return GetResourceText("ExcelAddIn.VSTO.Ribbon.xml");
-        }
+        public string GetCustomUI(string ribbonID) => GetResourceText("ExcelAddIn.VSTO.Ribbon.xml");
 
         #endregion
 
         #region Ribbon Callbacks
         //Create callback methods here. For more information about adding callback methods, visit https://go.microsoft.com/fwlink/?LinkID=271226
 
-        public void Ribbon_Load(Office.IRibbonUI ribbonUI)
-        {
-            this.ribbon = ribbonUI;
-        }
+        public void Ribbon_Load(Office.IRibbonUI ribbonUI) => this.ribbon = ribbonUI;
 
         #endregion
 

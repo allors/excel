@@ -53,16 +53,13 @@ namespace Application
                         worksheet.Row(index).Hidden = true;
                     }
 
-                    await worksheet.Flush().ConfigureAwait(true);
+                    worksheet.Flush();
 
                     break;
             }
         }
 
-        public async Task OnStop()
-        {
-            await Task.CompletedTask;
-        }
+        public async Task OnStop() => await Task.CompletedTask;
 
         public async Task OnNew(IWorkbook workbook)
         {
@@ -97,7 +94,7 @@ namespace Application
             sheet[5, 3].Style = style;
             sheet[5, 5].Style = style;
 
-            await sheet.Flush();
+            sheet.Flush();
 
             sheet[0, 0].Value = "Whoppa!";
             sheet[0, 0].Comment = "De Poppa!";
@@ -131,7 +128,7 @@ namespace Application
             }
 
 
-            await sheet.Flush();
+            sheet.Flush();
 
             sheet.AutoFit();
 
@@ -166,24 +163,12 @@ namespace Application
             await Task.CompletedTask;
         }
 
-        public Task OnBeforeDelete(IWorksheet worksheet)
-        {
-            return Task.CompletedTask;
-        }
+        public Task OnBeforeDelete(IWorksheet worksheet) => Task.CompletedTask;
 
-        public async Task OnLogin()
-        {
-            await Task.CompletedTask;
-        }
+        public async Task OnLogin() => await Task.CompletedTask;
 
-        public async Task OnLogout()
-        {
-            await Task.CompletedTask;
-        }
+        public async Task OnLogout() => await Task.CompletedTask;
 
-        public bool IsEnabled(string controlId, string controlTag)
-        {
-            return true;
-        }
+        public bool IsEnabled(string controlId, string controlTag) => true;
     }
 }

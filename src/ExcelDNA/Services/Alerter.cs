@@ -5,9 +5,6 @@ namespace ExcelDNA
 
     internal class Alerter : IAlerter
     {
-        public void Alert(string message)
-        {
-            MessageBox.Show(message);
-        }
+        public void Alert(string message) => MessageBox.Show(message);
     }
 }

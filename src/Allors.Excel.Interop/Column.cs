@@ -19,9 +19,6 @@ namespace Allors.Excel.Interop
 
         public int Index { get; internal set; }
 
-        public int CompareTo(Column other)
-        {
-            return this.Index.CompareTo(other.Index);
-        }
+        public int CompareTo(Column other) => this.Index.CompareTo(other.Index);
     }
 }

@@ -160,7 +160,7 @@ namespace Allors.Excel.Interop
             }
         }
 
-        public async Task RefreshPivotTables()
+        public void RefreshPivotTables()
         {
             var pivotTables = (InteropPivotTables)this.InteropWorksheet.PivotTables();
 
@@ -168,8 +168,6 @@ namespace Allors.Excel.Interop
             {
                 pivotTable.RefreshTable();
             }
-
-            await Task.CompletedTask;
         }
 
         ICell Excel.IWorksheet.this[(int, int) coordinates] => this[coordinates];
@@ -189,7 +187,7 @@ namespace Allors.Excel.Interop
                 return cell;
             }
         }
-        
+
         IRow Excel.IWorksheet.Row(int index) => this.Row(index);
 
         IColumn Excel.IWorksheet.Column(int index) => this.Column(index);
@@ -271,7 +269,7 @@ namespace Allors.Excel.Interop
             {
             }
         }
-        public async Task Flush()
+        public void Flush()
         {
             var tuple = this.DisableExcel();
 
@@ -305,44 +303,21 @@ namespace Allors.Excel.Interop
             {
                 this.EnableExcel(tuple);
             }
-
-            await Task.CompletedTask;
         }
 
-        public void AddDirtyNumberFormat(Cell cell)
-        {
-            this.DirtyNumberFormatCells.Add(cell);
-        }
+        public void AddDirtyNumberFormat(Cell cell) => this.DirtyNumberFormatCells.Add(cell);
 
-        public void AddDirtyValue(Cell cell)
-        {
-            this.DirtyValueCells.Add(cell);
-        }
+        public void AddDirtyValue(Cell cell) => this.DirtyValueCells.Add(cell);
 
-        public void AddDirtyFormula(Cell cell)
-        {
-            this.DirtyFormulaCells.Add(cell);
-        }
+        public void AddDirtyFormula(Cell cell) => this.DirtyFormulaCells.Add(cell);
 
-        public void AddDirtyComment(Cell cell)
-        {
-            this.DirtyCommentCells.Add(cell);
-        }
+        public void AddDirtyComment(Cell cell) => this.DirtyCommentCells.Add(cell);
 
-        public void AddDirtyStyle(Cell cell)
-        {
-            this.DirtyStyleCells.Add(cell);
-        }
+        public void AddDirtyStyle(Cell cell) => this.DirtyStyleCells.Add(cell);
 
-        public void AddDirtyOptions(Cell cell)
-        {
-            this.DirtyOptionCells.Add(cell);
-        }
+        public void AddDirtyOptions(Cell cell) => this.DirtyOptionCells.Add(cell);
 
-        public void AddDirtyRow(Row row)
-        {
-            this.DirtyRows.Add(row);
-        }
+        public void AddDirtyRow(Row row) => this.DirtyRows.Add(row);
 
         private void InteropWorksheet_Change(InteropRange target)
         {
@@ -497,8 +472,7 @@ namespace Allors.Excel.Interop
                 });
         }
 
-        private void RenderComments(IEnumerable<Cell> cells)
-        {
+        private void RenderComments(IEnumerable<Cell> cells) =>
             Parallel.ForEach(
                 cells,
                 cell =>
@@ -521,7 +495,6 @@ namespace Allors.Excel.Interop
                         }
                     });
                 });
-        }
 
         private void RenderStyle(IEnumerable<Cell> cells)
         {
@@ -1269,15 +1242,9 @@ namespace Allors.Excel.Interop
 
         public bool HasFreezePanes => this.FreezeRange != null;
 
-        public void SaveAsXPS(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true)
-        {
-            this.SaveAs(file, InteropXlFixedFormatType.xlTypeXPS, overwriteExistingFile, openAfterPublish, ignorePrintAreas);
-        }
+        public void SaveAsXPS(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true) => this.SaveAs(file, InteropXlFixedFormatType.xlTypeXPS, overwriteExistingFile, openAfterPublish, ignorePrintAreas);
 
-        public void SaveAsPDF(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true)
-        {
-            this.SaveAs(file, InteropXlFixedFormatType.xlTypePDF, overwriteExistingFile, openAfterPublish, ignorePrintAreas);
-        }
+        public void SaveAsPDF(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true) => this.SaveAs(file, InteropXlFixedFormatType.xlTypePDF, overwriteExistingFile, openAfterPublish, ignorePrintAreas);
 
         /// <summary>
         /// Save the sheet in the given formattype (0=PDF, 1=XPS) 

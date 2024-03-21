@@ -19,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Allors.Excel.Headless\Allors.Excel.Headless.csproj" />
     <ProjectReference Include="..\Allors.Excel.Tests\Allors.Excel.Tests.csproj" />
+    <ProjectReference Include="..\Application\Application.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="data\Catalog.xml">

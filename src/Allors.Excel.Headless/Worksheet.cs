@@ -20,7 +20,7 @@ namespace Allors.Excel.Headless
         IWorkbook IWorksheet.Workbook => this.Workbook;
 
         public ICustomProperties CustomProperties { get; }
-        
+
         public Workbook Workbook { get; }
 
         public Worksheet(Workbook workbook)
@@ -105,9 +105,8 @@ namespace Allors.Excel.Headless
             return column;
         }
 
-        public async Task Flush()
+        public void Flush()
         {
-            await Task.CompletedTask;
         }
 
         public void Activate()
@@ -120,82 +119,39 @@ namespace Allors.Excel.Headless
             this.IsActive = true;
         }
 
-        public async Task RefreshPivotTables()
+        public void RefreshPivotTables()
         {
-            // strictly ui
-            await Task.CompletedTask;
         }
 
         public void AddPicture(string uri, Rectangle rectangle)
         {
-            // strictly ui
         }
 
-        public Rectangle GetRectangle(string namedRange)
-        {
-            // strictly ui
-            return Rectangle.Empty;
-        }
+        public Rectangle GetRectangle(string namedRange) => Rectangle.Empty;
 
-        public Range[] GetNamedRanges()
-        {
-            throw new NotImplementedException();
-        }
+        public Range[] GetNamedRanges() => throw new NotImplementedException();
 
-        public void SetNamedRange(string name, Range range)
-        {
-            throw new NotImplementedException();
-        }
+        public void SetNamedRange(string name, Range range) => throw new NotImplementedException();
 
-        public void InsertRows(int startRowIndex, int numberOfRows)
-        {
-            throw new NotImplementedException();
-        }
+        public void InsertRows(int startRowIndex, int numberOfRows) => throw new NotImplementedException();
 
-        public void DeleteRows(int startRowIndex, int numberOfRows)
-        {
-            throw new NotImplementedException();
-        }
+        public void DeleteRows(int startRowIndex, int numberOfRows) => throw new NotImplementedException();
 
-        public void InsertColumns(int startColumnIndex, int numberOfColumns)
-        {
-            throw new NotImplementedException();
-        }
+        public void InsertColumns(int startColumnIndex, int numberOfColumns) => throw new NotImplementedException();
 
-        public void DeleteColumns(int startColumnIndex, int numberOfColumns)
-        {
-            throw new NotImplementedException();
-        }
+        public void DeleteColumns(int startColumnIndex, int numberOfColumns) => throw new NotImplementedException();
 
-        public Range GetRange(string cell1, string cell2 = null)
-        {
-            throw new NotImplementedException();
-        }
+        public Range GetRange(string cell1, string cell2 = null) => throw new NotImplementedException();
 
-        public Range GetUsedRange()
-        {
-            throw new NotImplementedException();
-        }
+        public Range GetUsedRange() => throw new NotImplementedException();
 
-        public Range GetUsedRange(string column)
-        {
-            throw new NotImplementedException();
-        }
+        public Range GetUsedRange(string column) => throw new NotImplementedException();
 
-        public Range GetUsedRange(int row)
-        {
-            throw new NotImplementedException();
-        }
+        public Range GetUsedRange(int row) => throw new NotImplementedException();
 
-        public void FreezePanes(Range range)
-        {
-            throw new NotImplementedException();
-        }
+        public void FreezePanes(Range range) => throw new NotImplementedException();
 
-        public void UnfreezePanes()
-        {
-            throw new NotImplementedException();
-        }
+        public void UnfreezePanes() => throw new NotImplementedException();
 
         public void SaveAsPDF(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true)
         {
@@ -212,24 +168,13 @@ namespace Allors.Excel.Headless
 
         }
 
-        public void HideInputMessage(ICell cell, bool clearInputMessage = false)
-        {
-            throw new NotImplementedException();
-        }
+        public void HideInputMessage(ICell cell, bool clearInputMessage = false) { }
 
-        public void SetInputMessage(ICell cell, string message, string title = null, bool showInputMessage = true)
-        {
-            throw new NotImplementedException();
-        }
+        public void SetInputMessage(ICell cell, string message, string title = null, bool showInputMessage = true) { }
 
-        public void SetPageSetup(PageSetup pageSetup)
-        {
-            throw new NotImplementedException();
-        }
+        public void SetPageSetup(PageSetup pageSetup) { }
 
-        public void AutoFit()
-        {
-        }
+        public void AutoFit() { }
 
         public void SetChartObjectDataLabels(
             object chartObject,
@@ -251,6 +196,6 @@ namespace Allors.Excel.Headless
         {
         }
 
-        public void AddHyperLink(string uri, ICell cell) => throw new NotImplementedException();
+        public void AddHyperLink(string uri, ICell cell) { }
     }
 }
