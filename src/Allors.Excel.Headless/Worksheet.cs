@@ -17,6 +17,7 @@ namespace Allors.Excel.Headless
 
         private readonly Dictionary<int, Column> columnByIndex;
 
+
         IWorkbook IWorksheet.Workbook => this.Workbook;
 
         public ICustomProperties CustomProperties { get; }
@@ -39,8 +40,14 @@ namespace Allors.Excel.Headless
 
         public string Name { get; set; }
 
-        public int Index => throw new NotImplementedException();
-
+        public int Index
+        {
+            get
+            {
+                return this.Workbook.WorksheetList.IndexOf(this) +1;
+            }
+        }
+        //public int Index => throw new NotImplementedException();
 
         public bool IsActive { get; set; }
 

@@ -22,6 +22,7 @@ namespace Allors.Excel.Headless
             this.CustomProperties = new CustomProperties();
         }
 
+
         public AddIn AddIn { get; }
 
         public List<Worksheet> WorksheetList { get; set; }
