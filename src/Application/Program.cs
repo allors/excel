@@ -23,7 +23,7 @@ namespace Application
         {
             ServiceLocator = serviceLocator;
             binderByWorksheet = new Dictionary<IWorksheet, Binder>();
-            this.counter = 0;
+            this.counter = 1;
         }
 
         public IServiceLocator ServiceLocator { get; }
