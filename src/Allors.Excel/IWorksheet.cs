@@ -238,6 +238,7 @@ namespace Allors.Excel
         void SaveAsPDF(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true);
 
 
+
         /// <summary>
         /// Saves the sheet as a XPS to the file, with the given parameters.
         /// </summary>
