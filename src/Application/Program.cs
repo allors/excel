@@ -23,7 +23,7 @@ namespace Application
         {
             ServiceLocator = serviceLocator;
             binderByWorksheet = new Dictionary<IWorksheet, Binder>();
-            this.counter = 1;
+            this.counter = 0;
         }
 
         public IServiceLocator ServiceLocator { get; }
@@ -146,6 +146,14 @@ namespace Application
             //};
         }
 
+        public async Task OnNew(IWorksheet worksheet)
+        {
+            worksheet.Name = $"{++counter}";
+
+            await Task.CompletedTask;
+        }
+
+
         public Style CanNotWriteCellStyle { get; set; }
 
         public Style CanWriteCellStyle { get; set; }
@@ -154,13 +162,6 @@ namespace Application
 
         public void OnClose(IWorkbook workbook, ref bool cancel)
         {
-        }
-
-        public async Task OnNew(IWorksheet worksheet)
-        {
-            worksheet.Name = $"{++counter}";
-
-            await Task.CompletedTask;
         }
 
         public Task OnBeforeDelete(IWorksheet worksheet) => Task.CompletedTask;

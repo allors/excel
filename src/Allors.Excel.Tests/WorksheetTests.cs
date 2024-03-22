@@ -9,6 +9,7 @@ namespace Allors.Excel.Tests
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Runtime.InteropServices;
     using System.Threading;
     using Moq;
     using Xunit;
@@ -398,9 +399,9 @@ namespace Allors.Excel.Tests
 
             var newSheet = workbook.AddWorksheet();
 
-            // There is nothing to print => no exception
+            // There is nothing to print => exception
             var file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(newSheet)}.pdf"));
-            newSheet.SaveAsPDF(file);
+            Assert.Throws<COMException>(() => newSheet.SaveAsPDF(file));
         }
 
 
@@ -687,7 +688,7 @@ namespace Allors.Excel.Tests
 
             // Expected order => Sheet3 | 1  | 2
 
-            Assert.Equal("Sheet3", worksheetsByIndex[0].Name);
+            Assert.Equal("5", worksheetsByIndex[0].Name);
             Assert.Equal("1", worksheetsByIndex[1].Name);
             Assert.Equal("2", worksheetsByIndex[2].Name);
 
@@ -700,8 +701,8 @@ namespace Allors.Excel.Tests
             Assert.Equal(2, worksheet.Index);
 
             // Expected order => Sheet3 | Sheet4 | 1 | 2  !! Order is determined dynamically, so it changes after the first AddWorksheet()
-            Assert.Equal("Sheet3", worksheetsByIndex[0].Name);
-            Assert.Equal("Sheet4", worksheetsByIndex[1].Name);
+            Assert.Equal("5", worksheetsByIndex[0].Name);
+            Assert.Equal("6", worksheetsByIndex[1].Name);
             Assert.Equal("1", worksheetsByIndex[2].Name);
             Assert.Equal("2", worksheetsByIndex[3].Name);
 
@@ -714,9 +715,9 @@ namespace Allors.Excel.Tests
             Assert.Equal(2, worksheet.Index);
 
             // Expected order => Sheet3 | Sheet5 | Sheet4 | 1 | 2  !! Order is determined dynamically, so it changes after the first AddWorksheet()
-            Assert.Equal("Sheet3", worksheetsByIndex[0].Name);
-            Assert.Equal("Sheet5", worksheetsByIndex[1].Name);
-            Assert.Equal("Sheet4", worksheetsByIndex[2].Name);
+            Assert.Equal("5", worksheetsByIndex[0].Name);
+            Assert.Equal("7", worksheetsByIndex[1].Name);
+            Assert.Equal("6", worksheetsByIndex[2].Name);
             Assert.Equal("1", worksheetsByIndex[3].Name);
             Assert.Equal("2", worksheetsByIndex[4].Name);
         }

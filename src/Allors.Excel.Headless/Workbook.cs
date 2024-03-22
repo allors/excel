@@ -44,7 +44,15 @@ namespace Allors.Excel.Headless
 
             if (index != null)
             {
-                this.WorksheetList.Insert(index.Value, worksheet);
+                if (index == 0)
+                {
+                    var active = this.WorksheetList.FirstOrDefault(v => v.IsActive);
+                    this.WorksheetList.Insert(this.WorksheetList.IndexOf(active), worksheet);
+                }
+                else
+                {
+                    this.WorksheetList.Insert(index.Value - 1, worksheet);
+                }
             }
             else if (before != null)
             {
