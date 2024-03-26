@@ -51,7 +51,14 @@ namespace Allors.Excel.Headless
                 }
                 else
                 {
-                    this.WorksheetList.Insert(index.Value - 1, worksheet);
+                    if (index.Value > this.WorksheetList.Count)
+                    {
+                        this.WorksheetList.Add(worksheet);
+                    }
+                    else
+                    {
+                        this.WorksheetList.Insert(index.Value - 1, worksheet);
+                    }
                 }
             }
             else if (before != null)
