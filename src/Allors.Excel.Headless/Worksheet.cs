@@ -9,6 +9,7 @@ namespace Allors.Excel.Headless
     using System.Collections.Generic;
     using System.Drawing;
     using System.IO;
+    using System.Linq;
     using System.Threading.Tasks;
 
     public class Worksheet : IWorksheet
@@ -153,11 +154,16 @@ namespace Allors.Excel.Headless
         public void AddPicture(string uri, Rectangle rectangle)
         {
         }
+        public Dictionary<string, Range> NamedRangeByName { get; } = new Dictionary<string, Range>();
+
+        public Range[] GetNamedRanges()
+        {
+            return this.NamedRangeByName.Values.ToArray();
+        }
 
         public Rectangle GetRectangle(string namedRange) => Rectangle.Empty;
 
-        public Range[] GetNamedRanges() => throw new NotImplementedException();
-
+      
         public void SetNamedRange(string name, Range range) => throw new NotImplementedException();
 
         public void InsertRows(int startRowIndex, int numberOfRows) => throw new NotImplementedException();
