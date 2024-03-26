@@ -17,7 +17,7 @@ namespace Allors.Excel.Headless
         private readonly Dictionary<int, Row> rowByIndex;
 
         private readonly Dictionary<int, Column> columnByIndex;
-
+        private bool isActive;
 
         IWorkbook IWorksheet.Workbook => this.Workbook;
 
@@ -45,18 +45,38 @@ namespace Allors.Excel.Headless
         {
             get
             {
-                return this.Workbook.WorksheetList.IndexOf(this) +1;
+                return this.Workbook.WorksheetList.IndexOf(this) + 1;
             }
         }
         //public int Index => throw new NotImplementedException();
 
-        public bool IsActive { get; set; }
 
         public Dictionary<(int, int), Cell> CellByCoordinates { get; }
 
         public bool IsVisible { get; set; }
 
         public bool HasFreezePanes => throw new NotImplementedException();
+
+        public bool IsActive 
+        {
+            get
+            {
+                return this.isActive;
+            }
+            set
+            {
+                if (value == false)
+                {
+                    return;
+                }
+
+                foreach (var worksheet in this.Workbook.WorksheetList)
+                {
+                    worksheet.isActive = false;
+                }
+                this.isActive = value;
+            }
+        }
 
 
         ICell IWorksheet.this[(int, int) coordinates] => this[coordinates];
