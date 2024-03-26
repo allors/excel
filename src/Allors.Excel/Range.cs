@@ -32,7 +32,7 @@ namespace Allors.Excel
         /// <summary>
         /// Gets the name of the Range
         /// </summary>
-        public string Name { get; }
+        public string Name { get; set; }
 
         /// <summary>
         /// Gets the start row index of the Range

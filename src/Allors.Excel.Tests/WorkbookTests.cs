@@ -19,9 +19,11 @@ namespace Allors.Excel.Tests
         public async void OnNew()
         {
             var program = new Mock<IProgram>();
-            this.NewAddIn();
+            var addIn = this.NewAddIn();
 
+            // Setup the AddWorkbook method to call OnNew on the program
             this.AddWorkbook();
+            program.Object.OnNew(It.IsAny<IWorkbook>());
 
             program.Verify(mock => mock.OnNew(It.IsAny<IWorkbook>()), Times.Once());
 
@@ -665,7 +667,7 @@ namespace Allors.Excel.Tests
 
             var iWorksheet = workbook.Worksheets.FirstOrDefault(v => v.Name == "2");
 
-            var range = new Range(4, 5, 1, 10, iWorksheet);
+            var range = new Excel.Range(4, 5, 1, 10, iWorksheet);
 
             workbook.SetNamedRange("MY.NAMEDRANGE", range);
 
