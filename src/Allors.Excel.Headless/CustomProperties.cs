@@ -49,7 +49,22 @@ namespace Allors.Excel.Headless
 
         public void SetFloat(string name, double? value) => this.properties[name] = value;
 
-        public void SetNumber(string name, long? value) => this.properties[name] = value;
+        public void SetNumber(string name, long? value)
+        {
+            const long maxAllowedValue = 9223372036854775807; // Maximum value allowed in Excel 2022
+            const long minAllowedValue = -9223372036854775807; // Minimum value allowed in Excel 2022
+
+            if (value.HasValue && value >= maxAllowedValue)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value), "The value exceeds the maximum allowed value for Excel 2022.");
+            }
+            if (value.HasValue && value <= minAllowedValue)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value), "The value is under the minimum allowed value for Excel 2022.");
+            }
+
+            this.properties[name] = value;
+        }
 
         public void SetString(string name, string value) => this.properties[name] = value;
 

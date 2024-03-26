@@ -97,19 +97,74 @@ namespace Allors.Excel.Headless
 
         public IWorksheet Copy(IWorksheet source, IWorksheet beforeWorksheet) => throw new NotImplementedException();
 
-        public void SetNamedRange(string name, Range range) => this.NamedRangeByName[name] = range;
+        public void SetNamedRange(string name, Range range)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentException("Name cannot be null or empty.", nameof(name));
+            }
+
+            if (range == null)
+            {
+                throw new ArgumentNullException(nameof(range));
+            }
+
+            this.NamedRangeByName[name] = range;
+            range.Name = name;
+        }
 
         public IBuiltinProperties BuiltinProperties { get; }
 
         public ICustomProperties CustomProperties { get; }
 
+        private string customXml;
+        public string SetCustomXML(XmlDocument xmlDocument)
+        {
+            this.customXml = xmlDocument.OuterXml;
+            return this.customXml;
+        }
+
         public IWorksheet[] WorksheetsByIndex => this.Worksheets;
 
-        public string SetCustomXML(XmlDocument xmlDocument) => throw new NotImplementedException();
 
-        public XmlDocument GetCustomXMLById(string id) => throw new NotImplementedException();
+        private Dictionary<string, XmlDocument> CustomXmlParts = new Dictionary<string, XmlDocument>();
 
-        public bool TryDeleteCustomXMLById(string id) => throw new NotImplementedException();
+        public XmlDocument GetCustomXMLById(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                throw new ArgumentException("ID cannot be null or empty.", nameof(id));
+            }
+
+             if (this.CustomXmlParts.TryGetValue(id, out var xmlDocument))
+            {
+                return xmlDocument;
+            }
+
+           return null;
+        }
+
+
+        public bool TryDeleteCustomXMLById(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                throw new ArgumentException("ID cannot be null or empty.", nameof(id));
+            }
+
+            // Check if the custom XML part exists
+            if (!this.customXml.Contains(id))
+            {
+                return false;
+            }
+
+            // Remove the custom XML part
+            this.customXml = this.customXml.Replace(id, string.Empty);
+
+
+            return true;
+        }
+
 
         public bool TrySetCustomProperty(string name, dynamic value) => throw new NotImplementedException();
 
