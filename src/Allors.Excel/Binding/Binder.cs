@@ -1,4 +1,4 @@
-// <copyright file="Binder.cs" company="Allors bvba">
+﻿// <copyright file="Binder.cs" company="Allors bvba">
 // Copyright (c) Allors bvba. All rights reserved.
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -12,9 +12,9 @@ namespace Allors.Excel
 
     public class Binder
     {
-        public IWorksheet Worksheet { get; }
+        public event EventHandler? ToDomained;
 
-        public event EventHandler ToDomained;
+        public IWorksheet Worksheet { get; }
 
         private IDictionary<ICell, IBinding> bindingByCell = new ConcurrentDictionary<ICell, IBinding>();
 
@@ -22,11 +22,11 @@ namespace Allors.Excel
 
         private IList<ICell> bindingCells = new List<ICell>();
 
-        public readonly Style changedStyle;
+        public readonly Style? changedStyle;
 
-        private readonly IDictionary<ICell, Style> changedCells;
+        private readonly IDictionary<ICell, Style?>? changedCells;
 
-        public Binder(IWorksheet worksheet, Style changedStyle = null)
+        public Binder(IWorksheet worksheet, Style? changedStyle = null)
         {
             this.Worksheet = worksheet;
             this.Worksheet.CellsChanged += this.Worksheet_CellsChanged;
@@ -34,7 +34,7 @@ namespace Allors.Excel
             this.changedStyle = changedStyle;
             if (this.changedStyle != null)
             {
-                this.changedCells = new Dictionary<ICell, Style>();
+                this.changedCells = new Dictionary<ICell, Style?>();
             }
         }
 
@@ -77,12 +77,13 @@ namespace Allors.Excel
                     {
                         binding.ToDomain(cell);
 
-                        if (this.changedStyle != null)
+                        if (this.changedStyle != null && this.changedCells != null)
                         {
                             if (!this.changedCells.ContainsKey(cell))
                             {
                                 this.changedCells.Add(cell, cell.Style);
                             }
+
                             cell.Style = this.changedStyle;
                         }
                     }
@@ -98,7 +99,7 @@ namespace Allors.Excel
 
         public void ResetChangedCells()
         {
-            if (this.changedStyle != null)
+            if (this.changedCells != null)
             {
                 foreach (var kvp in this.changedCells)
                 {

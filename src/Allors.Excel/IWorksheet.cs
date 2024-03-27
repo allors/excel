@@ -1,4 +1,4 @@
-// <copyright file="IWorksheet.cs" company="Allors bvba">
+﻿// <copyright file="IWorksheet.cs" company="Allors bvba">
 // Copyright (c) Allors bvba. All rights reserved.
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -28,7 +28,6 @@ namespace Allors.Excel
         /// the name of the activated sheet.
         /// </returns>
         event EventHandler<string> SheetActivated;
-
 
         event EventHandler<Allors.Excel.Hyperlink> HyperlinkClicked;
 
@@ -123,7 +122,6 @@ namespace Allors.Excel
         /// <param name="rectangle"></param>
         void AddPicture(string uri, Rectangle rectangle);
 
-
         void AddHyperLink(string uri, ICell cell);
 
         /// <summary>
@@ -174,7 +172,7 @@ namespace Allors.Excel
         /// <param name="numberOfColumns"></param>
         void DeleteColumns(int startColumnIndex, int numberOfColumns);
 
-        Range GetRange(string cell1, string cell2 = null);
+        Range? GetRange(string cell1, string? cell2 = null);
 
         Range GetUsedRange();
 
@@ -183,14 +181,14 @@ namespace Allors.Excel
         /// </summary>
         /// <param name="column"></param>
         /// <returns></returns>
-        Range GetUsedRange(string column);
+        Range? GetUsedRange(string column);
 
         /// <summary>
         /// row equals the zero-based index of excel rows (so 1 less than the excel rowindex)
         /// </summary>
         /// <param name="row"></param>
         /// <returns></returns>
-        Range GetUsedRange(int row);
+        Range? GetUsedRange(int row);
 
         void AutoFit();
 
@@ -235,9 +233,7 @@ namespace Allors.Excel
         /// <param name="overwriteExistingFile">true when we want to overwrite an existing file. Default is false</param>
         /// <param name="openAfterPublish">true when we want to open the pdf after it has been created. Default is false.</param>
         /// <param name="ignorePrintAreas">true if we want to print the entire sheet. Default is true</param>
-        void SaveAsPDF(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true);
-
-
+        void SaveAsPdf(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true);
 
         /// <summary>
         /// Saves the sheet as a XPS to the file, with the given parameters.
@@ -246,18 +242,18 @@ namespace Allors.Excel
         /// <param name="overwriteExistingFile">true when we want to overwrite an existing file. Default is false</param>
         /// <param name="openAfterPublish">true when we want to open the pdf after it has been created. Default is false.</param>
         /// <param name="ignorePrintAreas">true if we want to print the entire sheet. Default is true</param>
-        void SaveAsXPS(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true);
+        void SaveAsXps(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true);
 
         /// <summary>
         /// Sets the PrintArea to the given range, or to the entire sheet when range is null.
         /// </summary>
         /// <param name="range"></param>
-        void SetPrintArea(Range range = null);
+        void SetPrintArea(Range? range = null);
 
         /// <summary>
         /// Sets the inputMessage that will be displayed when the cell is selected (aka Help text)
         /// </summary>
-        void SetInputMessage(ICell cell, string message, string title = null, bool showInputMessage = true);
+        void SetInputMessage(ICell cell, string message, string? title = null, bool showInputMessage = true);
 
         /// <summary>
         /// Hides or optionally remove the inputtext from a cell.
