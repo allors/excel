@@ -55,7 +55,14 @@ namespace Allors.Excel.Headless
 
         public bool IsVisible { get; set; } = true;
 
-        public bool HasFreezePanes => throw new NotImplementedException();
+        public bool HasFreezePanes
+        {
+            get
+            {
+                return this.FrozenRange != null;
+            }
+        }
+
 
         public bool IsActive 
         {
@@ -187,11 +194,78 @@ namespace Allors.Excel.Headless
 
         public void InsertRows(int startRowIndex, int numberOfRows) => throw new NotImplementedException();
 
-        public void DeleteRows(int startRowIndex, int numberOfRows) => throw new NotImplementedException();
+        public void DeleteRows(int startRowIndex, int numberOfRows)
+        {
+            if (startRowIndex < 0 || numberOfRows < 0)
+            {
+                throw new ArgumentException("Start index and number of rows must be non-negative.");
+            }
+
+            // Remove the rows from the dictionary
+            for (int i = startRowIndex; i < startRowIndex + numberOfRows; i++)
+            {
+                if (this.rowByIndex.ContainsKey(i))
+                {
+                    this.rowByIndex.Remove(i);
+                }
+            }
+
+            // Shift the remaining rows up
+            var keys = new List<int>(this.rowByIndex.Keys.Where(key => key >= startRowIndex + numberOfRows));
+            foreach (var key in keys)
+            {
+                var value = this.rowByIndex[key];
+                this.rowByIndex.Remove(key);
+                this.rowByIndex[key - numberOfRows] = value;
+            }
+
+            // Shift the cells in the rows to the up
+            var cellKeys = new List<(int, int)>(this.CellByCoordinates.Keys.Where(key => key.Item1 >= startRowIndex + numberOfRows));
+            foreach (var key in cellKeys)
+            {
+                var cell = this.CellByCoordinates[key];
+                this.CellByCoordinates.Remove(key);
+                this.CellByCoordinates[(key.Item1 - numberOfRows, key.Item2)] = cell;
+            }
+        }
+
 
         public void InsertColumns(int startColumnIndex, int numberOfColumns) => throw new NotImplementedException();
 
-        public void DeleteColumns(int startColumnIndex, int numberOfColumns) => throw new NotImplementedException();
+        public void DeleteColumns(int startColumnIndex, int numberOfColumns)
+        {
+            if (startColumnIndex < 0 || numberOfColumns < 0)
+            {
+                throw new ArgumentException("Start index and number of columns must be non-negative.");
+            }
+
+            // Remove the columns from the dictionary
+            for (int i = startColumnIndex; i < startColumnIndex + numberOfColumns; i++)
+            {
+                if (this.columnByIndex.ContainsKey(i))
+                {
+                    this.columnByIndex.Remove(i);
+                }
+            }
+
+            // Shift the remaining columns to the left
+            var keys = new List<int>(this.columnByIndex.Keys.Where(key => key >= startColumnIndex + numberOfColumns));
+            foreach (var key in keys)
+            {
+                var value = this.columnByIndex[key];
+                this.columnByIndex.Remove(key);
+                this.columnByIndex[key - numberOfColumns] = value;
+            }
+
+            // Shift the cells in the columns to the left
+            var cellKeys = new List<(int, int)>(this.CellByCoordinates.Keys.Where(key => key.Item2 >= startColumnIndex + numberOfColumns));
+            foreach (var key in cellKeys)
+            {
+                var cell = this.CellByCoordinates[key];
+                this.CellByCoordinates.Remove(key);
+                this.CellByCoordinates[(key.Item1, key.Item2 - numberOfColumns)] = cell;
+            }
+        }
 
         public Range GetRange(string cell1, string cell2 = null) => throw new NotImplementedException();
 
@@ -201,9 +275,25 @@ namespace Allors.Excel.Headless
 
         public Range GetUsedRange(int row) => throw new NotImplementedException();
 
-        public void FreezePanes(Range range) => throw new NotImplementedException();
+        public Range FrozenRange { get; private set; }
 
-        public void UnfreezePanes() => throw new NotImplementedException();
+        public void FreezePanes(Range range)
+        {
+            // Check if the range is null
+            if (range == null)
+            {
+                throw new ArgumentNullException(nameof(range));
+            }
+
+            // Set the frozen range
+            this.FrozenRange = range;
+        }
+
+        public void UnfreezePanes()
+        {
+            this.FrozenRange = null;
+        }
+
 
         public void SaveAsPDF(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true)
         {
