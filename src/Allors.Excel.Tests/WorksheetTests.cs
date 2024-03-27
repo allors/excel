@@ -11,6 +11,7 @@ namespace Allors.Excel.Tests
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Threading;
+    using System.Threading.Tasks;
     using Moq;
     using Xunit;
     using Range = Excel.Range;
@@ -743,7 +744,6 @@ namespace Allors.Excel.Tests
 
             // Change the cell will trigger the Change Event
             this.ExpectedContextTag = tag1;
-
             worksheet[1, 1].Value = "i am cell00";
 
             var cell01 = worksheet[(0, 1)];
@@ -751,7 +751,6 @@ namespace Allors.Excel.Tests
 
             // Change the cell will trigger the Change Event
             this.ExpectedContextTag = tag2;
-
             worksheet[1, 2].Value = "i am cell01";
 
             Assert.Empty(this.ExpectedContextTags);
