@@ -1,4 +1,4 @@
-// <copyright file="Workbook.cs" company="Allors bvba">
+﻿// <copyright file="Workbook.cs" company="Allors bvba">
 // Copyright (c) Allors bvba. All rights reserved.
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -11,27 +11,19 @@ namespace Allors.Excel.Headless
     using System.Xml;
     using QuestPDF.Infrastructure;
 
-    public class Workbook : IWorkbook
+    public class Workbook(AddIn addIn) : IWorkbook
     {
         private int counter;
-      
 
-        public Workbook(AddIn addIn)
-        {
-            this.AddIn = addIn;
-            this.WorksheetList = new List<Worksheet>();
-            this.BuiltinProperties = new BuiltinProperties();
-            this.CustomProperties = new CustomProperties();
-        }
 
         static Workbook()
         {
             QuestPDF.Settings.License = LicenseType.Community;
         }
 
-        public AddIn AddIn { get; }
+        public AddIn AddIn { get; } = addIn;
 
-        public List<Worksheet> WorksheetList { get; set; }
+        public List<Worksheet> WorksheetList { get; set; } = new();
 
         public IWorksheet[] Worksheets => this.WorksheetList.Cast<IWorksheet>().ToArray();
 
@@ -119,9 +111,9 @@ namespace Allors.Excel.Headless
             range.Name = name;
         }
 
-        public IBuiltinProperties BuiltinProperties { get; }
+        public IBuiltinProperties BuiltinProperties { get; } = new BuiltinProperties();
 
-        public ICustomProperties CustomProperties { get; }
+        public ICustomProperties CustomProperties { get; } = new CustomProperties();
 
         private string customXml;
         private Dictionary<string, XmlDocument> CustomXmlParts = new Dictionary<string, XmlDocument>();

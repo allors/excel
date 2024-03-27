@@ -17,27 +17,18 @@ namespace Allors.Excel.Headless
     using QuestPDF.Helpers;
     using QuestPDF.Infrastructure;
 
-    public class Worksheet : IWorksheet
+    public class Worksheet(Workbook workbook) : IWorksheet
     {
-        private readonly Dictionary<int, Row> rowByIndex;
+        private readonly Dictionary<int, Row> rowByIndex = new();
 
-        private readonly Dictionary<int, Column> columnByIndex;
+        private readonly Dictionary<int, Column> columnByIndex = new();
         private bool isActive;
 
         IWorkbook IWorksheet.Workbook => this.Workbook;
 
         public ICustomProperties CustomProperties { get; }
 
-        public Workbook Workbook { get; }
-
-        public Worksheet(Workbook workbook)
-        {
-            this.Workbook = workbook;
-
-            this.rowByIndex = new Dictionary<int, Row>();
-            this.columnByIndex = new Dictionary<int, Column>();
-            this.CellByCoordinates = new Dictionary<(int, int), Cell>();
-        }
+        public Workbook Workbook { get; } = workbook;
 
         public event EventHandler<CellChangedEvent> CellsChanged;
         public event EventHandler<CellChangedEvent> SheetChanged;
@@ -55,7 +46,7 @@ namespace Allors.Excel.Headless
         }
         //public int Index => throw new NotImplementedException();
 
-        public Dictionary<(int, int), Cell> CellByCoordinates { get; }
+        public Dictionary<(int, int), Cell> CellByCoordinates { get; } = new();
 
         public bool IsVisible { get; set; } = true;
 

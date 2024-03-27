@@ -8,24 +8,17 @@ namespace Allors.Excel.Headless
     using System;
     using System.Globalization;
 
-    public class Cell : ICell
+    public class Cell(Worksheet worksheet, Row row, Column column) : ICell
     {
-        public Cell(Worksheet worksheet, Row row, Column column)
-        {
-            this.Worksheet = worksheet;
-            this.Row = row;
-            this.Column = column;
-        }
-
-        public IWorksheet Worksheet { get; }
+        public IWorksheet Worksheet { get; } = worksheet;
 
         IRow ICell.Row => this.Row;
 
-        public Row Row { get; }
+        public Row Row { get; } = row;
 
         IColumn ICell.Column => this.Column;
 
-        public Column Column { get; }
+        public Column Column { get; } = column;
 
         public object Value { get; set; }
 

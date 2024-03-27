@@ -1,22 +1,20 @@
-// <copyright file="WorkbookTests.cs" company="Allors bvba">
+﻿// <copyright file="WorkbookTests.cs" company="Allors bvba">
 // Copyright (c) Allors bvba. All rights reserved.
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
+using Allors.Excel;
+using Moq;
 using InteropApplication = Microsoft.Office.Interop.Excel.Application;
 using InteropWorkbook = Microsoft.Office.Interop.Excel.Workbook;
 
 namespace ExcelAddIn.VSTO.Tests
 {
-    using Allors.Excel;
     using Allors.Excel.Interop;
-    using Moq;
 
-    public class WorkbookTests : Allors.Excel.Tests.WorkbookTests
+    public class WorksheetTests : Allors.Excel.Tests.WorksheetTests
     {
-        private readonly InteropApplication application;
-
-        public WorkbookTests() => this.application = new InteropApplication { Visible = true };
+        private readonly InteropApplication application = new InteropApplication { Visible = true };
 
         public override void Dispose()
         {

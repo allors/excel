@@ -52,7 +52,7 @@ class Build : NukeBuild
                 .SetInformationalVersion(GitVersion.InformationalVersion));
 
             MSBuild(s => s
-                .SetTargetPath(SourceDirectory / "ExcelAddIn.VSTO.Tests" / "ExcelAddIn.VSTO.Tests.csproj")
+                .SetTargetPath(SourceDirectory / "Allors.Excel.Headless.Tests" / "Allors.Excel.Headless.Tests.csproj")
                 .SetTargets("Rebuild")
                 .SetConfiguration(Configuration)
                 .SetAssemblyVersion(GitVersion.AssemblySemVer)
@@ -74,12 +74,12 @@ class Build : NukeBuild
            }
 
            {
-               var assembly = SourceDirectory.GlobFiles("**/ExcelAddIn.VSTO.Tests.dll").First();
+               var assembly = SourceDirectory.GlobFiles("**/Allors.Excel.Headless.Tests.dll").First();
 
                Xunit2(v => v
                    .SetFramework("net462")
                    .AddTargetAssemblies(assembly)
-                   .SetResultReport(Xunit2ResultFormat.Xml, ArtifactsDirectory / "tests" / "vsto-results.xml"));
+                   .SetResultReport(Xunit2ResultFormat.Xml, ArtifactsDirectory / "tests" / "headless-results.xml"));
            }
        });
 
