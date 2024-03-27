@@ -1,52 +1,46 @@
-// <copyright file="Cell.cs" company="Allors bvba">
+﻿// <copyright file="Cell.cs" company="Allors bvba">
 // Copyright (c) Allors bvba. All rights reserved.
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-using System;
-using System.Globalization;
-
 namespace Allors.Excel.Interop
 {
-    public class Cell : ICell
+    using System;
+    using System.Globalization;
+
+    public class Cell(IWorksheet worksheet, Row row, Column column) : ICell
     {
+        private static readonly IValueConverter DefaultValueConverter = new DefaultValueConverter();
+
         // the state of this when it is created
         private bool touched;
 
-        private object value;
-        private Style style;
-        private string formula;
-        private string numberFormat;
-        private Range options;
+        private object? value;
+        private Style? style;
+        private string? formula;
+        private string? numberFormat;
+        private Range? options;
 
-        private IValueConverter valueConverter;
-        private readonly IValueConverter defaultValueConverter = new DefaultValueConverter();
-        private string comment;
-
-        public Cell(IWorksheet worksheet, Row row, Column column)
-        {
-            this.Worksheet = worksheet;
-            this.Row = row;
-            this.Column = column;
-        }
+        private IValueConverter? valueConverter;
+        private string? comment;
 
         Excel.IWorksheet ICell.Worksheet => this.Worksheet;
 
-        public IWorksheet Worksheet { get; }
+        public IWorksheet Worksheet { get; } = worksheet;
 
         IRow ICell.Row => this.Row;
 
-        public Row Row { get; internal set; }
+        public Row Row { get; internal set; } = row;
 
         IColumn ICell.Column => this.Column;
 
-        public Column Column { get; internal set; }
+        public Column Column { get; internal set; } = column;
 
-        object ICell.Value { get => this.Value; set => this.Value = value; }
+        object? ICell.Value { get => this.Value; set => this.Value = value; }
 
-        string ICell.Formula { get => this.Formula; set => this.Formula = value; }
+        string? ICell.Formula { get => this.Formula; set => this.Formula = value; }
 
-        public object Value
+        public object? Value
         {
             get => this.value;
             set
@@ -61,9 +55,9 @@ namespace Allors.Excel.Interop
             }
         }
 
-        public string ValueAsString => Convert.ToString(this.Value, CultureInfo.CurrentCulture);
+        public string? ValueAsString => Convert.ToString(this.Value, CultureInfo.CurrentCulture);
 
-        public string Formula
+        public string? Formula
         {
             get => this.formula;
             set
@@ -77,34 +71,42 @@ namespace Allors.Excel.Interop
             }
         }
 
-        public string Comment
+        public string? Comment
         {
             get => this.comment;
             set
             {
-                if (!Equals(this.comment, value))
+                if (Equals(this.comment, value))
                 {
-                    this.Worksheet.AddDirtyComment(this);
-                    this.comment = value;                
-
+                    return;
                 }
+
+                this.Worksheet.AddDirtyComment(this);
+                this.comment = value;
             }
         }
 
-        public Style Style
+        public Style? Style
         {
             get => this.style;
             set
             {
-                if (!this.style?.Equals(value) ?? value != null)
+                if (this.style == null && value == null)
                 {
-                    this.Worksheet.AddDirtyStyle(this);
-                    this.style = value;
+                    return;
                 }
+
+                if (this.style != null && value != null && this.style.Equals(value))
+                {
+                    return;
+                }
+
+                this.Worksheet.AddDirtyStyle(this);
+                this.style = value;
             }
         }
 
-        public string NumberFormat
+        public string? NumberFormat
         {
             get => this.numberFormat;
             set
@@ -119,11 +121,11 @@ namespace Allors.Excel.Interop
 
         public IValueConverter ValueConverter
         {
-            get => this.valueConverter ?? this.defaultValueConverter;
+            get => this.valueConverter ?? DefaultValueConverter;
             set => this.valueConverter = value;
         }
 
-        public Range Options
+        public Range? Options
         {
             get => this.options;
             set
@@ -162,7 +164,7 @@ namespace Allors.Excel.Interop
             this.Style = null;
             this.NumberFormat = null;
         }
-        
-        public object Tag { get; set; }
+
+        public object? Tag { get; set; }
     }
 }

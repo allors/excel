@@ -1,14 +1,10 @@
-namespace Allors.Excel
+﻿namespace Allors.Excel
 {
     using System;
-    using System.Collections.Generic;
-    using Microsoft.Office.Core;
 
-    public abstract class PropertiesBase
+    public abstract class PropertiesBase(dynamic properties)
     {
-        protected PropertiesBase(dynamic properties) => this.Properties = properties;
-
-        protected dynamic Properties { get; }
+        protected dynamic Properties { get; } = properties;
 
         public bool? GetBoolean(string key)
         {
@@ -40,7 +36,7 @@ namespace Allors.Excel
 
         internal bool Exist(string key) => this.Get(key) != null;
 
-        protected dynamic Get(string key)
+        protected dynamic? Get(string key)
         {
             foreach (var property in this.Properties)
             {

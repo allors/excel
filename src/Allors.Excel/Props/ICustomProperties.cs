@@ -1,4 +1,4 @@
-namespace Allors.Excel
+﻿namespace Allors.Excel
 {
     using System;
 
@@ -12,7 +12,7 @@ namespace Allors.Excel
 
         long? GetNumber(string name);
 
-        string GetString(string name);
+        string? GetString(string name);
 
         void SetBoolean(string name, bool? value);
 
@@ -22,7 +22,7 @@ namespace Allors.Excel
 
         void SetNumber(string name, long? value);
 
-        void SetString(string name, string value);
+        void SetString(string name, string? value);
 
         void Remove(string name);
     }

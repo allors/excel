@@ -1,4 +1,4 @@
-// <copyright file="Row.cs" company="Allors bvba">
+﻿// <copyright file="Row.cs" company="Allors bvba">
 // Copyright (c) Allors bvba. All rights reserved.
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -7,21 +7,15 @@ namespace Allors.Excel.Interop
 {
     using System;
 
-    public class Row : IRow, IComparable<Row>
+    public class Row(Worksheet worksheet, int index) : IRow, IComparable<Row>
     {
         private bool hidden;
 
-        public Row(Worksheet worksheet, int index)
-        {
-            this.Worksheet = worksheet;
-            this.Index = index;
-        }
-
         Excel.IWorksheet IRow.Worksheet => this.Worksheet;
 
-        public Worksheet Worksheet { get; }
+        public Worksheet Worksheet { get; } = worksheet;
 
-        public int Index { get; internal set; }
+        public int Index { get; internal set; } = index;
 
         bool IRow.Hidden { get => this.Hidden; set => this.Hidden = value; }
 

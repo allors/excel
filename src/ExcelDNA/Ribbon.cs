@@ -1,4 +1,4 @@
-using ExcelDna.Integration.CustomUI;
+﻿using ExcelDna.Integration.CustomUI;
 using System.Runtime.InteropServices;
 using InteropApplication = Microsoft.Office.Interop.Excel.Application;
 
@@ -14,6 +14,12 @@ namespace ExcelDNA
     [ComVisible(true)]
     public class Ribbon : ExcelRibbon, IRibbon
     {
+        public IRibbonUI RibbonUI { get; private set; } = null!;
+
+        public AddIn AddIn { get; private set; } = null!;
+
+        public Program Program { get; private set; } = null!;
+
         public override string GetCustomUI(string _)
         {
             try
@@ -30,12 +36,6 @@ namespace ExcelDNA
                 throw;
             }
         }
-
-        public IRibbonUI RibbonUI { get; private set; }
-
-        public AddIn AddIn { get; private set; }
-
-        public Program Program { get; private set; }
 
         public async void OnLoad(IRibbonUI ribbon)
         {

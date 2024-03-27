@@ -1,4 +1,4 @@
-// <copyright file="Binding.cs" company="Allors bvba">
+﻿// <copyright file="Binding.cs" company="Allors bvba">
 // Copyright (c) Allors bvba. All rights reserved.
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -9,11 +9,11 @@ namespace Allors.Excel
 
     public class Binding : IBinding
     {
-        private readonly Action<ICell> toCell;
+        private readonly Action<ICell>? toCell;
 
-        private readonly Action<ICell> toDomain;
+        private readonly Action<ICell>? toDomain;
 
-        public Binding(Action<ICell> toCell = null, Action<ICell> toDomain = null)
+        public Binding(Action<ICell>? toCell = null, Action<ICell>? toDomain = null)
         {
             this.toCell = toCell;
             this.toDomain = toDomain;
@@ -23,7 +23,7 @@ namespace Allors.Excel
 
         public bool TwoWayBinding => !this.OneWayBinding;
 
-        public object Value { get; }
+        public object? Value { get; }
 
         public void ToCell(ICell cell) => this.toCell?.Invoke(cell);
 

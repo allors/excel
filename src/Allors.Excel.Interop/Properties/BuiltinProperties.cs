@@ -1,8 +1,8 @@
-namespace Allors.Excel
+﻿namespace Allors.Excel
 {
     using System;
 
-    public class BuiltinProperties : PropertiesBase, IBuiltinProperties
+    public class BuiltinProperties(object properties) : PropertiesBase(properties), IBuiltinProperties
     {
         private const string TitleKey = "Title";
         private const string SubjectKey = "Subject";
@@ -38,8 +38,6 @@ namespace Allors.Excel
         private const string ContentStatusKey = "Content status";
         private const string LanguageKey = "Language";
         private const string DocumentVersionKey = "Document version";
-
-        public BuiltinProperties(object properties) : base(properties) { }
 
         public string Title { get => this.GetString(TitleKey); set => this.SetString(TitleKey, value); }
 
@@ -119,7 +117,7 @@ namespace Allors.Excel
 
         public void SetString(string key, string value) => this.Set(key, value);
 
-        private void Set(string key, object value)
+        private void Set(string key, object? value)
         {
             if (value == null)
             {

@@ -27,6 +27,7 @@ namespace Allors.Excel.Headless
         {
             QuestPDF.Settings.License = LicenseType.Community;
         }
+
         public AddIn AddIn { get; }
 
         public List<Worksheet> WorksheetList { get; set; }
@@ -130,7 +131,6 @@ namespace Allors.Excel.Headless
 
         public IWorksheet[] WorksheetsByIndex => this.Worksheets;
 
-
         private Dictionary<string, XmlDocument> CustomXmlParts = new Dictionary<string, XmlDocument>();
 
         public XmlDocument GetCustomXMLById(string id)
@@ -148,7 +148,6 @@ namespace Allors.Excel.Headless
            return null;
         }
 
-
         public bool TryDeleteCustomXMLById(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -165,10 +164,8 @@ namespace Allors.Excel.Headless
             // Remove the custom XML part
             this.customXml = this.customXml.Replace(id, string.Empty);
 
-
             return true;
         }
-
 
         public bool TrySetCustomProperty(string name, dynamic value) => throw new NotImplementedException();
 
