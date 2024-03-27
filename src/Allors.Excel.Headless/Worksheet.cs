@@ -53,7 +53,7 @@ namespace Allors.Excel.Headless
 
         public Dictionary<(int, int), Cell> CellByCoordinates { get; }
 
-        public bool IsVisible { get; set; }
+        public bool IsVisible { get; set; } = true;
 
         public bool HasFreezePanes => throw new NotImplementedException();
 
