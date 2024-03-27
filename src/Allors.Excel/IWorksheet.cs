@@ -172,7 +172,7 @@ namespace Allors.Excel
         /// <param name="numberOfColumns"></param>
         void DeleteColumns(int startColumnIndex, int numberOfColumns);
 
-        Range? GetRange(string cell1, string? cell2 = null);
+        Range GetRange(string cell1, string cell2 = null);
 
         Range GetUsedRange();
 
@@ -181,14 +181,14 @@ namespace Allors.Excel
         /// </summary>
         /// <param name="column"></param>
         /// <returns></returns>
-        Range? GetUsedRange(string column);
+        Range GetUsedRange(string column);
 
         /// <summary>
         /// row equals the zero-based index of excel rows (so 1 less than the excel rowindex)
         /// </summary>
         /// <param name="row"></param>
         /// <returns></returns>
-        Range? GetUsedRange(int row);
+        Range GetUsedRange(int row);
 
         void AutoFit();
 
@@ -248,12 +248,12 @@ namespace Allors.Excel
         /// Sets the PrintArea to the given range, or to the entire sheet when range is null.
         /// </summary>
         /// <param name="range"></param>
-        void SetPrintArea(Range? range = null);
+        void SetPrintArea(Range range = null);
 
         /// <summary>
         /// Sets the inputMessage that will be displayed when the cell is selected (aka Help text)
         /// </summary>
-        void SetInputMessage(ICell cell, string message, string? title = null, bool showInputMessage = true);
+        void SetInputMessage(ICell cell, string message, string title = null, bool showInputMessage = true);
 
         /// <summary>
         /// Hides or optionally remove the inputtext from a cell.

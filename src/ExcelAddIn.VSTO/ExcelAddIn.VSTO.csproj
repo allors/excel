@@ -1,4 +1,5 @@
 ﻿<Project ToolsVersion="16.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.CodeAnalysis.CSharp.CodeStyle.4.9.2\build\Microsoft.CodeAnalysis.CSharp.CodeStyle.props" Condition="Exists('..\packages\Microsoft.CodeAnalysis.CSharp.CodeStyle.4.9.2\build\Microsoft.CodeAnalysis.CSharp.CodeStyle.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <!--
     This section defines project-level properties.
@@ -31,6 +32,8 @@
     <DefineConstants>VSTO40</DefineConstants>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <BootstrapperComponentsLocation>HomeSite</BootstrapperComponentsLocation>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.VSTORuntime.4.0">
@@ -169,6 +172,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <None Include="ExcelAddIn.VSTO_TemporaryKey.pfx" />
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -208,6 +212,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Ribbon.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.CSharp.CodeStyle.4.9.2\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CodeStyle.dll" />
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.CSharp.CodeStyle.4.9.2\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CodeStyle.Fixes.dll" />
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.CSharp.CodeStyle.4.9.2\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.CodeStyle.dll" />
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.CSharp.CodeStyle.4.9.2\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.CodeStyle.Fixes.dll" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
@@ -236,4 +246,12 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.CodeAnalysis.CSharp.CodeStyle.4.9.2\build\Microsoft.CodeAnalysis.CSharp.CodeStyle.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeAnalysis.CSharp.CodeStyle.4.9.2\build\Microsoft.CodeAnalysis.CSharp.CodeStyle.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.CodeAnalysis.CSharp.CodeStyle.4.9.2\build\Microsoft.CodeAnalysis.CSharp.CodeStyle.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeAnalysis.CSharp.CodeStyle.4.9.2\build\Microsoft.CodeAnalysis.CSharp.CodeStyle.targets'))" />
+  </Target>
+  <Import Project="..\packages\Microsoft.CodeAnalysis.CSharp.CodeStyle.4.9.2\build\Microsoft.CodeAnalysis.CSharp.CodeStyle.targets" Condition="Exists('..\packages\Microsoft.CodeAnalysis.CSharp.CodeStyle.4.9.2\build\Microsoft.CodeAnalysis.CSharp.CodeStyle.targets')" />
 </Project>

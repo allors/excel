@@ -12,7 +12,7 @@ namespace Allors.Excel
 
     public class Binder
     {
-        public event EventHandler? ToDomained;
+        public event EventHandler ToDomained;
 
         public IWorksheet Worksheet { get; }
 
@@ -22,11 +22,11 @@ namespace Allors.Excel
 
         private IList<ICell> bindingCells = new List<ICell>();
 
-        public readonly Style? changedStyle;
+        public readonly Style changedStyle;
 
-        private readonly IDictionary<ICell, Style?>? changedCells;
+        private readonly IDictionary<ICell, Style> changedCells;
 
-        public Binder(IWorksheet worksheet, Style? changedStyle = null)
+        public Binder(IWorksheet worksheet, Style changedStyle = null)
         {
             this.Worksheet = worksheet;
             this.Worksheet.CellsChanged += this.Worksheet_CellsChanged;
@@ -34,7 +34,7 @@ namespace Allors.Excel
             this.changedStyle = changedStyle;
             if (this.changedStyle != null)
             {
-                this.changedCells = new Dictionary<ICell, Style?>();
+                this.changedCells = new Dictionary<ICell, Style>();
             }
         }
 

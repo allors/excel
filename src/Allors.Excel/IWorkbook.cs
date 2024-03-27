@@ -34,7 +34,7 @@ namespace Allors.Excel
         /// </summary>
         /// <param name="saveChanges"></param>
         /// <param name="fileName"></param>
-        void Close(bool? saveChanges = null, string? fileName = null);
+        void Close(bool? saveChanges = null, string fileName = null);
 
         /// <summary>
         /// Add a worksheet at the given location
@@ -43,7 +43,7 @@ namespace Allors.Excel
         /// <param name="before"></param>
         /// <param name="after"></param>
         /// <returns></returns>
-        IWorksheet AddWorksheet(int? index = null, IWorksheet? before = null, IWorksheet? after = null);
+        IWorksheet AddWorksheet(int? index = null, IWorksheet before = null, IWorksheet after = null);
 
         /// <summary>
         /// Copies a worksheet at the given beforeWorksheet
@@ -57,7 +57,7 @@ namespace Allors.Excel
         /// Gets all named Ranges in this workbook scope.
         /// </summary>
         /// <returns></returns>
-        Range[] GetNamedRanges(string? refersToSheetName = null);
+        Range[] GetNamedRanges(string refersToSheetName = null);
 
         /// <summary>
         /// Adds a NamedRange scoped to the Workbook
@@ -84,7 +84,7 @@ namespace Allors.Excel
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        XmlDocument? GetCustomXMLById(string id);
+        XmlDocument GetCustomXMLById(string id);
 
         /// <summary>
         /// Delete the custom xml part.

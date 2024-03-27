@@ -28,13 +28,13 @@ namespace Application
 
         public IServiceLocator ServiceLocator { get; }
 
-        public IAddIn AddIn { get; private set; } = null!;
+        public IAddIn AddIn { get; private set; }
 
-        public Style? CanNotWriteCellStyle { get; set; }
+        public Style CanNotWriteCellStyle { get; set; }
 
-        public Style? CanWriteCellStyle { get; set; }
+        public Style CanWriteCellStyle { get; set; }
 
-        public Style? ChangedCellStyle { get; set; }
+        public Style ChangedCellStyle { get; set; }
 
         public async Task OnStart(IAddIn addIn)
         {

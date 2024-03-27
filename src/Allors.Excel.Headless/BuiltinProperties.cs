@@ -24,7 +24,7 @@ namespace Allors.Excel.Headless
 
         public string LastAuthor { get; set; }
 
-        public string RevisionNumber { get; }
+        public string RevisionNumber { get; set; }
 
         public string ApplicationName { get; set; }
 

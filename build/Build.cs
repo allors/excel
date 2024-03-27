@@ -68,7 +68,7 @@ class Build : NukeBuild
                var assembly = SourceDirectory.GlobFiles("**/Allors.Excel.Interop.Tests.dll").First();
 
                Xunit2(v => v
-                   .SetFramework("net461")
+                   .SetFramework("net462")
                    .AddTargetAssemblies(assembly)
                    .SetResultReport(Xunit2ResultFormat.Xml, ArtifactsDirectory / "tests" / "interop-results.xml"));
            }
@@ -77,7 +77,7 @@ class Build : NukeBuild
                var assembly = SourceDirectory.GlobFiles("**/ExcelAddIn.VSTO.Tests.dll").First();
 
                Xunit2(v => v
-                   .SetFramework("net48")
+                   .SetFramework("net462")
                    .AddTargetAssemblies(assembly)
                    .SetResultReport(Xunit2ResultFormat.Xml, ArtifactsDirectory / "tests" / "vsto-results.xml"));
            }

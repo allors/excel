@@ -13,28 +13,28 @@ namespace Allors.Excel
 
         IColumn Column { get; }
 
-        object? Value { get; set; }
+        object Value { get; set; }
 
-        string? ValueAsString { get; }
+        string ValueAsString { get; }
 
-        string? Formula { get; set; }
+        string Formula { get; set; }
 
-        Range? Options { get; set; }
+        Range Options { get; set; }
 
         bool IsRequired { get; set; }
 
         bool HideInCellDropdown { get; set; }
 
-        string? Comment { get; set; }
+        string Comment { get; set; }
 
-        Style? Style { get; set; }
+        Style Style { get; set; }
 
-        string? NumberFormat { get; set; }
+        string NumberFormat { get; set; }
 
         IValueConverter ValueConverter { get; set; }
 
         void Clear();
 
-        object? Tag { get; set; }
+        object Tag { get; set; }
     }
 }

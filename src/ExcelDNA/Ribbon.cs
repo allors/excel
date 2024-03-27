@@ -14,11 +14,11 @@ namespace ExcelDNA
     [ComVisible(true)]
     public class Ribbon : ExcelRibbon, IRibbon
     {
-        public IRibbonUI RibbonUI { get; private set; } = null!;
+        public IRibbonUI RibbonUI { get; private set; }
 
-        public AddIn AddIn { get; private set; } = null!;
+        public AddIn AddIn { get; private set; }
 
-        public Program Program { get; private set; } = null!;
+        public Program Program { get; private set; }
 
         public override string GetCustomUI(string _)
         {

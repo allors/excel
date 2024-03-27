@@ -11,7 +11,7 @@ namespace Allors.Excel
     {
         public override string ToString() => $"{this.Worksheet?.Name ?? "null"}!{this.Name ?? "null"} (row:{this.Row}, col:{this.Column}, rows:{this.Rows}, cols:{this.Columns})";
 
-        public Range(int row, int column, int? rows = null, int? columns = null, IWorksheet? worksheet = null, string? name = null)
+        public Range(int row, int column, int? rows = null, int? columns = null, IWorksheet worksheet = null, string name = null)
         {
             this.Row = row;
             this.Column = column;
@@ -26,12 +26,12 @@ namespace Allors.Excel
             }
         }
 
-        public IWorksheet? Worksheet { get; }
+        public IWorksheet Worksheet { get; }
 
         /// <summary>
         /// Gets the name of the Range
         /// </summary>
-        public string? Name { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// Gets the start row index of the Range
