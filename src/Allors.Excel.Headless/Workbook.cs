@@ -13,6 +13,7 @@ namespace Allors.Excel.Headless
     public class Workbook : IWorkbook
     {
         private int counter;
+      
 
         public Workbook(AddIn addIn)
         {
@@ -22,6 +23,7 @@ namespace Allors.Excel.Headless
             this.CustomProperties = new CustomProperties();
         }
 
+      
 
         public AddIn AddIn { get; }
 
@@ -118,16 +120,17 @@ namespace Allors.Excel.Headless
         public ICustomProperties CustomProperties { get; }
 
         private string customXml;
+        private Dictionary<string, XmlDocument> CustomXmlParts = new Dictionary<string, XmlDocument>();
         public string SetCustomXML(XmlDocument xmlDocument)
         {
-            this.customXml = xmlDocument.OuterXml;
-            return this.customXml;
-        }
+            var id = Guid.NewGuid().ToString(); // Generate a unique ID for the custom XML part
 
+            this.CustomXmlParts[id] = xmlDocument; // Store the XML document in the dictionary
+
+            return id; // Return the ID of the custom XML part
+        }
         public IWorksheet[] WorksheetsByIndex => this.Worksheets;
 
-
-        private Dictionary<string, XmlDocument> CustomXmlParts = new Dictionary<string, XmlDocument>();
 
         public XmlDocument GetCustomXMLById(string id)
         {
@@ -136,13 +139,15 @@ namespace Allors.Excel.Headless
                 throw new ArgumentException("ID cannot be null or empty.", nameof(id));
             }
 
-             if (this.CustomXmlParts.TryGetValue(id, out var xmlDocument))
+            if (this.CustomXmlParts.TryGetValue(id, out var xmlDocument))
             {
                 return xmlDocument;
             }
 
-           return null;
+            return null;
         }
+
+
 
 
         public bool TryDeleteCustomXMLById(string id)
@@ -152,17 +157,15 @@ namespace Allors.Excel.Headless
                 throw new ArgumentException("ID cannot be null or empty.", nameof(id));
             }
 
-            // Check if the custom XML part exists
-            if (!this.customXml.Contains(id))
+            // Check if the custom XML part exists in the dictionary
+            if (this.CustomXmlParts.ContainsKey(id))
             {
-                return false;
+                // Remove the custom XML part from the dictionary
+                this.CustomXmlParts.Remove(id);
+                return true;
             }
 
-            // Remove the custom XML part
-            this.customXml = this.customXml.Replace(id, string.Empty);
-
-
-            return true;
+            return false;
         }
 
 
