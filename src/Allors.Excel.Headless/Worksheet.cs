@@ -193,6 +193,10 @@ namespace Allors.Excel.Headless
 
         public void SaveAsPDF(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true)
         {
+            if (file == null)
+            {
+                throw new ArgumentNullException(nameof(file));
+            }
             var fullName = file.FullName;
             fullName = Path.ChangeExtension(fullName, "pdf");
             if (File.Exists(fullName) && !overwriteExistingFile)
@@ -250,7 +254,6 @@ namespace Allors.Excel.Headless
 
         public void SetPrintArea(Range range = null)
         {
-
         }
 
         public void HideInputMessage(ICell cell, bool clearInputMessage = false) { }
