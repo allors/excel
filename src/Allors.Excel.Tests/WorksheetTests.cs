@@ -398,7 +398,7 @@ namespace Allors.Excel.Tests
         }
 
         [Fact]
-        public async void SaveAsPDFThrowsExceptionWhenFileExists()
+        public void SaveAsPDFThrowsExceptionWhenFileExists()
         {
             var addIn = this.NewAddIn();
 
@@ -497,7 +497,7 @@ namespace Allors.Excel.Tests
         }
 
         [Fact]
-        public async void FreezePanes()
+        public void FreezePanes()
         {
             var addIn = this.NewAddIn();
 
@@ -578,7 +578,7 @@ namespace Allors.Excel.Tests
         }
 
         [Fact]
-        public async void AddWorksheetsBeforeAndAfter()
+        public void AddWorksheetsBeforeAndAfter()
         {
             var addIn = this.NewAddIn();
 
@@ -655,7 +655,7 @@ namespace Allors.Excel.Tests
         }
 
         [Fact]
-        public async void AddWorksheetsByIndex()
+        public void AddWorksheetsByIndex()
         {
             var addIn = this.NewAddIn();
 
@@ -712,7 +712,7 @@ namespace Allors.Excel.Tests
         }
 
         [Fact]
-        public async void CellTagContainsCustomObject()
+        public void CellTagContainsCustomObject()
         {
             this.ExpectedContextTags = new List<ContextTag>();
 
@@ -772,7 +772,7 @@ namespace Allors.Excel.Tests
         }
 
         [Fact]
-        public async void IsVisible()
+        public void IsVisible()
         {
             var addIn = this.NewAddIn();
 
@@ -795,7 +795,7 @@ namespace Allors.Excel.Tests
         }
 
         [Fact]
-        public async void AddWorkbookTest()
+        public void AddWorkbookTest()
         {
             var addIn = this.NewAddIn();
 
@@ -807,7 +807,7 @@ namespace Allors.Excel.Tests
         }
 
         [Fact]
-        public async void InsertRows()
+        public void InsertRows()
         {
             ICell cell = null;
 
@@ -890,7 +890,7 @@ namespace Allors.Excel.Tests
         }
 
         [Fact]
-        public async void InsertColumn()
+        public void InsertColumn()
         {
             ICell cell = null;
 
@@ -930,7 +930,7 @@ namespace Allors.Excel.Tests
         }
 
         [Fact]
-        public async void InsertColumns()
+        public void InsertColumns()
         {
             ICell cell = null;
 
@@ -973,7 +973,7 @@ namespace Allors.Excel.Tests
         }
 
         [Fact]
-        public async void DeleteColumn()
+        public void DeleteColumn()
         {
             ICell cell = null;
 
@@ -1027,7 +1027,7 @@ namespace Allors.Excel.Tests
         }
 
         [Fact]
-        public async void DeleteColumns()
+        public void DeleteColumns()
         {
             ICell cell = null;
 
@@ -1076,7 +1076,7 @@ namespace Allors.Excel.Tests
         }
 
         [Fact]
-        public async void SetIsActiveWorksheet()
+        public void SetIsActiveWorksheet()
         {
             ICell cell = null;
 
@@ -1182,7 +1182,7 @@ namespace Allors.Excel.Tests
         }
 
         [Fact]
-        public async void GetUsedRange()
+        public void GetUsedRange()
         {
             var addIn = this.NewAddIn();
 
@@ -1250,7 +1250,7 @@ namespace Allors.Excel.Tests
         }
 
         [Fact]
-        public async void GetUsedRangeColumn()
+        public void GetUsedRangeColumn()
         {
             var addIn = this.NewAddIn();
 
@@ -1311,7 +1311,7 @@ namespace Allors.Excel.Tests
         }
 
         [Fact]
-        public async void GetUsedRangeRow()
+        public void GetUsedRangeRow()
         {
             var addIn = this.NewAddIn();
 
