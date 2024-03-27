@@ -1,17 +1,17 @@
-// <copyright file="ChunkTests.cs" company="Allors bvba">
+﻿// <copyright file="ChunkTests.cs" company="Allors bvba">
 // Copyright (c) Allors bvba. All rights reserved.
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Allors.Excel.Interop;
-using Moq;
-using Xunit;
-
 namespace Allors.Excel.Tests.Rendering
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Allors.Excel.Interop;
+    using Moq;
+    using Xunit;
+
     public class ChunkTests
     {
         private readonly Dictionary<int, Row> rowByIndex = new Dictionary<int, Row>();
@@ -22,7 +22,7 @@ namespace Allors.Excel.Tests.Rendering
         {
             if (!this.rowByIndex.TryGetValue(index, out var row))
             {
-                row = new Row(null, index);
+                row = new Row(null!, index);
                 this.rowByIndex.Add(index, row);
             }
 
@@ -33,7 +33,7 @@ namespace Allors.Excel.Tests.Rendering
         {
             if (!this.columnByIndex.TryGetValue(index, out var column))
             {
-                column = new Column(null, index);
+                column = new Column(null!, index);
                 this.columnByIndex.Add(index, column);
             }
 
@@ -45,8 +45,8 @@ namespace Allors.Excel.Tests.Rendering
         {
             var cells = new[]
             {
-                new Cell(null, this.Row(0), this.Column(0)),
-                new Cell(null, this.Row(0), this.Column(1)),
+                new Cell(null!, this.Row(0), this.Column(0)),
+                new Cell(null!, this.Row(0), this.Column(1)),
             };
 
             var chunks = cells.Chunks((v, w) => true).ToArray();
@@ -61,10 +61,10 @@ namespace Allors.Excel.Tests.Rendering
         {
             var cells = new[]
                 {
-                    new Cell(null, this.Row(0), this.Column(0)),
-                    new Cell(null, this.Row(0), this.Column(1)),
-                    new Cell(null, this.Row(0), this.Column(2)),
-                    new Cell(null, this.Row(0), this.Column(3)),
+                    new Cell(null!, this.Row(0), this.Column(0)),
+                    new Cell(null!, this.Row(0), this.Column(1)),
+                    new Cell(null!, this.Row(0), this.Column(2)),
+                    new Cell(null!, this.Row(0), this.Column(3)),
             };
 
             var chunks = cells.Chunks((v, w) => true).ToArray();
@@ -76,46 +76,43 @@ namespace Allors.Excel.Tests.Rendering
         {
             var cells = new[]
                 {
-                    new Cell(null, this.Row(0), this.Column(0)),
-                    new Cell(null, this.Row(1), this.Column(0)),
+                    new Cell(null!, this.Row(0), this.Column(0)),
+                    new Cell(null!, this.Row(1), this.Column(0)),
             };
 
             var chunks = cells.Chunks((v, w) => true).ToArray();
             Assert.Single(chunks);
         }
-
 
         [Fact]
         public void OneChunk_TwoRows_TwoCells()
         {
             var cells = new[]
                 {
-                    new Cell(null, this.Row(0), this.Column(0)),
-                    new Cell(null, this.Row(0), this.Column(1)),
-                    new Cell(null, this.Row(1), this.Column(0)),
-                    new Cell(null, this.Row(1), this.Column(1)),
+                    new Cell(null!, this.Row(0), this.Column(0)),
+                    new Cell(null!, this.Row(0), this.Column(1)),
+                    new Cell(null!, this.Row(1), this.Column(0)),
+                    new Cell(null!, this.Row(1), this.Column(1)),
             };
 
             var chunks = cells.Chunks((v, w) => true).ToArray();
             Assert.Single(chunks);
         }
 
-
         [Fact]
         public void TwoChunks_OneRow_TwoCells()
         {
             var cells = new[]
                 {
-                    new Cell(null, this.Row(0), this.Column(0)),
-                    new Cell(null, this.Row(0), this.Column(1)),
-                    new Cell(null, this.Row(0), this.Column(3)),
-                    new Cell(null, this.Row(0), this.Column(4)),
+                    new Cell(null!, this.Row(0), this.Column(0)),
+                    new Cell(null!, this.Row(0), this.Column(1)),
+                    new Cell(null!, this.Row(0), this.Column(3)),
+                    new Cell(null!, this.Row(0), this.Column(4)),
             };
 
             var chunks = cells.Chunks((v, w) => true).ToArray();
             Assert.Equal(2, chunks.Length);
         }
-
 
         [Fact]
         public void Square()

@@ -1,4 +1,4 @@
-// <copyright file="Column.cs" company="Allors bvba">
+﻿// <copyright file="Column.cs" company="Allors bvba">
 // Copyright (c) Allors bvba. All rights reserved.
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -7,17 +7,11 @@ namespace Allors.Excel.Interop
 {
     using System;
 
-    public class Column : IColumn, IComparable<Column>
+    public class Column(Worksheet worksheet, int index) : IColumn, IComparable<Column>
     {
-        public Column(Worksheet worksheet, int index)
-        {
-            this.Worksheet = worksheet;
-            this.Index = index;
-        }
+        public Excel.IWorksheet Worksheet { get; } = worksheet;
 
-        public Excel.IWorksheet Worksheet { get; }
-
-        public int Index { get; internal set; }
+        public int Index { get; internal set; } = index;
 
         public int CompareTo(Column other) => this.Index.CompareTo(other.Index);
     }

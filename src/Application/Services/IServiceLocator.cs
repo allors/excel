@@ -5,7 +5,7 @@
 
 namespace Application
 {
-    public interface IServiceLocator 
+    public interface IServiceLocator
     {
         IAlerter Alerter { get; }
     }

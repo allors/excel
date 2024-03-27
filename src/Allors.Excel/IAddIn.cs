@@ -1,4 +1,4 @@
-// <copyright file="IAddIn.cs" company="Allors bvba">
+﻿// <copyright file="IAddIn.cs" company="Allors bvba">
 // Copyright (c) Allors bvba. All rights reserved.
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -11,7 +11,7 @@ namespace Allors.Excel
 
         IWorkbook[] Workbooks { get; }
 
-        string ExistentialAttribute { get; set; }
+        string? ExistentialAttribute { get; set; }
 
         void DisplayAlerts(bool displayAlerts);
     }

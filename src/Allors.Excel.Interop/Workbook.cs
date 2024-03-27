@@ -1,4 +1,4 @@
-// <copyright file="Workbook.cs" company="Allors bvba">
+﻿// <copyright file="Workbook.cs" company="Allors bvba">
 // Copyright (c) Allors bvba. All rights reserved.
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -24,16 +24,22 @@ namespace Allors.Excel.Interop
         {
             this.AddIn = addIn;
             this.InteropWorkbook = interopWorkbook;
-            this.worksheetByInteropWorksheet = new Dictionary<InteropWorksheet, Worksheet>();
+            this.worksheetByInteropWorksheet = [];
             this.AddIn.Application.WorkbookNewSheet += this.ApplicationOnWorkbookNewSheet;
             this.AddIn.Application.SheetBeforeDelete += this.ApplicationOnSheetBeforeDelete;
             this.BuiltinProperties = new BuiltinProperties(this.InteropWorkbook.BuiltinDocumentProperties);
             this.CustomProperties = new CustomProperties(this.InteropWorkbook.CustomDocumentProperties);
         }
 
+        public event EventHandler<Hyperlink>? OnHyperlinkClicked;
+
         public AddIn AddIn { get; }
 
         public InteropWorkbook InteropWorkbook { get; }
+
+        public IBuiltinProperties BuiltinProperties { get; }
+
+        public ICustomProperties CustomProperties { get; }
 
         /// <summary>
         /// When index = 0 => add new worksheet before the active worksheet
@@ -47,7 +53,7 @@ namespace Allors.Excel.Interop
         /// <param name="before"></param>
         /// <param name="after"></param>
         /// <returns></returns>
-        public Excel.IWorksheet AddWorksheet(int? index, Excel.IWorksheet before = null, Excel.IWorksheet after = null)
+        public Excel.IWorksheet AddWorksheet(int? index, Excel.IWorksheet? before = null, Excel.IWorksheet? after = null)
         {
             InteropWorksheet interopWorksheet;
 
@@ -64,7 +70,6 @@ namespace Allors.Excel.Interop
                     if (before != null)
                     {
                         interopWorksheet = (InteropWorksheet)this.InteropWorkbook.Sheets.Add(((Worksheet)before).InteropWorksheet, Missing.Value);
-
                     }
                     else if (after != null)
                     {
@@ -112,7 +117,6 @@ namespace Allors.Excel.Interop
         }
 
         /// <inheritdoc/>
-
         public Excel.IWorksheet[] Worksheets => this.worksheetByInteropWorksheet.Values.Cast<Excel.IWorksheet>().ToArray();
 
         public Excel.IWorksheet[] WorksheetsByIndex => this.worksheetByInteropWorksheet.Values.OrderBy(v => v.Index).Cast<Excel.IWorksheet>().ToArray();
@@ -121,7 +125,7 @@ namespace Allors.Excel.Interop
         public bool IsActive { get; internal set; }
 
         /// <inheritdoc/>
-        public void Close(bool? saveChanges = null, string fileName = null) => this.InteropWorkbook.Close((object)saveChanges ?? Missing.Value, (object)fileName ?? Missing.Value, Missing.Value);
+        public void Close(bool? saveChanges = null, string? fileName = null) => this.InteropWorkbook.Close((object?)saveChanges ?? Missing.Value, (object?)fileName ?? Missing.Value, Missing.Value);
 
         public Worksheet New(InteropWorksheet interopWorksheet) => this.TryAdd(interopWorksheet);
 
@@ -164,7 +168,7 @@ namespace Allors.Excel.Interop
         }
 
         /// <inheritdoc/>
-        public Range[] GetNamedRanges(string refersToSheetName = null)
+        public Range[] GetNamedRanges(string? refersToSheetName = null)
         {
             var ranges = new List<Range>();
 
@@ -177,7 +181,7 @@ namespace Allors.Excel.Interop
                     {
                         var iworkSheet = this.worksheetByInteropWorksheet.FirstOrDefault(v => string.Equals(v.Key.Name, refersToRange.Worksheet.Name)).Value;
 
-                        if (string.IsNullOrEmpty(refersToSheetName) || refersToSheetName.Equals(iworkSheet?.Name, StringComparison.OrdinalIgnoreCase))
+                        if (string.IsNullOrEmpty(refersToSheetName) || refersToSheetName!.Equals(iworkSheet?.Name, StringComparison.OrdinalIgnoreCase))
                         {
                             ranges.Add(new Range(refersToRange.Row - 1, refersToRange.Column - 1, refersToRange.Rows.Count, refersToRange.Columns.Count, worksheet: iworkSheet, name: namedRange.Name));
                         }
@@ -195,31 +199,28 @@ namespace Allors.Excel.Interop
         /// <inheritdoc/>
         public void SetNamedRange(string name, Range range)
         {
-            if (!string.IsNullOrWhiteSpace(name) && range != null)
+            if (!string.IsNullOrWhiteSpace(name))
             {
                 try
                 {
 
-                    var interopWorksheet = ((Worksheet)range.Worksheet).InteropWorksheet;
+                    var interopWorksheet = ((Worksheet)range.Worksheet!).InteropWorksheet;
 
-                    if (interopWorksheet != null)
+                    var topLeft = interopWorksheet.Cells[range.Row + 1, range.Column + 1];
+                    var bottomRight = interopWorksheet.Cells[range.Row + range.Rows, range.Column + range.Columns];
+
+                    var refersTo = interopWorksheet.Range[topLeft, bottomRight];
+
+                    // When it does not exist, add it, else we update the range.
+                    if (this.InteropWorkbook.Names
+                            .Cast<InteropName>()
+                            .Any(v => string.Equals(v.Name, name)))
                     {
-                        var topLeft = interopWorksheet.Cells[range.Row + 1, range.Column + 1];
-                        var bottomRight = interopWorksheet.Cells[range.Row + range.Rows, range.Column + range.Columns];
-
-                        var refersTo = interopWorksheet.Range[topLeft, bottomRight];
-
-                        // When it does not exist, add it, else we update the range.
-                        if (this.InteropWorkbook.Names
-                                .Cast<InteropName>()
-                                .Any(v => string.Equals(v.Name, name)))
-                        {
-                            this.InteropWorkbook.Names.Item(name).RefersTo = refersTo;
-                        }
-                        else
-                        {
-                            this.InteropWorkbook.Names.Add(name, refersTo);
-                        }
+                        this.InteropWorkbook.Names.Item(name).RefersTo = refersTo;
+                    }
+                    else
+                    {
+                        this.InteropWorkbook.Names.Add(name, refersTo);
                     }
                 }
                 catch
@@ -229,20 +230,15 @@ namespace Allors.Excel.Interop
             }
         }
 
-        public IBuiltinProperties BuiltinProperties { get; }
-
-        public ICustomProperties CustomProperties { get; }
-
         /// <inheritdoc/>
-        public XmlDocument GetCustomXMLById(string id)
+        public XmlDocument? GetCustomXMLById(string id)
         {
-            var xmlDocument = new XmlDocument();
-            var customXMLPart = this.InteropWorkbook.CustomXMLParts.SelectByID(id);
+            var customXmlPart = this.InteropWorkbook.CustomXMLParts.SelectByID(id);
 
-            if (customXMLPart != null)
+            if (customXmlPart != null)
             {
-                xmlDocument.LoadXml(customXMLPart.XML);
-
+                var xmlDocument = new XmlDocument();
+                xmlDocument.LoadXml(customXmlPart.XML);
                 return xmlDocument;
             }
 
@@ -267,8 +263,6 @@ namespace Allors.Excel.Interop
             }
         }
 
-        public event EventHandler<Allors.Excel.Hyperlink> OnHyperlinkClicked;
-
-        public void HyperlinkClicked(Allors.Excel.Hyperlink hyperlink) => this.OnHyperlinkClicked.Invoke(this, hyperlink);
+        public void HyperlinkClicked(Hyperlink hyperlink) => this.OnHyperlinkClicked?.Invoke(this, hyperlink);
     }
 }

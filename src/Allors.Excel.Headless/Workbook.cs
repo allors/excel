@@ -9,6 +9,7 @@ namespace Allors.Excel.Headless
     using System.Collections.Generic;
     using System.Linq;
     using System.Xml;
+    using QuestPDF.Infrastructure;
 
     public class Workbook : IWorkbook
     {
@@ -23,7 +24,10 @@ namespace Allors.Excel.Headless
             this.CustomProperties = new CustomProperties();
         }
 
-      
+        static Workbook()
+        {
+            QuestPDF.Settings.License = LicenseType.Community;
+        }
 
         public AddIn AddIn { get; }
 
@@ -129,8 +133,8 @@ namespace Allors.Excel.Headless
 
             return id; // Return the ID of the custom XML part
         }
+        
         public IWorksheet[] WorksheetsByIndex => this.Worksheets;
-
 
         public XmlDocument GetCustomXMLById(string id)
         {
@@ -146,9 +150,6 @@ namespace Allors.Excel.Headless
 
             return null;
         }
-
-
-
 
         public bool TryDeleteCustomXMLById(string id)
         {
@@ -167,7 +168,6 @@ namespace Allors.Excel.Headless
 
             return false;
         }
-
 
         public bool TrySetCustomProperty(string name, dynamic value) => throw new NotImplementedException();
 

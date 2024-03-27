@@ -1,12 +1,10 @@
-namespace Allors.Excel
+﻿namespace Allors.Excel
 {
     using System;
     using Microsoft.Office.Core;
 
-    public class CustomProperties : PropertiesBase, ICustomProperties
+    public class CustomProperties(object properties) : PropertiesBase(properties), ICustomProperties
     {
-        public CustomProperties(object properties) : base(properties) { }
-
         public void SetBoolean(string key, bool? value) => this.Set(key, MsoDocProperties.msoPropertyTypeBoolean, value);
 
         public void SetDate(string key, DateTime? value) => this.Set(key, MsoDocProperties.msoPropertyTypeDate, value);
@@ -15,9 +13,9 @@ namespace Allors.Excel
 
         public void SetNumber(string key, long? value) => this.Set(key, MsoDocProperties.msoPropertyTypeNumber, value);
 
-        public void SetString(string key, string value) => this.Set(key, MsoDocProperties.msoPropertyTypeString, value);
+        public void SetString(string key, string? value) => this.Set(key, MsoDocProperties.msoPropertyTypeString, value);
 
-        private void Set(string key, MsoDocProperties type, object value)
+        private void Set(string key, MsoDocProperties type, object? value)
         {
             if (value == null)
             {
@@ -34,6 +32,5 @@ namespace Allors.Excel
 
             this.Properties.Add(key, false, type, value, null);
         }
-
     }
 }
