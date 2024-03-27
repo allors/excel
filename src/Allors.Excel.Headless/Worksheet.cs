@@ -157,7 +157,7 @@ namespace Allors.Excel.Headless
         public void AddPicture(string uri, Rectangle rectangle)
         {
         }
-        public Dictionary<string, Range> NamedRangeByName { get; } = new Dictionary<string, Range>();
+        public Dictionary<string, Range> NamedRangeByName { get; set; } = new Dictionary<string, Range>();
 
         public Range[] GetNamedRanges()
         {
@@ -166,7 +166,22 @@ namespace Allors.Excel.Headless
 
         public Rectangle GetRectangle(string namedRange) => Rectangle.Empty;
 
-        public void SetNamedRange(string name, Range range) => throw new NotImplementedException();
+        public void SetNamedRange(string name, Range range)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentException("Name cannot be null or empty.", nameof(name));
+            }
+
+            if (range == null)
+            {
+                throw new ArgumentNullException(nameof(range));
+            }
+
+            // Replace the existing named range with the new range
+            this.NamedRangeByName[name] = range;
+            range.Name = name;
+        }
 
         public void InsertRows(int startRowIndex, int numberOfRows) => throw new NotImplementedException();
 
