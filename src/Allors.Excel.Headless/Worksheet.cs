@@ -10,7 +10,12 @@ namespace Allors.Excel.Headless
     using System.Drawing;
     using System.IO;
     using System.Linq;
+    using System.Runtime.InteropServices;
     using System.Threading.Tasks;
+    using QuestPDF;
+    using QuestPDF.Fluent;
+    using QuestPDF.Helpers;
+    using QuestPDF.Infrastructure;
 
     public class Worksheet : IWorksheet
     {
@@ -57,7 +62,7 @@ namespace Allors.Excel.Headless
 
         public bool HasFreezePanes => throw new NotImplementedException();
 
-        public bool IsActive 
+        public bool IsActive
         {
             get
             {
@@ -163,7 +168,7 @@ namespace Allors.Excel.Headless
 
         public Rectangle GetRectangle(string namedRange) => Rectangle.Empty;
 
-      
+
         public void SetNamedRange(string name, Range range) => throw new NotImplementedException();
 
         public void InsertRows(int startRowIndex, int numberOfRows) => throw new NotImplementedException();
@@ -188,7 +193,54 @@ namespace Allors.Excel.Headless
 
         public void SaveAsPDF(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true)
         {
+            var fullName = file.FullName;
+            fullName = Path.ChangeExtension(fullName, "pdf");
+            if (File.Exists(fullName) && !overwriteExistingFile)
+            {
+                throw new IOException("File already exists");
+            }
+            if (this.CellByCoordinates.Count == 0)
+            {
+                throw new COMException("Cannot save an empty file as PDF.");
+            }
+            Document.Create(container =>
+                                                                                                                                                          {
+                                                                                                                                                              container.Page(page =>
+                                                                                                                                                              {
+                                                                                                                                                                  page.Size(PageSizes.A4);
+                                                                                                                                                                  page.Margin(2, Unit.Centimetre);
+                                                                                                                                                                  page.PageColor(Colors.White);
+                                                                                                                                                                  page.DefaultTextStyle(x => x.FontSize(20));
 
+                                                                                                                                                                  page.Header()
+                                                                                                                                                                      .Text("Hello PDF!")
+                                                                                                                                                                      .SemiBold().FontSize(36).FontColor(Colors.Blue.Medium);
+
+                                                                                                                                                                  page.Content()
+                                                                                                                                                                      .PaddingVertical(1, Unit.Centimetre)
+                                                                                                                                                                      .Column(x =>
+                                                                                                                                                                      {
+                                                                                                                                                                          x.Spacing(20);
+
+
+                                                                                                                                                                          foreach (var cell in this.CellByCoordinates)
+                                                                                                                                                                          {
+                                                                                                                                                                              x.Item().Text(cell.Value.Value);
+                                                                                                                                                                          }
+
+
+                                                                                                                                                                      });
+
+                                                                                                                                                                  page.Footer()
+                                                                                                                                                                      .AlignCenter()
+                                                                                                                                                                      .Text(x =>
+                                                                                                                                                                      {
+                                                                                                                                                                          x.Span("Page ");
+                                                                                                                                                                          x.CurrentPageNumber();
+                                                                                                                                                                      });
+                                                                                                                                                              });
+                                                                                                                                                          })
+  .GeneratePdf(fullName);
         }
 
         public void SaveAsXPS(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true)
