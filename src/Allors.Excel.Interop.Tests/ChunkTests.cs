@@ -84,7 +84,6 @@ namespace Allors.Excel.Tests.Rendering
             Assert.Single(chunks);
         }
 
-
         [Fact]
         public void OneChunk_TwoRows_TwoCells()
         {
@@ -100,7 +99,6 @@ namespace Allors.Excel.Tests.Rendering
             Assert.Single(chunks);
         }
 
-
         [Fact]
         public void TwoChunks_OneRow_TwoCells()
         {
@@ -115,7 +113,6 @@ namespace Allors.Excel.Tests.Rendering
             var chunks = cells.Chunks((v, w) => true).ToArray();
             Assert.Equal(2, chunks.Length);
         }
-
 
         [Fact]
         public void Square()

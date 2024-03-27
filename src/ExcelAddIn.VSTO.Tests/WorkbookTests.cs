@@ -26,7 +26,6 @@ namespace ExcelAddIn.VSTO.Tests
                 workbook.Close(false);
             }
 
-
             this.application.Quit();
         }
 

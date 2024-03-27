@@ -54,7 +54,6 @@ namespace Allors.Excel.Headless
             this.Style = null;
         }
 
-
         public object Tag { get; set; }
     }
 }

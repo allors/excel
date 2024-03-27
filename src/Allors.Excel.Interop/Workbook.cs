@@ -70,7 +70,6 @@ namespace Allors.Excel.Interop
                     if (before != null)
                     {
                         interopWorksheet = (InteropWorksheet)this.InteropWorkbook.Sheets.Add(((Worksheet)before).InteropWorksheet, Missing.Value);
-
                     }
                     else if (after != null)
                     {

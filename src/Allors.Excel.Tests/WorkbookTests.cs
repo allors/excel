@@ -538,13 +538,11 @@ namespace Allors.Excel.Tests
 
             var tagId = workbook.SetCustomXML(xmlDoc);
 
-
             Assert.True(workbook.TryDeleteCustomXMLById(tagId));
 
             // Then read the xml
             var outputXmlDoc = workbook.GetCustomXMLById(Convert.ToString(tagId));
             Assert.Null(outputXmlDoc);
-
         }
 
         [Fact]

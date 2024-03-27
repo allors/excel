@@ -29,7 +29,6 @@ namespace Allors.Excel
         /// </returns>
         event EventHandler<string> SheetActivated;
 
-
         event EventHandler<Allors.Excel.Hyperlink> HyperlinkClicked;
 
         /// <summary>
@@ -122,7 +121,6 @@ namespace Allors.Excel
         /// <param name="uri"></param>
         /// <param name="rectangle"></param>
         void AddPicture(string uri, Rectangle rectangle);
-
 
         void AddHyperLink(string uri, ICell cell);
 
@@ -235,9 +233,7 @@ namespace Allors.Excel
         /// <param name="overwriteExistingFile">true when we want to overwrite an existing file. Default is false</param>
         /// <param name="openAfterPublish">true when we want to open the pdf after it has been created. Default is false.</param>
         /// <param name="ignorePrintAreas">true if we want to print the entire sheet. Default is true</param>
-        void SaveAsPDF(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true);
-
-
+        void SaveAsPdf(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true);
 
         /// <summary>
         /// Saves the sheet as a XPS to the file, with the given parameters.
@@ -246,7 +242,7 @@ namespace Allors.Excel
         /// <param name="overwriteExistingFile">true when we want to overwrite an existing file. Default is false</param>
         /// <param name="openAfterPublish">true when we want to open the pdf after it has been created. Default is false.</param>
         /// <param name="ignorePrintAreas">true if we want to print the entire sheet. Default is true</param>
-        void SaveAsXPS(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true);
+        void SaveAsXps(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true);
 
         /// <summary>
         /// Sets the PrintArea to the given range, or to the entire sheet when range is null.

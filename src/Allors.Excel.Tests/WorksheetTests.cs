@@ -1,4 +1,4 @@
-// <copyright file="WorkbookTests.cs" company="Allors bvba">
+﻿// <copyright file="WorkbookTests.cs" company="Allors bvba">
 // Copyright (c) Allors bvba. All rights reserved.
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -34,7 +34,6 @@ namespace Allors.Excel.Tests
                     }
                     catch
                     {
-
                     }
                 }
             }
@@ -76,7 +75,6 @@ namespace Allors.Excel.Tests
             Assert.Equal(1, sheet1.Index);
             Assert.Equal(2, sheet.Index);
             Assert.Equal(3, sheet2.Index);
-
         }
 
         [Fact]
@@ -99,7 +97,6 @@ namespace Allors.Excel.Tests
             Assert.Equal(1, sheet1.Index);
             Assert.Equal(2, sheet.Index);
             Assert.Equal(3, sheet2.Index);
-
         }
 
         [Fact]
@@ -129,7 +126,6 @@ namespace Allors.Excel.Tests
             Assert.Equal(1, sheet1.Index);
             Assert.Equal(3, sheet2.Index);
             Assert.Equal(2, sheet.Index);
-
         }
 
         [Fact]
@@ -152,9 +148,7 @@ namespace Allors.Excel.Tests
             Assert.Equal(1, sheet1.Index);
             Assert.Equal(2, sheet.Index);
             Assert.Equal(3, sheet2.Index);
-
         }
-
 
         [Fact]
         public void ShowInputMessage()
@@ -195,7 +189,6 @@ namespace Allors.Excel.Tests
         //    var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
 
         //    var expectedDate = DateTime.Now;
-
 
         //    var dict = new OldCustomProperties();
         //    dict.Add("Showcase.IsInvoiceSheet", false);
@@ -259,7 +252,7 @@ namespace Allors.Excel.Tests
             // Sheet with content
             var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
 
-            Assert.Throws<ArgumentNullException>(() => sheet2.SaveAsPDF(null));
+            Assert.Throws<ArgumentNullException>(() => sheet2.SaveAsPdf(null));
         }
 
         [Fact]
@@ -279,19 +272,19 @@ namespace Allors.Excel.Tests
             var file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(sheet2)}.pdf"));
 
             // PrintArea is set, but we do not want to use it. Prints the entire sheet
-            sheet2.SaveAsPDF(file, true);
+            sheet2.SaveAsPdf(file, true);
 
             // use the printArea
-            sheet2.SaveAsPDF(file, true, false, false);
+            sheet2.SaveAsPdf(file, true, false, false);
 
             Assert.True(new FileInfo(file.FullName).Exists);
 
             // Set PrintArea to entire sheet
             sheet2.SetPrintArea();
-            sheet2.SaveAsPDF(file, true, false, false);
+            sheet2.SaveAsPdf(file, true, false, false);
             Assert.True(new FileInfo(file.FullName).Exists);
 
-            sheet2.SaveAsPDF(file, true);
+            sheet2.SaveAsPdf(file, true);
             Assert.True(new FileInfo(file.FullName).Exists);
 
             //sheet2.SaveAsPDF(file, true, true);
@@ -328,7 +321,7 @@ namespace Allors.Excel.Tests
                 },
             });
 
-            sheet2.SaveAsPDF(file);
+            sheet2.SaveAsPdf(file);
 
             Assert.True(new FileInfo(file.FullName).Exists);
 
@@ -360,7 +353,7 @@ namespace Allors.Excel.Tests
                 },
             });
 
-            sheet2.SaveAsPDF(file);
+            sheet2.SaveAsPdf(file);
 
             Assert.True(new FileInfo(file.FullName).Exists);
 
@@ -381,7 +374,7 @@ namespace Allors.Excel.Tests
 
             var file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(sheet2)}.pdf"));
 
-            sheet2.SaveAsPDF(file);
+            sheet2.SaveAsPdf(file);
 
             Assert.True(new FileInfo(file.FullName).Exists);
 
@@ -401,9 +394,8 @@ namespace Allors.Excel.Tests
 
             // There is nothing to print => exception
             var file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(newSheet)}.pdf"));
-            Assert.Throws<COMException>(() => newSheet.SaveAsPDF(file));
+            Assert.Throws<COMException>(() => newSheet.SaveAsPdf(file));
         }
-
 
         [Fact]
         public async void SaveAsPDFThrowsExceptionWhenFileExists()
@@ -419,21 +411,20 @@ namespace Allors.Excel.Tests
             var file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(sheet2)}.pdf"));
 
             // First save with overwriteExistingFile
-            sheet2.SaveAsPDF(file, true);
+            sheet2.SaveAsPdf(file, true);
 
             var lastWriteTime = new FileInfo(file.FullName).LastWriteTimeUtc;
 
             // Second save with the same name will throw an exception
             // File exist and should not be overwritten.
-            Assert.Throws<IOException>(() => sheet2.SaveAsPDF(file));
+            Assert.Throws<IOException>(() => sheet2.SaveAsPdf(file));
 
             Thread.Sleep(1000);
 
             // Third save will overwrite existingFile
-            sheet2.SaveAsPDF(file, true);
+            sheet2.SaveAsPdf(file, true);
 
             Assert.True(new FileInfo(file.FullName).LastWriteTimeUtc > lastWriteTime);
-
         }
 
         [Fact]
@@ -450,7 +441,7 @@ namespace Allors.Excel.Tests
 
             var file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(sheet2)}.xps"));
 
-            sheet2.SaveAsXPS(file);
+            sheet2.SaveAsXps(file);
 
             Assert.True(new FileInfo(file.FullName).Exists);
 
@@ -471,7 +462,7 @@ namespace Allors.Excel.Tests
 
             var file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(sheet2)}.AAA"));
 
-            sheet2.SaveAsXPS(file);
+            sheet2.SaveAsXps(file);
 
             Assert.False(new FileInfo(file.FullName).Exists);
 
@@ -495,7 +486,7 @@ namespace Allors.Excel.Tests
 
             var file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(sheet2)}.AAA"));
 
-            sheet2.SaveAsPDF(file);
+            sheet2.SaveAsPdf(file);
 
             Assert.False(new FileInfo(file.FullName).Exists);
 
@@ -504,8 +495,6 @@ namespace Allors.Excel.Tests
 
             //sheet2.SaveAsPDF(file, true, true);
         }
-
-
 
         [Fact]
         public async void FreezePanes()
@@ -780,7 +769,6 @@ namespace Allors.Excel.Tests
             Assert.Equal(this.ExpectedContextTag, tag);
 
             this.ExpectedContextTags.Remove(tag);
-
         }
 
         [Fact]
@@ -806,7 +794,6 @@ namespace Allors.Excel.Tests
             Assert.True(worksheet.IsVisible);
         }
 
-
         [Fact]
         public async void AddWorkbookTest()
         {
@@ -817,7 +804,6 @@ namespace Allors.Excel.Tests
             var workbook = addIn.Workbooks[0];
 
             Assert.Equal(2, workbook.Worksheets.Length);
-
         }
 
         [Fact]
@@ -1025,7 +1011,6 @@ namespace Allors.Excel.Tests
             cell = worksheet[1, 0];
             Assert.True(Convert.ToString(cell.Value) == "Cell A1");
 
-
             // B is Gone!
 
             cell = worksheet[0, 1];
@@ -1080,10 +1065,8 @@ namespace Allors.Excel.Tests
             cell = worksheet[1, 0];
             Assert.True(Convert.ToString(cell.Value) == "Cell A1");
 
-
             // B is Gone!
             // C is Gone!
-
 
             cell = worksheet[0, 1];
             Assert.True(Convert.ToString(cell.Value) == "Cell D0");
@@ -1196,7 +1179,6 @@ namespace Allors.Excel.Tests
 
             Assert.Equal(2, range.Column);
             Assert.Equal(2, range.Columns);
-
         }
 
         [Fact]
@@ -1390,7 +1372,6 @@ namespace Allors.Excel.Tests
             var rectangle = sheet1.GetRectangle("image");
 
             Assert.True(rectangle.Left > 0);
-
         }
 
         [Fact]
@@ -1405,7 +1386,6 @@ namespace Allors.Excel.Tests
             var sheet1 = workbook.AddWorksheet(0);
 
             Assert.True(sheet1.IsActive);
-
         }
     }
 }

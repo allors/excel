@@ -390,7 +390,6 @@ namespace Allors.Excel.Interop
                     }
                 }
 
-
                 if (cells != null)
                 {
                     this.CellsChanged?.Invoke(this, new CellChangedEvent(cells.Cast<ICell>().ToArray()));
@@ -472,7 +471,6 @@ namespace Allors.Excel.Interop
                         return this.InteropWorksheet.Range[from, to];
                     });
 
-
                     if (range == null)
                     {
                         // TODO: Render failed
@@ -532,7 +530,6 @@ namespace Allors.Excel.Interop
                         return this.InteropWorksheet.Range[from, to];
                     });
 
-
                     if (range == null)
                     {
                         // TODO: Render failed
@@ -576,7 +573,6 @@ namespace Allors.Excel.Interop
                         return this.InteropWorksheet.Range[from, to];
                     });
 
-
                     if (range == null)
                     {
                         // TODO: Render failed
@@ -607,7 +603,6 @@ namespace Allors.Excel.Interop
                         var to = this.InteropWorksheet.Cells[toRow.Index + 1, toColumn.Index + 1];
                         return this.InteropWorksheet.Range[from, to];
                     });
-
 
                     if (range == null)
                     {
@@ -785,7 +780,6 @@ namespace Allors.Excel.Interop
 
                 return new Rectangle(left, top, width, height);
             }
-
         }
 
         public Range[] GetNamedRanges()
@@ -1181,7 +1175,6 @@ namespace Allors.Excel.Interop
             }
             while (!quit || beginRowIndex >= maxRows);
 
-
             var endRowIndex = this.InteropWorksheet.UsedRange.Row + this.InteropWorksheet.UsedRange.Rows.Count - 1;
             quit = false;
 
@@ -1268,9 +1261,9 @@ namespace Allors.Excel.Interop
 
         public bool HasFreezePanes => this.FreezeRange != null;
 
-        public void SaveAsXPS(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true) => this.SaveAs(file, InteropXlFixedFormatType.xlTypeXPS, overwriteExistingFile, openAfterPublish, ignorePrintAreas);
+        public void SaveAsXps(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true) => this.SaveAs(file, InteropXlFixedFormatType.xlTypeXPS, overwriteExistingFile, openAfterPublish, ignorePrintAreas);
 
-        public void SaveAsPDF(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true) => this.SaveAs(file, InteropXlFixedFormatType.xlTypePDF, overwriteExistingFile, openAfterPublish, ignorePrintAreas);
+        public void SaveAsPdf(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true) => this.SaveAs(file, InteropXlFixedFormatType.xlTypePDF, overwriteExistingFile, openAfterPublish, ignorePrintAreas);
 
         /// <summary>
         /// Save the sheet in the given formattype (0=PDF, 1=XPS)
@@ -1423,7 +1416,6 @@ namespace Allors.Excel.Interop
                     this.CellsChanged?.Invoke(this, new CellChangedEvent(changedCells.ToArray()));
                 }
             }
-
         }
 
         public void SetPageSetup(PageSetup pageSetup)

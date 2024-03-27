@@ -1,4 +1,4 @@
-// <copyright file="Worksheet.cs" company="Allors bvba">
+﻿// <copyright file="Worksheet.cs" company="Allors bvba">
 // Copyright (c) Allors bvba. All rights reserved.
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -50,7 +50,6 @@ namespace Allors.Excel.Headless
         }
         //public int Index => throw new NotImplementedException();
 
-
         public Dictionary<(int, int), Cell> CellByCoordinates { get; }
 
         public bool IsVisible { get; set; } = true;
@@ -77,7 +76,6 @@ namespace Allors.Excel.Headless
                 this.isActive = value;
             }
         }
-
 
         ICell IWorksheet.this[(int, int) coordinates] => this[coordinates];
 
@@ -163,7 +161,6 @@ namespace Allors.Excel.Headless
 
         public Rectangle GetRectangle(string namedRange) => Rectangle.Empty;
 
-      
         public void SetNamedRange(string name, Range range) => throw new NotImplementedException();
 
         public void InsertRows(int startRowIndex, int numberOfRows) => throw new NotImplementedException();
@@ -186,19 +183,16 @@ namespace Allors.Excel.Headless
 
         public void UnfreezePanes() => throw new NotImplementedException();
 
-        public void SaveAsPDF(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true)
+        public void SaveAsPdf(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true)
         {
-
         }
 
-        public void SaveAsXPS(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true)
+        public void SaveAsXps(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true)
         {
-
         }
 
         public void SetPrintArea(Range range = null)
         {
-
         }
 
         public void HideInputMessage(ICell cell, bool clearInputMessage = false) { }
