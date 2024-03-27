@@ -249,7 +249,7 @@ namespace Allors.Excel.Headless
 
         public void SaveAsXPS(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true)
         {
-
+            SaveAsXPS(file, overwriteExistingFile, openAfterPublish, ignorePrintAreas);
         }
 
         public void SetPrintArea(Range range = null)
