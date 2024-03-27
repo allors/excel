@@ -1,4 +1,4 @@
-// <copyright file="Worksheet.cs" company="Allors bvba">
+﻿// <copyright file="Worksheet.cs" company="Allors bvba">
 // Copyright (c) Allors bvba. All rights reserved.
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -19,6 +19,7 @@ using XlDataLabelPosition = Microsoft.Office.Interop.Excel.XlDataLabelPosition;
 
 namespace Allors.Excel.Interop
 {
+    using System.Reflection;
     using System.Threading;
     using InteropDocEvents_Event = DocEvents_Event;
     using InteropName = Name;
@@ -44,17 +45,17 @@ namespace Allors.Excel.Interop
             this.Workbook = workbook;
             this.InteropWorksheet = interopWorksheet;
 
-            this.RowByIndex = new Dictionary<int, Row>();
-            this.ColumnByIndex = new Dictionary<int, Column>();
-            this.CellByCoordinates = new Dictionary<(int, int), Cell>();
-            this.HyperlinksByCell = new Dictionary<ICell, string>();
-            this.DirtyValueCells = new HashSet<Cell>();
-            this.DirtyCommentCells = new HashSet<Cell>();
-            this.DirtyStyleCells = new HashSet<Cell>();
-            this.DirtyOptionCells = new HashSet<Cell>();
-            this.DirtyNumberFormatCells = new HashSet<Cell>();
-            this.DirtyFormulaCells = new HashSet<Cell>();
-            this.DirtyRows = new HashSet<Row>();
+            this.RowByIndex = [];
+            this.ColumnByIndex = [];
+            this.CellByCoordinates = [];
+            this.HyperlinksByCell = [];
+            this.DirtyValueCells = [];
+            this.DirtyCommentCells = [];
+            this.DirtyStyleCells = [];
+            this.DirtyOptionCells = [];
+            this.DirtyNumberFormatCells = [];
+            this.DirtyFormulaCells = [];
+            this.DirtyRows = [];
 
             interopWorksheet.Change += this.InteropWorksheet_Change;
             interopWorksheet.FollowHyperlink += this.InteropWorksheet_FollowHyperlink;
@@ -72,13 +73,13 @@ namespace Allors.Excel.Interop
             this.Reset();
         }
 
-        public event EventHandler<CellChangedEvent> CellsChanged;
+        public event EventHandler<CellChangedEvent>? CellsChanged;
 
-        public event EventHandler<CellChangedEvent> SheetChanged;
+        public event EventHandler<CellChangedEvent>? SheetChanged;
 
-        public event EventHandler<string> SheetActivated;
+        public event EventHandler<string>? SheetActivated;
 
-        public event EventHandler<Allors.Excel.Hyperlink> HyperlinkClicked;
+        public event EventHandler<Hyperlink>? HyperlinkClicked;
 
         private void InteropWorksheet_FollowHyperlink(Microsoft.Office.Interop.Excel.Hyperlink target)
         {
@@ -90,7 +91,7 @@ namespace Allors.Excel.Interop
             this.HyperlinkClicked?.Invoke(this, hyperlink);
         }
 
-        private Range FreezeRange { get; set; }
+        private Range? FreezeRange { get; set; }
 
         public int Index => this.InteropWorksheet.Index;
 
@@ -276,28 +277,28 @@ namespace Allors.Excel.Interop
             try
             {
                 this.RenderHyperlinks();
-                this.HyperlinksByCell = new Dictionary<ICell, string>();
+                this.HyperlinksByCell = [];
 
                 this.RenderNumberFormat(this.DirtyNumberFormatCells);
-                this.DirtyNumberFormatCells = new HashSet<Cell>();
+                this.DirtyNumberFormatCells = [];
 
                 this.RenderValue(this.DirtyValueCells);
-                this.DirtyValueCells = new HashSet<Cell>();
+                this.DirtyValueCells = [];
 
                 this.RenderFormula(this.DirtyFormulaCells);
-                this.DirtyFormulaCells = new HashSet<Cell>();
+                this.DirtyFormulaCells = [];
 
                 this.RenderComments(this.DirtyCommentCells);
-                this.DirtyCommentCells = new HashSet<Cell>();
+                this.DirtyCommentCells = [];
 
                 this.RenderStyle(this.DirtyStyleCells);
-                this.DirtyStyleCells = new HashSet<Cell>();
+                this.DirtyStyleCells = [];
 
                 this.SetOptions(this.DirtyOptionCells);
-                this.DirtyOptionCells = new HashSet<Cell>();
+                this.DirtyOptionCells = [];
 
                 this.UpdateRows(this.DirtyRows);
-                this.DirtyRows = new HashSet<Row>();
+                this.DirtyRows = [];
             }
             finally
             {
@@ -333,7 +334,7 @@ namespace Allors.Excel.Interop
             }
             else
             {
-                List<Cell> cells = null;
+                List<Cell>? cells = null;
 
                 // Get the Top Left cell in Excel ranges:
                 // e.g changed cells start at (row, column) (3,5)
@@ -362,7 +363,7 @@ namespace Allors.Excel.Interop
                             {
                                 if (cells == null)
                                 {
-                                    cells = new List<Cell>();
+                                    cells = [];
                                 }
 
                                 cells.Add(cell);
@@ -381,7 +382,7 @@ namespace Allors.Excel.Interop
                         {
                             if (cells == null)
                             {
-                                cells = new List<Cell>();
+                                cells = [];
                             }
 
                             cells.Add(cell);
@@ -406,7 +407,7 @@ namespace Allors.Excel.Interop
                 chunks,
                 chunk =>
                 {
-                    var values = new object[chunk.Count, chunk[0].Count];
+                    var values = new object?[chunk.Count, chunk[0].Count];
                     for (var i = 0; i < chunk.Count; i++)
                     {
                         for (var j = 0; j < chunk[0].Count; j++)
@@ -428,6 +429,12 @@ namespace Allors.Excel.Interop
                         return this.InteropWorksheet.Range[from, to];
                     });
 
+                    if (range == null)
+                    {
+                        // TODO: Render failed
+                        return;
+                    }
+
                     this.WaitAndRetry(() =>
                     {
                         range.Value2 = values;
@@ -443,7 +450,7 @@ namespace Allors.Excel.Interop
                 chunks,
                 chunk =>
                 {
-                    var formulas = new object[chunk.Count, chunk[0].Count];
+                    var formulas = new object?[chunk.Count, chunk[0].Count];
                     for (var i = 0; i < chunk.Count; i++)
                     {
                         for (var j = 0; j < chunk[0].Count; j++)
@@ -465,6 +472,13 @@ namespace Allors.Excel.Interop
                         return this.InteropWorksheet.Range[from, to];
                     });
 
+
+                    if (range == null)
+                    {
+                        // TODO: Render failed
+                        return;
+                    }
+
                     this.WaitAndRetry(() =>
                     {
                         range.Formula = formulas;
@@ -477,10 +491,13 @@ namespace Allors.Excel.Interop
                 cells,
                 cell =>
                 {
-                    var range = this.WaitAndRetry(() =>
+                    var range = this.WaitAndRetry(() => (InteropRange)this.InteropWorksheet.Cells[cell.Row.Index + 1, cell.Column.Index + 1]);
+
+                    if (range == null)
                     {
-                        return (InteropRange)this.InteropWorksheet.Cells[cell.Row.Index + 1, cell.Column.Index + 1];
-                    });
+                        // TODO: Render failed
+                        return;
+                    }
 
                     this.WaitAndRetry(() =>
                     {
@@ -500,9 +517,7 @@ namespace Allors.Excel.Interop
         {
             var chunks = cells.Chunks((v, w) => Equals(v.Style, w.Style));
 
-            Parallel.ForEach(
-                chunks,
-                chunk =>
+            Parallel.ForEach(chunks, chunk =>
                 {
                     var fromRow = chunk.First().First().Row;
                     var fromColumn = chunk.First().First().Column;
@@ -517,12 +532,20 @@ namespace Allors.Excel.Interop
                         return this.InteropWorksheet.Range[from, to];
                     });
 
+
+                    if (range == null)
+                    {
+                        // TODO: Render failed
+                        return;
+                    }
+
                     this.WaitAndRetry(() =>
                     {
                         var cc = chunk[0][0];
                         if (cc.Style != null)
                         {
-                            range.Interior.Color = ColorTranslator.ToOle(chunk[0][0].Style.BackgroundColor);
+                            Color? styleBackgroundColor = chunk[0][0].Style?.BackgroundColor;
+                            range.Interior.Color = styleBackgroundColor != null ? ColorTranslator.ToOle(styleBackgroundColor.Value) : Missing.Value;
                         }
                         else
                         {
@@ -553,6 +576,13 @@ namespace Allors.Excel.Interop
                         return this.InteropWorksheet.Range[from, to];
                     });
 
+
+                    if (range == null)
+                    {
+                        // TODO: Render failed
+                        return;
+                    }
+
                     this.WaitAndRetry(() => range.NumberFormat = chunk[0][0].NumberFormat);
                 });
         }
@@ -578,21 +608,28 @@ namespace Allors.Excel.Interop
                         return this.InteropWorksheet.Range[from, to];
                     });
 
+
+                    if (range == null)
+                    {
+                        // TODO: Render failed
+                        return;
+                    }
+
                     this.WaitAndRetry(() =>
                     {
                         var cc = chunk[0][0];
-                        if (cc.Options != null)
+                        if (cc?.Options != null)
                         {
                             var validationRange = cc.Options.Name;
                             if (string.IsNullOrEmpty(validationRange))
                             {
                                 if (cc.Options.Columns.HasValue)
                                 {
-                                    validationRange = $"{cc.Options.Worksheet.Name}!${Utils.ExcelColumnFromNumber(cc.Options.Column + 1)}${cc.Options.Row + 1}:${Utils.ExcelColumnFromNumber(cc.Options.Column + cc.Options.Columns.Value)}${cc.Options.Row + 1}";
+                                    validationRange = $"{cc.Options.Worksheet?.Name}!${Utils.ExcelColumnFromNumber(cc.Options.Column + 1)}${cc.Options.Row + 1}:${Utils.ExcelColumnFromNumber(cc.Options.Column + cc.Options.Columns.Value)}${cc.Options.Row + 1}";
                                 }
                                 else if (cc.Options.Rows.HasValue)
                                 {
-                                    validationRange = $"{cc.Options.Worksheet.Name}!${Utils.ExcelColumnFromNumber(cc.Options.Column + 1)}${cc.Options.Row + 1}:${Utils.ExcelColumnFromNumber(cc.Options.Column + 1)}${cc.Options.Row + cc.Options.Rows}";
+                                    validationRange = $"{cc.Options.Worksheet?.Name}!${Utils.ExcelColumnFromNumber(cc.Options.Column + 1)}${cc.Options.Row + 1}:${Utils.ExcelColumnFromNumber(cc.Options.Column + 1)}${cc.Options.Row + cc.Options.Rows}";
                                 }
                             }
 
@@ -655,10 +692,13 @@ namespace Allors.Excel.Interop
                     var from = $"$A${fromChunk.Index + 1}";
                     var to = $"$A${toChunk.Index + 1}";
 
-                    var range = this.WaitAndRetry(() =>
+                    var range = this.WaitAndRetry(() => this.InteropWorksheet.Range[from, to]);
+
+                    if (range == null)
                     {
-                        return this.InteropWorksheet.Range[from, to];
-                    });
+                        // TODO: Render failed
+                        return;
+                    }
 
                     this.WaitAndRetry(() =>
                     {
@@ -703,14 +743,14 @@ namespace Allors.Excel.Interop
         public void AddHyperLink(string textToDisplay, ICell cell) => this.HyperlinksByCell.Add(cell, textToDisplay);
 
         /// <summary>
-        /// Gets the Rectangle of a namedRange (uses the Range.MergeArea as reference). 
+        /// Gets the Rectangle of a namedRange (uses the Range.MergeArea as reference).
         /// NamedRange must exist on Workbook.
         /// </summary>
         /// <param name="namedRange"></param>
         /// <returns></returns>
         public Rectangle GetRectangle(string namedRange)
         {
-            InteropName name = null;
+            InteropName name;
 
             try
             {
@@ -722,11 +762,10 @@ namespace Allors.Excel.Interop
                 throw new ArgumentException("Name not found for namedRange", nameof(namedRange));
             }
 
-
             // when the range is a mergedrange, then take the values from the area
             var range = name.RefersToRange;
 
-            if ((bool)range.MergeCells == false)
+            if (!(bool)range.MergeCells)
             {
                 var left = Convert.ToInt32(range.Left);
                 var top = Convert.ToInt32(range.Top);
@@ -1032,12 +1071,12 @@ namespace Allors.Excel.Interop
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="cell1">The name of the range in A1-style notation - "A1" - "A1:C5", "A", "A:C"</param>
         /// <param name="cell2">The cell in the lower-right corner of the range</param>
         /// <returns></returns>
-        public Range GetRange(string cell1, string cell2 = null)
+        public Range? GetRange(string cell1, string? cell2 = null)
         {
             if (string.IsNullOrWhiteSpace(cell1) && cell2 == null)
             {
@@ -1046,35 +1085,22 @@ namespace Allors.Excel.Interop
 
             try
             {
-                InteropRange interopRange;
-                if (cell2 == null)
-                {
-                    interopRange = this.InteropWorksheet.Range[cell1];
-                }
-                else
-                {
-                    interopRange = this.InteropWorksheet.Range[cell1, cell2];
-                }
-
-
+                InteropRange interopRange = cell2 == null ? this.InteropWorksheet.Range[cell1] : this.InteropWorksheet.Range[cell1, cell2];
                 return new Range(interopRange.Row - 1, interopRange.Column - 1, interopRange.Rows.Count, interopRange.Columns.Count, this);
             }
             catch
             {
                 return null;
             }
-
-
         }
 
         public Range GetUsedRange()
         {
             var range = this.InteropWorksheet.UsedRange;
-
             return new Range(range.Row - 1, range.Column - 1, range.Rows.Count, range.Columns.Count, this);
         }
 
-        public Range GetUsedRange(int row)
+        public Range? GetUsedRange(int row)
         {
             if (row < 0 || row >= this.InteropWorksheet.UsedRange.Row + this.InteropWorksheet.UsedRange.Rows.Count)
             {
@@ -1126,7 +1152,7 @@ namespace Allors.Excel.Interop
             return new Range(rowRange.Row - 1, beginColumnIndex - 1, rowRange.Rows.Count, columnCount, this);
         }
 
-        public Range GetUsedRange(string column)
+        public Range? GetUsedRange(string column)
         {
             if (string.IsNullOrWhiteSpace(column))
             {
@@ -1247,7 +1273,7 @@ namespace Allors.Excel.Interop
         public void SaveAsPDF(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true) => this.SaveAs(file, InteropXlFixedFormatType.xlTypePDF, overwriteExistingFile, openAfterPublish, ignorePrintAreas);
 
         /// <summary>
-        /// Save the sheet in the given formattype (0=PDF, 1=XPS) 
+        /// Save the sheet in the given formattype (0=PDF, 1=XPS)
         /// </summary>
         /// <param name="file"></param>
         /// <param name="formatType"></param>
@@ -1296,7 +1322,7 @@ namespace Allors.Excel.Interop
         }
 
         /// <inheritdoc/>
-        public void SetPrintArea(Range range = null)
+        public void SetPrintArea(Range? range = null)
         {
             // Use A1-Style reference for the printarea
 
@@ -1318,7 +1344,7 @@ namespace Allors.Excel.Interop
             this.InteropWorksheet.PageSetup.PrintArea = printArea;
         }
 
-        public void SetInputMessage(ICell cell, string message, string title = null, bool showInputMessage = true)
+        public void SetInputMessage(ICell cell, string message, string? title = null, bool showInputMessage = true)
         {
             var inputCell = (InteropRange)this.InteropWorksheet.Cells[cell.Row.Index + 1, cell.Column.Index + 1];
 
@@ -1481,7 +1507,7 @@ namespace Allors.Excel.Interop
 
         private void WaitAndRetry(Action action, int waitTime = 100, int maxRetries = 10)
         {
-            Exception exception = null;
+            Exception? exception = null;
 
             for (var i = 0; i < maxRetries; i++)
             {
@@ -1504,10 +1530,10 @@ namespace Allors.Excel.Interop
             }
         }
 
-        private T WaitAndRetry<T>(Func<T> func, int waitTime = 100, int maxRetries = 10)
+        private T? WaitAndRetry<T>(Func<T> func, int waitTime = 100, int maxRetries = 10)
         {
-            T result = default;
-            Exception exception = null;
+            T? result = default;
+            Exception? exception = null;
 
             for (var i = 0; i < maxRetries; i++)
             {

@@ -1,4 +1,4 @@
-// <copyright file="AddIn.cs" company="Allors bvba">
+﻿// <copyright file="AddIn.cs" company="Allors bvba">
 // Copyright (c) Allors bvba. All rights reserved.
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -22,14 +22,14 @@ namespace Allors.Excel.Interop
             this.Program = program;
             this.Ribbon = ribbon;
 
-            this.workbookByInteropWorkbook = new Dictionary<InteropWorkbook, Workbook>();
+            this.workbookByInteropWorkbook = [];
 
             ((InteropAppEvents_Event)this.Application).NewWorkbook += async interopWorkbook =>
             {
                 if (!string.IsNullOrWhiteSpace(this.ExistentialAttribute))
                 {
                     var customProperties = new CustomProperties(interopWorkbook.CustomDocumentProperties);
-                    if (!customProperties.Exist(this.ExistentialAttribute))
+                    if (this.ExistentialAttribute == null || !customProperties.Exist(this.ExistentialAttribute))
                     {
                         return;
                     }
@@ -57,7 +57,7 @@ namespace Allors.Excel.Interop
                 if (!string.IsNullOrWhiteSpace(this.ExistentialAttribute))
                 {
                     var customProperties = new CustomProperties(interopWorkbook.CustomDocumentProperties);
-                    if (!customProperties.Exist(this.ExistentialAttribute))
+                    if (this.ExistentialAttribute == null || !customProperties.Exist(this.ExistentialAttribute))
                     {
                         return;
                     }
@@ -83,7 +83,7 @@ namespace Allors.Excel.Interop
                 if (!string.IsNullOrWhiteSpace(this.ExistentialAttribute))
                 {
                     var customProperties = new CustomProperties(interopWorkbook.CustomDocumentProperties);
-                    if (!customProperties.Exist(this.ExistentialAttribute))
+                    if (this.ExistentialAttribute == null || !customProperties.Exist(this.ExistentialAttribute))
                     {
                         return;
                     }
@@ -121,7 +121,7 @@ namespace Allors.Excel.Interop
             this.Application.WorkbookBeforeClose += WorkbookBeforeClose;
         }
 
-        public string ExistentialAttribute { get; set; }
+        public string? ExistentialAttribute { get; set; }
 
         public InteropApplication Application { get; }
 

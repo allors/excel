@@ -319,13 +319,13 @@ namespace Allors.Excel.Tests
                 {
                     Margin = 10.0,
                     Left = "&\"Arial\"&B&12LeftHeader&B",
-                    Right = "&P of &N"
+                    Right = "&P of &N",
                 },
                 Footer = new PageHeaderFooter
                 {
                     Margin = 60.0,
                     Center = "Copy presented to Walter Hesius",
-                }
+                },
             });
 
             sheet2.SaveAsPDF(file);
@@ -356,7 +356,7 @@ namespace Allors.Excel.Tests
                 {
                     Margin = 10.0,
                     Left = "&\"Arial\"&B&12LeftHeader&B",
-                    Right = "&P of &N"
+                    Right = "&P of &N",
                 },
             });
 
