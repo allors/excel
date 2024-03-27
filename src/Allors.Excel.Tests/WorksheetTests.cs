@@ -15,6 +15,7 @@ namespace Allors.Excel.Tests
     using Xunit;
     using Range = Excel.Range;
 
+
     public abstract class WorksheetTests : ExcelTest
     {
         private DirectoryInfo tempDirectory;
@@ -493,6 +494,8 @@ namespace Allors.Excel.Tests
             file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(sheet2)}.pdf"));
             Assert.True(new FileInfo(file.FullName).Exists);
 
+            file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(sheet2)}"));
+            Assert.False(new FileInfo(file.FullName).Exists);
             //sheet2.SaveAsPDF(file, true, true);
         }
 
