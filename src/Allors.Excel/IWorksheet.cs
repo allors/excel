@@ -179,20 +179,6 @@ namespace Allors.Excel
 
         Range GetUsedRange();
 
-        /// <summary>
-        /// column equals the excel columns A,B,C, ...
-        /// </summary>
-        /// <param name="column"></param>
-        /// <returns></returns>
-        Range GetUsedRange(string column);
-
-        /// <summary>
-        /// row equals the zero-based index of excel rows (so 1 less than the excel rowindex)
-        /// </summary>
-        /// <param name="row"></param>
-        /// <returns></returns>
-        Range GetUsedRange(int row);
-
         void AutoFit();
 
         void SetChartObjectDataLabels(
