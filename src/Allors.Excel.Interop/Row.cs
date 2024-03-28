@@ -7,7 +7,7 @@ namespace Allors.Excel.Interop
 {
     using System;
 
-    public class Row(Worksheet worksheet, int index) : IRow, IComparable<Row>
+    public sealed class Row(Worksheet worksheet, int index) : IRow, IComparable<Row>
     {
         private bool hidden;
 

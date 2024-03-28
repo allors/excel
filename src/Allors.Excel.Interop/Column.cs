@@ -7,7 +7,7 @@ namespace Allors.Excel.Interop
 {
     using System;
 
-    public class Column(Worksheet worksheet, int index) : IColumn, IComparable<Column>
+    public sealed class Column(Worksheet worksheet, int index) : IColumn, IComparable<Column>
     {
         public Excel.IWorksheet Worksheet { get; } = worksheet;
 

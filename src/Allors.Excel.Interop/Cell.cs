@@ -8,21 +8,21 @@ namespace Allors.Excel.Interop
     using System;
     using System.Globalization;
 
-    public class Cell(IWorksheet worksheet, Row row, Column column) : ICell
+    public sealed class Cell(IWorksheet worksheet, Row row, Column column) : ICell
     {
         private static readonly IValueConverter DefaultValueConverter = new DefaultValueConverter();
 
         // the state of this when it is created
         private bool touched;
 
-        private object? value;
-        private Style? style;
-        private string? formula;
-        private string? numberFormat;
-        private Range? options;
+        private object value;
+        private Style style;
+        private string formula;
+        private string numberFormat;
+        private Range options;
 
-        private IValueConverter? valueConverter;
-        private string? comment;
+        private IValueConverter valueConverter;
+        private string comment;
 
         Excel.IWorksheet ICell.Worksheet => this.Worksheet;
 
@@ -36,11 +36,11 @@ namespace Allors.Excel.Interop
 
         public Column Column { get; internal set; } = column;
 
-        object? ICell.Value { get => this.Value; set => this.Value = value; }
+        object ICell.Value { get => this.Value; set => this.Value = value; }
 
-        string? ICell.Formula { get => this.Formula; set => this.Formula = value; }
+        string ICell.Formula { get => this.Formula; set => this.Formula = value; }
 
-        public object? Value
+        public object Value
         {
             get => this.value;
             set
@@ -55,9 +55,9 @@ namespace Allors.Excel.Interop
             }
         }
 
-        public string? ValueAsString => Convert.ToString(this.Value, CultureInfo.CurrentCulture);
+        public string ValueAsString => Convert.ToString(this.Value, CultureInfo.CurrentCulture);
 
-        public string? Formula
+        public string Formula
         {
             get => this.formula;
             set
@@ -71,7 +71,7 @@ namespace Allors.Excel.Interop
             }
         }
 
-        public string? Comment
+        public string Comment
         {
             get => this.comment;
             set
@@ -86,7 +86,7 @@ namespace Allors.Excel.Interop
             }
         }
 
-        public Style? Style
+        public Style Style
         {
             get => this.style;
             set
@@ -106,7 +106,7 @@ namespace Allors.Excel.Interop
             }
         }
 
-        public string? NumberFormat
+        public string NumberFormat
         {
             get => this.numberFormat;
             set
@@ -125,7 +125,7 @@ namespace Allors.Excel.Interop
             set => this.valueConverter = value;
         }
 
-        public Range? Options
+        public Range Options
         {
             get => this.options;
             set
@@ -164,7 +164,5 @@ namespace Allors.Excel.Interop
             this.Style = null;
             this.NumberFormat = null;
         }
-
-        public object? Tag { get; set; }
     }
 }

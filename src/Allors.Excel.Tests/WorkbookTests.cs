@@ -526,10 +526,10 @@ namespace Allors.Excel.Tests
             var xmlDoc = new XmlDocument();
             xmlDoc.Load(@"data\catalog.xml");
 
-            var tagId = workbook.SetCustomXML(xmlDoc);
+            var tagId = workbook.SetCustomXml(xmlDoc);
 
             // Then read the xml
-            var outputXmlDoc = workbook.GetCustomXMLById(tagId);
+            var outputXmlDoc = workbook.GetCustomXmlById(tagId);
             Assert.Equal("CATALOG", outputXmlDoc.DocumentElement?.Name);
 
             Assert.Equal(36, outputXmlDoc.DocumentElement?.ChildNodes.Count);
@@ -546,12 +546,12 @@ namespace Allors.Excel.Tests
             var xmlDoc = new XmlDocument();
             xmlDoc.Load(@"data\catalog.xml");
 
-            var tagId = workbook.SetCustomXML(xmlDoc);
+            var tagId = workbook.SetCustomXml(xmlDoc);
 
-            Assert.True(workbook.TryDeleteCustomXMLById(tagId));
+            Assert.True(workbook.TryDeleteCustomXmlById(tagId));
 
             // Then read the xml
-            var outputXmlDoc = workbook.GetCustomXMLById(Convert.ToString(tagId));
+            var outputXmlDoc = workbook.GetCustomXmlById(Convert.ToString(tagId));
             Assert.Null(outputXmlDoc);
         }
 

@@ -7,10 +7,10 @@ namespace Allors.Excel.Interop
 {
     using System.Collections.Generic;
     using System.Linq;
+    using InteropAppEvents_Event = Microsoft.Office.Interop.Excel.AppEvents_Event;
     using InteropApplication = Microsoft.Office.Interop.Excel.Application;
     using InteropWorkbook = Microsoft.Office.Interop.Excel.Workbook;
     using InteropWorksheet = Microsoft.Office.Interop.Excel.Worksheet;
-    using InteropAppEvents_Event = Microsoft.Office.Interop.Excel.AppEvents_Event;
 
     public class AddIn : IAddIn
     {
@@ -53,7 +53,6 @@ namespace Allors.Excel.Interop
 
             this.Application.WorkbookOpen += async interopWorkbook =>
             {
-
                 if (!string.IsNullOrWhiteSpace(this.ExistentialAttribute))
                 {
                     var customProperties = new CustomProperties(interopWorkbook.CustomDocumentProperties);
@@ -121,7 +120,7 @@ namespace Allors.Excel.Interop
             this.Application.WorkbookBeforeClose += WorkbookBeforeClose;
         }
 
-        public string? ExistentialAttribute { get; set; }
+        public string ExistentialAttribute { get; set; }
 
         public InteropApplication Application { get; }
 

@@ -11,9 +11,9 @@ namespace Allors.Excel.Interop
     using System.Reflection;
     using System.Runtime.InteropServices;
     using System.Xml;
+    using InteropName = Microsoft.Office.Interop.Excel.Name;
     using InteropWorkbook = Microsoft.Office.Interop.Excel.Workbook;
     using InteropWorksheet = Microsoft.Office.Interop.Excel.Worksheet;
-    using InteropName = Microsoft.Office.Interop.Excel.Name;
     using InteropXlSheetVisibility = Microsoft.Office.Interop.Excel.XlSheetVisibility;
 
     public class Workbook : IWorkbook
@@ -31,7 +31,7 @@ namespace Allors.Excel.Interop
             this.CustomProperties = new CustomProperties(this.InteropWorkbook.CustomDocumentProperties);
         }
 
-        public event EventHandler<Hyperlink>? OnHyperlinkClicked;
+        public event EventHandler<Hyperlink> OnHyperlinkClicked;
 
         public AddIn AddIn { get; }
 
@@ -40,6 +40,14 @@ namespace Allors.Excel.Interop
         public IBuiltinProperties BuiltinProperties { get; }
 
         public ICustomProperties CustomProperties { get; }
+
+        /// <inheritdoc/>
+        public Excel.IWorksheet[] Worksheets => this.worksheetByInteropWorksheet.Values.Cast<Excel.IWorksheet>().ToArray();
+
+        public Excel.IWorksheet[] WorksheetsByIndex => this.worksheetByInteropWorksheet.Values.OrderBy(v => v.Index).Cast<Excel.IWorksheet>().ToArray();
+
+        /// <inheritdoc/>
+        public bool IsActive { get; internal set; }
 
         /// <summary>
         /// When index = 0 => add new worksheet before the active worksheet
@@ -53,15 +61,14 @@ namespace Allors.Excel.Interop
         /// <param name="before"></param>
         /// <param name="after"></param>
         /// <returns></returns>
-        public Excel.IWorksheet AddWorksheet(int? index, Excel.IWorksheet? before = null, Excel.IWorksheet? after = null)
+        public Excel.IWorksheet AddWorksheet(int? index, Excel.IWorksheet before = null, Excel.IWorksheet after = null)
         {
-            InteropWorksheet interopWorksheet;
-
             try
             {
                 this.AddIn.Application.WorkbookNewSheet -= this.ApplicationOnWorkbookNewSheet;
 
-                if (index.HasValue && index.Value == 0)
+                InteropWorksheet interopWorksheet;
+                if (index is 0)
                 {
                     interopWorksheet = (InteropWorksheet)this.InteropWorkbook.Sheets.Add();
                 }
@@ -117,17 +124,106 @@ namespace Allors.Excel.Interop
         }
 
         /// <inheritdoc/>
-        public Excel.IWorksheet[] Worksheets => this.worksheetByInteropWorksheet.Values.Cast<Excel.IWorksheet>().ToArray();
-
-        public Excel.IWorksheet[] WorksheetsByIndex => this.worksheetByInteropWorksheet.Values.OrderBy(v => v.Index).Cast<Excel.IWorksheet>().ToArray();
-
-        /// <inheritdoc/>
-        public bool IsActive { get; internal set; }
-
-        /// <inheritdoc/>
-        public void Close(bool? saveChanges = null, string? fileName = null) => this.InteropWorkbook.Close((object?)saveChanges ?? Missing.Value, (object?)fileName ?? Missing.Value, Missing.Value);
+        public void Close(bool? saveChanges = null, string fileName = null) => this.InteropWorkbook.Close((object)saveChanges ?? Missing.Value, (object)fileName ?? Missing.Value, Missing.Value);
 
         public Worksheet New(InteropWorksheet interopWorksheet) => this.TryAdd(interopWorksheet);
+
+        /// <inheritdoc/>
+        public Range[] GetNamedRanges(string refersToSheetName = null)
+        {
+            var ranges = new List<Range>();
+
+            foreach (InteropName namedRange in this.InteropWorkbook.Names)
+            {
+                try
+                {
+                    var refersToRange = namedRange.RefersToRange;
+                    if (refersToRange != null)
+                    {
+                        var iworkSheet = this.worksheetByInteropWorksheet.FirstOrDefault(v => string.Equals(v.Key.Name, refersToRange.Worksheet.Name)).Value;
+
+                        if (string.IsNullOrEmpty(refersToSheetName) || refersToSheetName!.Equals(iworkSheet?.Name, StringComparison.OrdinalIgnoreCase))
+                        {
+                            ranges.Add(new Range(refersToRange.Row - 1, refersToRange.Column - 1, refersToRange.Rows.Count, refersToRange.Columns.Count, worksheet: iworkSheet, name: namedRange.Name));
+                        }
+                    }
+                }
+                catch
+                {
+                    // RefersToRange can throw exception
+                }
+            }
+
+            return ranges.ToArray();
+        }
+
+        /// <inheritdoc/>
+        public void SetNamedRange(string name, Range range)
+        {
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                try
+                {
+                    var interopWorksheet = ((Worksheet)range.Worksheet!).InteropWorksheet;
+
+                    var topLeft = interopWorksheet.Cells[range.Row + 1, range.Column + 1];
+                    var bottomRight = interopWorksheet.Cells[range.Row + range.Rows, range.Column + range.Columns];
+
+                    var refersTo = interopWorksheet.Range[topLeft, bottomRight];
+
+                    // When it does not exist, add it, else we update the range.
+                    if (this.InteropWorkbook.Names
+                            .Cast<InteropName>()
+                            .Any(v => string.Equals(v.Name, name)))
+                    {
+                        this.InteropWorkbook.Names.Item(name).RefersTo = refersTo;
+                    }
+                    else
+                    {
+                        this.InteropWorkbook.Names.Add(name, refersTo);
+                    }
+                }
+                catch
+                {
+                    // can throw exception, we don't care.
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public XmlDocument GetCustomXmlById(string id)
+        {
+            var customXmlPart = this.InteropWorkbook.CustomXMLParts.SelectByID(id);
+
+            if (customXmlPart != null)
+            {
+                var xmlDocument = new XmlDocument();
+                xmlDocument.LoadXml(customXmlPart.XML);
+                return xmlDocument;
+            }
+
+            return null;
+        }
+
+        /// <inheritdoc/>
+        public string SetCustomXml(XmlDocument xmlDocument) => this.InteropWorkbook.CustomXMLParts.Add(xmlDocument.OuterXml, Type.Missing).Id;
+
+        /// <inheritdoc/>
+        public bool TryDeleteCustomXmlById(string id)
+        {
+            try
+            {
+                var customXmlPart = this.InteropWorkbook.CustomXMLParts.SelectByID(id);
+                customXmlPart.Delete();
+                return true;
+            }
+            catch (COMException)
+            {
+                return false;
+            }
+        }
+
+        public void HyperlinkClicked(Hyperlink hyperlink) => this.OnHyperlinkClicked?.Invoke(this, hyperlink);
 
         private void ApplicationOnWorkbookNewSheet(InteropWorkbook wb, object sh)
         {
@@ -166,103 +262,5 @@ namespace Allors.Excel.Interop
                 Console.WriteLine("Not a InteropWorksheet");
             }
         }
-
-        /// <inheritdoc/>
-        public Range[] GetNamedRanges(string? refersToSheetName = null)
-        {
-            var ranges = new List<Range>();
-
-            foreach (InteropName namedRange in this.InteropWorkbook.Names)
-            {
-                try
-                {
-                    var refersToRange = namedRange.RefersToRange;
-                    if (refersToRange != null)
-                    {
-                        var iworkSheet = this.worksheetByInteropWorksheet.FirstOrDefault(v => string.Equals(v.Key.Name, refersToRange.Worksheet.Name)).Value;
-
-                        if (string.IsNullOrEmpty(refersToSheetName) || refersToSheetName!.Equals(iworkSheet?.Name, StringComparison.OrdinalIgnoreCase))
-                        {
-                            ranges.Add(new Range(refersToRange.Row - 1, refersToRange.Column - 1, refersToRange.Rows.Count, refersToRange.Columns.Count, worksheet: iworkSheet, name: namedRange.Name));
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-                    // RefersToRange can throw exception
-                }
-            }
-
-            return ranges.ToArray();
-        }
-
-        /// <inheritdoc/>
-        public void SetNamedRange(string name, Range range)
-        {
-            if (!string.IsNullOrWhiteSpace(name))
-            {
-                try
-                {
-
-                    var interopWorksheet = ((Worksheet)range.Worksheet!).InteropWorksheet;
-
-                    var topLeft = interopWorksheet.Cells[range.Row + 1, range.Column + 1];
-                    var bottomRight = interopWorksheet.Cells[range.Row + range.Rows, range.Column + range.Columns];
-
-                    var refersTo = interopWorksheet.Range[topLeft, bottomRight];
-
-                    // When it does not exist, add it, else we update the range.
-                    if (this.InteropWorkbook.Names
-                            .Cast<InteropName>()
-                            .Any(v => string.Equals(v.Name, name)))
-                    {
-                        this.InteropWorkbook.Names.Item(name).RefersTo = refersTo;
-                    }
-                    else
-                    {
-                        this.InteropWorkbook.Names.Add(name, refersTo);
-                    }
-                }
-                catch
-                {
-                    // can throw exception, we don't care.
-                }
-            }
-        }
-
-        /// <inheritdoc/>
-        public XmlDocument? GetCustomXMLById(string id)
-        {
-            var customXmlPart = this.InteropWorkbook.CustomXMLParts.SelectByID(id);
-
-            if (customXmlPart != null)
-            {
-                var xmlDocument = new XmlDocument();
-                xmlDocument.LoadXml(customXmlPart.XML);
-                return xmlDocument;
-            }
-
-            return null;
-        }
-
-        /// <inheritdoc/>
-        public string SetCustomXML(XmlDocument xmlDocument) => this.InteropWorkbook.CustomXMLParts.Add(xmlDocument.OuterXml, Type.Missing).Id;
-
-        /// <inheritdoc/>
-        public bool TryDeleteCustomXMLById(string id)
-        {
-            try
-            {
-                var customXMLPart = this.InteropWorkbook.CustomXMLParts.SelectByID(id);
-                customXMLPart.Delete();
-                return true;
-            }
-            catch (COMException)
-            {
-                return false;
-            }
-        }
-
-        public void HyperlinkClicked(Hyperlink hyperlink) => this.OnHyperlinkClicked?.Invoke(this, hyperlink);
     }
 }

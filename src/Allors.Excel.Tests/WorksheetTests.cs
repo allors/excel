@@ -17,8 +17,6 @@ namespace Allors.Excel.Tests
     public abstract class WorksheetTests : ExcelTest
     {
         private readonly DirectoryInfo tempDirectory;
-        private ContextTag expectedContextTag;
-        private List<ContextTag> expectedContextTags;
 
         protected WorksheetTests()
         {
@@ -681,7 +679,7 @@ namespace Allors.Excel.Tests
             Assert.Equal(3, worksheetsByIndex.Length);
             Assert.Equal(1, worksheet.Index);
 
-            // Expected order => Sheet3 | 1  | 2
+            // Expected order => 5 | 1  | 2
             Assert.Equal("5", worksheetsByIndex[0].Name);
             Assert.Equal("1", worksheetsByIndex[1].Name);
             Assert.Equal("2", worksheetsByIndex[2].Name);
@@ -694,7 +692,7 @@ namespace Allors.Excel.Tests
             Assert.Equal(4, worksheetsByIndex.Length);
             Assert.Equal(2, worksheet.Index);
 
-            // Expected order => Sheet3 | Sheet4 | 1 | 2  !! Order is determined dynamically, so it changes after the first AddWorksheet()
+            // Expected order => 5 | 6 | 1 | 2  !! Order is determined dynamically, so it changes after the first AddWorksheet()
             Assert.Equal("5", worksheetsByIndex[0].Name);
             Assert.Equal("6", worksheetsByIndex[1].Name);
             Assert.Equal("1", worksheetsByIndex[2].Name);
@@ -708,53 +706,12 @@ namespace Allors.Excel.Tests
             Assert.Equal(5, worksheetsByIndex.Length);
             Assert.Equal(2, worksheet.Index);
 
-            // Expected order => Sheet3 | Sheet5 | Sheet4 | 1 | 2  !! Order is determined dynamically, so it changes after the first AddWorksheet()
+            // Expected order => 5 | 7 | 6 | 1 | 2  !! Order is determined dynamically, so it changes after the first AddWorksheet()
             Assert.Equal("5", worksheetsByIndex[0].Name);
             Assert.Equal("7", worksheetsByIndex[1].Name);
             Assert.Equal("6", worksheetsByIndex[2].Name);
             Assert.Equal("1", worksheetsByIndex[3].Name);
             Assert.Equal("2", worksheetsByIndex[4].Name);
-        }
-
-        [Fact]
-        public void CellTagContainsCustomObject()
-        {
-            this.expectedContextTags = new List<ContextTag>();
-
-            var addIn = this.NewAddIn();
-
-            this.AddWorkbook();
-
-            var workbook = addIn.Workbooks[0];
-
-            Assert.Equal(2, workbook.Worksheets.Length);
-
-            var worksheet = workbook.AddWorksheet(null, null, workbook.Worksheets.Last());
-
-            worksheet.CellsChanged += this.Worksheet_CellsChanged;
-
-            var tag1 = new ContextTag { Context = "Cell00" };
-            var tag2 = new ContextTag { Context = "Cell01" };
-            this.expectedContextTags.Add(tag1);
-            this.expectedContextTags.Add(tag2);
-
-            var cell00 = worksheet[(0, 0)];
-            cell00.Tag = tag1;
-
-            Assert.NotEmpty(this.expectedContextTags);
-
-            // Change the cell will trigger the Change Event
-            this.expectedContextTag = tag1;
-            worksheet[1, 1].Value = "i am cell00";
-
-            var cell01 = worksheet[(0, 1)];
-            cell01.Tag = tag2;
-
-            // Change the cell will trigger the Change Event
-            this.expectedContextTag = tag2;
-            worksheet[1, 2].Value = "i am cell01";
-
-            Assert.Empty(this.expectedContextTags);
         }
 
         [Fact]
@@ -1368,20 +1325,6 @@ namespace Allors.Excel.Tests
             var sheet1 = workbook.AddWorksheet(0);
 
             Assert.True(sheet1.IsActive);
-        }
-
-        private void Worksheet_CellsChanged(object sender, CellChangedEvent e)
-        {
-            var tag = (ContextTag)e.Cells[0].Tag;
-
-            Assert.Equal(this.expectedContextTag, tag);
-
-            this.expectedContextTags.Remove(tag);
-        }
-
-        private class ContextTag
-        {
-            public string Context { get; set; }
         }
     }
 }

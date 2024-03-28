@@ -26,7 +26,7 @@
     <OutputType>Library</OutputType>
     <NoStandardLibraries>false</NoStandardLibraries>
     <RootNamespace>ExcelAddIn.VSTO</RootNamespace>
-    <AssemblyName>ExcelAddIn.VSTO</AssemblyName>
+    <AssemblyName>Allors.Excel.Interop.Vsto</AssemblyName>
     <LoadBehavior>3</LoadBehavior>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <DefineConstants>VSTO40</DefineConstants>
