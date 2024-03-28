@@ -19,10 +19,10 @@ stages:
       matrix:
         Excel32:
           options: '--forcex86'
-          target: 'CiTests'
+          target: 'Ci'
         Excel64:
           options: ''
-          target: 'CiTests'
+          target: 'Ci'
       maxParallel: 4
 
     steps:

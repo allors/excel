@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ExcelAddIn.VSTO.Properties {
+namespace Allors.Excel.Interop.Vsto {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

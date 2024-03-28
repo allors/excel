@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ExcelDNA {
+namespace Allors.Excel.Interop.Dna {
     using System;
     
     
@@ -19,7 +19,7 @@ namespace ExcelDNA {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class RibbonResources {
@@ -39,7 +39,7 @@ namespace ExcelDNA {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ExcelDNA.RibbonResources", typeof(RibbonResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Allors.Excel.Interop.Dna.RibbonResources", typeof(RibbonResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -72,17 +72,18 @@ namespace ExcelDNA {
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
-        ///&lt;customUI xmlns=&apos;http://schemas.microsoft.com/office/2009/07/customui&apos; loadImage=&apos;LoadImage&apos;&gt;
+        ///&lt;customUI xmlns=&apos;http://schemas.microsoft.com/office/2009/07/customui&apos; loadImage=&apos;LoadImage&apos; onLoad=&apos;OnLoad&apos;&gt;
         ///	&lt;ribbon&gt;
         ///		&lt;tabs&gt;
-        ///			&lt;tab id=&apos;tab1&apos; label=&apos;ExcelDNA&apos;&gt;
+        ///			&lt;tab id=&apos;tab1&apos; label=&apos;Allors (DNA)&apos;&gt;
         ///				&lt;group id=&apos;group1&apos; label=&apos;My Group&apos;&gt;
         ///					&lt;button id=&apos;button1&apos; label=&apos;My Button&apos; onAction=&apos;OnButtonPressed&apos; image=&apos;Image1&apos;/&gt;
         ///				&lt;/group&gt;
         ///			&lt;/tab&gt;
         ///		&lt;/tabs&gt;
         ///	&lt;/ribbon&gt;
-        ///&lt;/customUI&gt;.
+        ///&lt;/customUI&gt;
+        ///.
         /// </summary>
         internal static string Ribbon {
             get {

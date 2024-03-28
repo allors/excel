@@ -3,16 +3,16 @@
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
+using Allors.Excel;
+using Moq;
 using InteropApplication = Microsoft.Office.Interop.Excel.Application;
 using InteropWorkbook = Microsoft.Office.Interop.Excel.Workbook;
 
-namespace ExcelAddIn.VSTO.Tests
+namespace Allors.Excel.Interop.Dna.Tests
 {
-    using Allors.Excel;
     using Allors.Excel.Interop;
-    using Moq;
 
-    public class WorkbookTests : Allors.Excel.Tests.WorkbookTests
+    public class WorksheetTests : Allors.Excel.Tests.WorksheetTests
     {
         private readonly InteropApplication application = new InteropApplication { Visible = true };
 

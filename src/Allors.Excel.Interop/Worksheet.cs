@@ -542,7 +542,7 @@ namespace Allors.Excel.Interop
                         if (cc.Style != null)
                         {
                             Color? styleBackgroundColor = chunk[0][0].Style?.BackgroundColor;
-                            range.Interior.Color = styleBackgroundColor != null ? ColorTranslator.ToOle(styleBackgroundColor.Value) : Missing.Value;
+                            range.Interior.Color = styleBackgroundColor != null ? ToOle(styleBackgroundColor.Value) : Missing.Value;
                         }
                         else
                         {
@@ -1548,6 +1548,12 @@ namespace Allors.Excel.Interop
             }
 
             return result;
+        }
+
+        public static int ToOle(Color c)
+        {
+            // OleColor format is BGR, same as Win32
+            return ((c.B << 16) | (c.G << 8) | c.R);
         }
     }
 }

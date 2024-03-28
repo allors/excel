@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="xunit.runner.console" Version="2.7.0" PrivateAssets="all" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7" PrivateAssets="all" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Allors.Excel.Tests\Allors.Excel.Tests.csproj" />
+    <ProjectReference Include="..\Allors.Excel.Interop.Dna\Allors.Excel.Interop.Dna.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="data\Catalog.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

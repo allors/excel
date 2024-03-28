@@ -1,6 +1,6 @@
 ﻿using Application;
 
-namespace ExcelAddIn.VSTO
+namespace Allors.Excel.Interop.Vsto
 {
     internal class ServiceLocator : IServiceLocator
     {

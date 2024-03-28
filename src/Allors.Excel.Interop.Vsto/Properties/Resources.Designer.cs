@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ExcelAddIn.VSTO.Properties {
+namespace Allors.Excel.Interop.Vsto {
     
     
     /// <summary>

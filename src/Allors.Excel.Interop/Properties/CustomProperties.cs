@@ -1,4 +1,4 @@
-﻿namespace Allors.Excel
+﻿namespace Allors.Excel.Interop
 {
     using System;
     using Microsoft.Office.Core;

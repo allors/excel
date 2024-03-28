@@ -9,9 +9,61 @@
 //------------------------------------------------------------------------------
 
 #pragma warning disable 414
-namespace ExcelAddIn.VSTO {
-    
-    
+namespace Allors.Excel.Interop.Vsto
+{
+    /// 
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Tools.Office.ProgrammingModel.dll", "16.0.0.0")]
+    internal sealed partial class Globals {
+        
+        /// 
+        private Globals() {
+        }
+        
+        private static ThisAddIn _ThisAddIn;
+        
+        private static global::Microsoft.Office.Tools.Excel.ApplicationFactory _factory;
+        
+        private static ThisRibbonCollection _ThisRibbonCollection;
+        
+        internal static ThisAddIn ThisAddIn {
+            get {
+                return _ThisAddIn;
+            }
+            set {
+                if ((_ThisAddIn == null)) {
+                    _ThisAddIn = value;
+                }
+                else {
+                    throw new System.NotSupportedException();
+                }
+            }
+        }
+        
+        internal static global::Microsoft.Office.Tools.Excel.ApplicationFactory Factory {
+            get {
+                return _factory;
+            }
+            set {
+                if ((_factory == null)) {
+                    _factory = value;
+                }
+                else {
+                    throw new System.NotSupportedException();
+                }
+            }
+        }
+        
+        internal static ThisRibbonCollection Ribbons {
+            get {
+                if ((_ThisRibbonCollection == null)) {
+                    _ThisRibbonCollection = new ThisRibbonCollection(_factory.GetRibbonFactory());
+                }
+                return _ThisRibbonCollection;
+            }
+        }
+    }
+
     /// 
     [Microsoft.VisualStudio.Tools.Applications.Runtime.StartupObjectAttribute(0)]
     [global::System.Security.Permissions.PermissionSetAttribute(global::System.Security.Permissions.SecurityAction.Demand, Name="FullTrust")]
@@ -31,7 +83,7 @@ namespace ExcelAddIn.VSTO {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         public ThisAddIn(global::Microsoft.Office.Tools.Excel.ApplicationFactory factory, global::System.IServiceProvider serviceProvider) : 
-                base(factory, serviceProvider, "AddIn", "ThisAddIn") {
+            base(factory, serviceProvider, "AddIn", "ThisAddIn") {
             Globals.Factory = factory;
         }
         
@@ -170,60 +222,7 @@ namespace ExcelAddIn.VSTO {
             base.OnShutdown();
         }
     }
-    
-    /// 
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Tools.Office.ProgrammingModel.dll", "16.0.0.0")]
-    internal sealed partial class Globals {
-        
-        /// 
-        private Globals() {
-        }
-        
-        private static ThisAddIn _ThisAddIn;
-        
-        private static global::Microsoft.Office.Tools.Excel.ApplicationFactory _factory;
-        
-        private static ThisRibbonCollection _ThisRibbonCollection;
-        
-        internal static ThisAddIn ThisAddIn {
-            get {
-                return _ThisAddIn;
-            }
-            set {
-                if ((_ThisAddIn == null)) {
-                    _ThisAddIn = value;
-                }
-                else {
-                    throw new System.NotSupportedException();
-                }
-            }
-        }
-        
-        internal static global::Microsoft.Office.Tools.Excel.ApplicationFactory Factory {
-            get {
-                return _factory;
-            }
-            set {
-                if ((_factory == null)) {
-                    _factory = value;
-                }
-                else {
-                    throw new System.NotSupportedException();
-                }
-            }
-        }
-        
-        internal static ThisRibbonCollection Ribbons {
-            get {
-                if ((_ThisRibbonCollection == null)) {
-                    _ThisRibbonCollection = new ThisRibbonCollection(_factory.GetRibbonFactory());
-                }
-                return _ThisRibbonCollection;
-            }
-        }
-    }
-    
+
     /// 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Tools.Office.ProgrammingModel.dll", "16.0.0.0")]
@@ -231,7 +230,7 @@ namespace ExcelAddIn.VSTO {
         
         /// 
         internal ThisRibbonCollection(global::Microsoft.Office.Tools.Ribbon.RibbonFactory factory) : 
-                base(factory) {
+            base(factory) {
         }
     }
 }

@@ -6,7 +6,7 @@ using Allors.Excel.Interop;
 using Application;
 using Microsoft.Office.Core;
 
-namespace ExcelAddIn.VSTO
+namespace Allors.Excel.Interop.Vsto
 {
     public partial class ThisAddIn
     {

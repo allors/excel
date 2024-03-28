@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using InteropApplication = Microsoft.Office.Interop.Excel.Application;
 
-namespace ExcelDNA
+namespace Allors.Excel.Interop.Dna
 {
     using System;
     using System.Windows.Forms;

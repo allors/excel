@@ -73,12 +73,12 @@
             "type": "string",
             "enum": [
               "Ci",
-              "CiTests",
               "Clean",
               "Compile",
+              "Default",
               "Pack",
               "Restore",
-              "Tests"
+              "Test"
             ]
           }
         },
@@ -93,12 +93,12 @@
             "type": "string",
             "enum": [
               "Ci",
-              "CiTests",
               "Clean",
               "Compile",
+              "Default",
               "Pack",
               "Restore",
-              "Tests"
+              "Test"
             ]
           }
         },

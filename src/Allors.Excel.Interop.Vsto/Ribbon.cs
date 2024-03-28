@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using Allors.Excel.Interop;
 using Office = Microsoft.Office.Core;
 
-namespace ExcelAddIn.VSTO
+namespace Allors.Excel.Interop.Vsto
 {
     using Allors.Excel;
 

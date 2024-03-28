@@ -2,6 +2,8 @@ using System.Linq;
 using Nuke.Common;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
+using Nuke.Common.Tooling;
+using Nuke.Common.Tools.Coverlet;
 using Nuke.Common.Tools.MSBuild;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitVersion;
@@ -12,7 +14,7 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
 class Build : NukeBuild
 {
-    public static int Main() => Execute<Build>(x => x.Ci);
+    public static int Main() => Execute<Build>(x => x.Default);
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
@@ -22,6 +24,7 @@ class Build : NukeBuild
 
     AbsolutePath SourceDirectory => RootDirectory / "src";
     AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
+    AbsolutePath TestsDirectory => ArtifactsDirectory / "tests";
 
     Target Clean => _ => _
         .Before(Restore)
@@ -44,6 +47,14 @@ class Build : NukeBuild
         .Executes(() =>
         {
             MSBuild(s => s
+                .SetTargetPath(SourceDirectory / "Allors.Excel.Headless.Tests" / "Allors.Excel.Headless.Tests.csproj")
+                .SetTargets("Rebuild")
+                .SetConfiguration(Configuration)
+                .SetAssemblyVersion(GitVersion.AssemblySemVer)
+                .SetFileVersion(GitVersion.AssemblySemFileVer)
+                .SetInformationalVersion(GitVersion.InformationalVersion));
+
+            MSBuild(s => s
                 .SetTargetPath(SourceDirectory / "Allors.Excel.Interop.Tests" / "Allors.Excel.Interop.Tests.csproj")
                 .SetTargets("Rebuild")
                 .SetConfiguration(Configuration)
@@ -52,7 +63,7 @@ class Build : NukeBuild
                 .SetInformationalVersion(GitVersion.InformationalVersion));
 
             MSBuild(s => s
-                .SetTargetPath(SourceDirectory / "Allors.Excel.Headless.Tests" / "Allors.Excel.Headless.Tests.csproj")
+                .SetTargetPath(SourceDirectory / "Allors.Excel.Interop.Vsto.Tests" / "Allors.Excel.Interop.Vsto.Tests.csproj")
                 .SetTargets("Rebuild")
                 .SetConfiguration(Configuration)
                 .SetAssemblyVersion(GitVersion.AssemblySemVer)
@@ -60,17 +71,36 @@ class Build : NukeBuild
                 .SetInformationalVersion(GitVersion.InformationalVersion));
         });
 
-    Target Tests => _ => _
+    Target Test => _ => _
        .DependsOn(Compile)
        .Executes(() =>
        {
+           DotNetTest(s => s
+               .SetProjectFile(Solution.GetProject("Allors.Excel.Interop.Tests"))
+               .SetConfiguration(Configuration)
+               .EnableNoBuild()
+               .EnableNoRestore()
+               .AddLoggers("trx;LogFileName=interop-results-dotnet.trx")
+               .EnableProcessLogOutput()
+               .SetResultsDirectory(TestsDirectory)
+           );
+
            {
                var assembly = SourceDirectory.GlobFiles("**/Allors.Excel.Interop.Tests.dll").First();
 
                Xunit2(v => v
                    .SetFramework("net462")
                    .AddTargetAssemblies(assembly)
-                   .SetResultReport(Xunit2ResultFormat.Xml, ArtifactsDirectory / "tests" / "interop-results.xml"));
+                   .SetResultReport(Xunit2ResultFormat.Xml, TestsDirectory / "interop-results-framework.xml"));
+           }
+
+           {
+               var assembly = SourceDirectory.GlobFiles("**/Allors.Excel.Interop.Vsto.Tests.dll").First();
+
+               Xunit2(v => v
+                   .SetFramework("net462")
+                   .AddTargetAssemblies(assembly)
+                   .SetResultReport(Xunit2ResultFormat.Xml, TestsDirectory / "interop-vsto-results.xml"));
            }
 
            {
@@ -79,12 +109,12 @@ class Build : NukeBuild
                Xunit2(v => v
                    .SetFramework("net462")
                    .AddTargetAssemblies(assembly)
-                   .SetResultReport(Xunit2ResultFormat.Xml, ArtifactsDirectory / "tests" / "headless-results.xml"));
+                   .SetResultReport(Xunit2ResultFormat.Xml, TestsDirectory / "headless-results.xml"));
            }
        });
 
     Target Pack => _ => _
-       .After(Tests)
+       .After(Test)
        .DependsOn(Compile)
        .Executes(() =>
        {
@@ -112,9 +142,9 @@ class Build : NukeBuild
                .SetPackageOutputPath(ArtifactsDirectory / "nuget"));
        });
 
-    Target CiTests => _ => _
-    .DependsOn(Tests);
-
     Target Ci => _ => _
-        .DependsOn(Pack, Tests);
+    .DependsOn(Test);
+
+    Target Default => _ => _
+        .DependsOn(Pack, Test);
 }

@@ -3,7 +3,7 @@
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace Allors.Excel.Tests.Rendering
+namespace Allors.Excel.Interop.Tests
 {
     using System;
     using System.Collections.Generic;

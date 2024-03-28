@@ -1,4 +1,4 @@
-﻿namespace ExcelDNA
+﻿namespace Allors.Excel.Interop.Dna
 {
     using Application;
 
