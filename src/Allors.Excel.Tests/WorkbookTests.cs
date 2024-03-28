@@ -11,7 +11,7 @@ namespace Allors.Excel.Tests
     using System.Xml;
     using Moq;
     using Xunit;
-    using Range = Excel.Range;
+    using Range = Allors.Excel.Range;
 
     public abstract class WorkbookTests : ExcelTest
     {
@@ -19,11 +19,11 @@ namespace Allors.Excel.Tests
         public async void OnNew()
         {
             var program = new Mock<IProgram>();
-            var addIn = this.NewAddIn();
+            this.NewAddIn();
 
-            // Setup the AddWorkbook method to call OnNew on the program
+            // Set up the AddWorkbook method to call OnNew on the program
             this.AddWorkbook();
-            program.Object.OnNew(It.IsAny<IWorkbook>());
+            await program.Object.OnNew(It.IsAny<IWorkbook>());
 
             program.Verify(mock => mock.OnNew(It.IsAny<IWorkbook>()), Times.Once());
 
@@ -153,34 +153,36 @@ namespace Allors.Excel.Tests
 
             var properties = workbook.CustomProperties;
 
-            void doRemoveOrNot(bool removeOrNot, string prop)
-            {
-                if (removeOrNot)
-                {
-                    properties.Remove(prop);
-                }
-            }
-
             var removeOrNotOptions = new[] { false, true };
             foreach (var removeOrNot in removeOrNotOptions)
             {
-                var prop = "MyBooleanProperty";
+                const string prop = "MyBooleanProperty";
 
                 properties.SetBoolean(prop, true);
                 Assert.Equal(true, properties.GetBoolean(prop));
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
 
                 properties.SetBoolean(prop, false);
                 Assert.Equal(false, properties.GetBoolean(prop));
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
 
                 properties.SetBoolean(prop, false);
                 Assert.Equal(false, properties.GetBoolean(prop));
 
                 properties.SetBoolean(prop, null);
                 Assert.Null(properties.GetDate(prop));
+            }
+
+            return;
+
+            void DoRemoveOrNot(bool removeOrNot, string prop)
+            {
+                if (removeOrNot)
+                {
+                    properties.Remove(prop);
+                }
             }
         }
 
@@ -194,7 +196,32 @@ namespace Allors.Excel.Tests
 
             var properties = workbook.CustomProperties;
 
-            void doRemoveOrNot(bool removeOrNot, string prop)
+            var removeOrNotOptions = new[] { false, true };
+            foreach (var removeOrNot in removeOrNotOptions)
+            {
+                const string prop = "MyDateProperty";
+
+                var birthDay = new DateTime(1973, 3, 27, 0, 0, 0, DateTimeKind.Local);
+                properties.SetDate(prop, birthDay);
+                Assert.Equal(birthDay, properties.GetDate(prop));
+
+                DoRemoveOrNot(removeOrNot, prop);
+
+                properties.SetDate(prop, Trim(DateTime.MinValue));
+                Assert.True(properties.GetDate(prop) < DateTime.Now.AddYears(-100));
+
+                DoRemoveOrNot(removeOrNot, prop);
+
+                properties.SetDate(prop, Trim(DateTime.MaxValue));
+                Assert.Equal(Trim(DateTime.MaxValue), properties.GetDate(prop));
+
+                properties.SetDate(prop, null);
+                Assert.Null(properties.GetDate(prop));
+            }
+
+            return;
+
+            void DoRemoveOrNot(bool removeOrNot, string prop)
             {
                 if (removeOrNot)
                 {
@@ -202,30 +229,7 @@ namespace Allors.Excel.Tests
                 }
             }
 
-            DateTime trim(DateTime now) => new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second, now.Kind);
-
-            var removeOrNotOptions = new[] { false, true };
-            foreach (var removeOrNot in removeOrNotOptions)
-            {
-                var prop = "MyDateProperty";
-
-                var birthDay = new DateTime(1973, 3, 27, 0, 0, 0, DateTimeKind.Local);
-                properties.SetDate(prop, birthDay);
-                Assert.Equal(birthDay, properties.GetDate(prop));
-
-                doRemoveOrNot(removeOrNot, prop);
-
-                properties.SetDate(prop, trim(DateTime.MinValue));
-                Assert.True(properties.GetDate(prop) < DateTime.Now.AddYears(-100));
-
-                doRemoveOrNot(removeOrNot, prop);
-
-                properties.SetDate(prop, trim(DateTime.MaxValue));
-                Assert.Equal(trim(DateTime.MaxValue), properties.GetDate(prop));
-
-                properties.SetDate(prop, null);
-                Assert.Null(properties.GetDate(prop));
-            }
+            DateTime Trim(DateTime now) => new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second, now.Kind);
         }
 
         [Fact]
@@ -238,40 +242,32 @@ namespace Allors.Excel.Tests
 
             var properties = workbook.CustomProperties;
 
-            void doRemoveOrNot(bool removeOrNot, string prop)
-            {
-                if (removeOrNot)
-                {
-                    properties.Remove(prop);
-                }
-            }
-
             var removeOrNotOptions = new[] { false, true };
 
-            // Int32 
+            // Int32
             foreach (var removeOrNot in removeOrNotOptions)
             {
-                var prop = "MyFloatProperty";
+                const string prop = "MyFloatProperty";
 
                 properties.SetFloat(prop, 0);
                 Assert.Equal(0, properties.GetFloat(prop));
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
 
                 properties.SetFloat(prop, 1);
                 Assert.Equal(1, properties.GetFloat(prop));
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
 
                 properties.SetFloat(prop, -1);
                 Assert.Equal(-1, properties.GetFloat(prop));
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
 
                 properties.SetFloat(prop, int.MinValue);
                 Assert.Equal(int.MinValue, properties.GetFloat(prop));
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
 
                 properties.SetFloat(prop, int.MaxValue);
                 Assert.Equal(int.MaxValue, properties.GetFloat(prop));
@@ -283,22 +279,22 @@ namespace Allors.Excel.Tests
             // Float32
             foreach (var removeOrNot in removeOrNotOptions)
             {
-                var prop = "MyFloatProperty";
+                const string prop = "MyFloatProperty";
 
                 properties.SetFloat(prop, 1.1f);
                 Assert.Equal(1.1f, properties.GetFloat(prop));
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
 
                 properties.SetFloat(prop, -1.1f);
                 Assert.Equal(-1.1f, properties.GetFloat(prop));
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
 
                 properties.SetFloat(prop, float.MinValue);
                 Assert.Equal(float.MinValue, properties.GetFloat(prop));
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
 
                 properties.SetFloat(prop, float.MaxValue);
                 Assert.Equal(float.MaxValue, properties.GetFloat(prop));
@@ -310,28 +306,38 @@ namespace Allors.Excel.Tests
             // Float64
             foreach (var removeOrNot in removeOrNotOptions)
             {
-                var prop = "MyFloatProperty";
+                const string prop = "MyFloatProperty";
 
                 properties.SetFloat(prop, 1.1d);
                 Assert.Equal(1.1d, properties.GetFloat(prop));
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
 
                 properties.SetFloat(prop, -1.1d);
                 Assert.Equal(-1.1d, properties.GetFloat(prop));
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
 
                 properties.SetFloat(prop, double.MinValue);
                 Assert.Equal(double.MinValue, properties.GetFloat(prop));
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
 
                 properties.SetFloat(prop, double.MaxValue);
                 Assert.Equal(double.MaxValue, properties.GetFloat(prop));
 
                 properties.SetFloat(prop, null);
                 Assert.Null(properties.GetFloat(prop));
+            }
+
+            return;
+
+            void DoRemoveOrNot(bool removeOrNot, string prop)
+            {
+                if (removeOrNot)
+                {
+                    properties.Remove(prop);
+                }
             }
         }
 
@@ -345,40 +351,32 @@ namespace Allors.Excel.Tests
 
             var properties = workbook.CustomProperties;
 
-            void doRemoveOrNot(bool removeOrNot, string prop)
-            {
-                if (removeOrNot)
-                {
-                    properties.Remove(prop);
-                }
-            }
-
             var removeOrNotOptions = new[] { false, true };
 
-            // Int32 
+            // Int32
             foreach (var removeOrNot in removeOrNotOptions)
             {
-                var prop = "MyNumberProperty";
+                const string prop = "MyNumberProperty";
 
                 properties.SetNumber(prop, 0);
                 Assert.Equal(0, properties.GetNumber(prop));
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
 
                 properties.SetNumber(prop, 1);
                 Assert.Equal(1, properties.GetNumber(prop));
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
 
                 properties.SetNumber(prop, -1);
                 Assert.Equal(-1, properties.GetNumber(prop));
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
 
                 properties.SetNumber(prop, int.MinValue);
                 Assert.Equal(int.MinValue, properties.GetNumber(prop));
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
 
                 properties.SetNumber(prop, int.MaxValue);
                 Assert.Equal(int.MaxValue, properties.GetNumber(prop));
@@ -387,25 +385,25 @@ namespace Allors.Excel.Tests
                 Assert.Null(properties.GetNumber(prop));
             }
 
-            // Int64 
+            // Int64
             foreach (var removeOrNot in removeOrNotOptions)
             {
-                var prop = "MyNumberProperty";
+                const string prop = "MyNumberProperty";
 
                 properties.SetNumber(prop, 0L);
                 Assert.Equal(0L, properties.GetNumber(prop));
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
 
                 properties.SetNumber(prop, 1L);
                 Assert.Equal(1L, properties.GetNumber(prop));
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
 
                 properties.SetNumber(prop, -1L);
                 Assert.Equal(-1L, properties.GetNumber(prop));
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
 
                 var tooLarge = false;
                 try
@@ -419,7 +417,7 @@ namespace Allors.Excel.Tests
 
                 Assert.True(tooLarge);
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
 
                 tooLarge = false;
                 try
@@ -436,6 +434,16 @@ namespace Allors.Excel.Tests
                 properties.SetNumber(prop, null);
                 Assert.Null(properties.GetNumber(prop));
             }
+
+            return;
+
+            void DoRemoveOrNot(bool removeOrNot, string prop)
+            {
+                if (removeOrNot)
+                {
+                    properties.Remove(prop);
+                }
+            }
         }
 
         [Fact]
@@ -448,65 +456,67 @@ namespace Allors.Excel.Tests
 
             var properties = workbook.CustomProperties;
 
-            void doRemoveOrNot(bool removeOrNot, string prop)
-            {
-                if (removeOrNot)
-                {
-                    properties.Remove(prop);
-                }
-            }
-
             var removeOrNotOptions = new[] { false, true };
 
-            // Strings 
+            // Strings
             foreach (var removeOrNot in removeOrNotOptions)
             {
-                var prop = "MyStringProperty";
+                const string prop = "MyStringProperty";
 
                 properties.SetString(prop, string.Empty);
                 Assert.Equal(string.Empty, properties.GetString(prop));
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
 
                 properties.SetString(prop, "a string");
                 Assert.Equal("a string", properties.GetString(prop));
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
 
                 properties.SetString(prop, null);
                 Assert.Null(properties.GetString(prop));
             }
 
-            // Large strings 
+            // Large strings
             foreach (var removeOrNot in removeOrNotOptions)
             {
-                var prop = "MyStringProperty";
+                const string prop = "MyStringProperty";
 
                 var length = 1000;
 
                 properties.SetString(prop, $"{new string('A', length)}");
                 Assert.Equal($"{new string('A', length)}", properties.GetString(prop));
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
 
                 length = 1000 * 1000;
 
                 properties.SetString(prop, $"{new string('A', length)}");
                 Assert.Equal($"{new string('A', length)}", properties.GetString(prop));
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
 
                 length = 1000 * 1000 * 1000;
 
                 properties.SetString(prop, $"{new string('A', length)}");
                 Assert.Equal($"{new string('A', length)}", properties.GetString(prop));
 
-                doRemoveOrNot(removeOrNot, prop);
+                DoRemoveOrNot(removeOrNot, prop);
+            }
+
+            return;
+
+            void DoRemoveOrNot(bool removeOrNot, string prop)
+            {
+                if (removeOrNot)
+                {
+                    properties.Remove(prop);
+                }
             }
         }
 
         [Fact]
-        public void SetCustomXMLParts()
+        public void SetCustomXmlParts()
         {
             var addIn = this.NewAddIn();
 
@@ -520,13 +530,13 @@ namespace Allors.Excel.Tests
 
             // Then read the xml
             var outputXmlDoc = workbook.GetCustomXMLById(tagId);
-            Assert.Equal("CATALOG", outputXmlDoc.DocumentElement.Name);
+            Assert.Equal("CATALOG", outputXmlDoc.DocumentElement?.Name);
 
-            Assert.Equal(36, outputXmlDoc.DocumentElement.ChildNodes.Count);
+            Assert.Equal(36, outputXmlDoc.DocumentElement?.ChildNodes.Count);
         }
 
         [Fact]
-        public void DeleteCustomXMLParts()
+        public void DeleteCustomXmlParts()
         {
             var addIn = this.NewAddIn();
 
@@ -554,9 +564,9 @@ namespace Allors.Excel.Tests
 
             var workbook = addIn.Workbooks[0];
 
-            var iWorksheet = workbook.Worksheets.FirstOrDefault(v => v.Name == "2");
+            var worksheet = workbook.Worksheets.First(v => v.Name == "2");
 
-            var range = new Range(4, 5, 1, 10, iWorksheet);
+            var range = new Range(4, 5, 1, 10, worksheet);
 
             workbook.SetNamedRange("MY.NAMEDRANGE", range);
 
@@ -564,7 +574,7 @@ namespace Allors.Excel.Tests
 
             Assert.Contains(namedRanges, v => string.Equals(v.Name, "MY.NAMEDRANGE"));
 
-            namedRanges = iWorksheet.GetNamedRanges();
+            namedRanges = worksheet.GetNamedRanges();
 
             Assert.DoesNotContain(namedRanges, v => string.Equals(v.Name, "MY.NAMEDRANGE"));
         }
@@ -578,15 +588,15 @@ namespace Allors.Excel.Tests
 
             var workbook = addIn.Workbooks[0];
 
-            var iWorksheet = workbook.Worksheets.FirstOrDefault(v => v.Name == "2");
+            var worksheet = workbook.Worksheets.First(v => v.Name == "2");
 
-            var range = new Range(4, 5, 1, 10, iWorksheet);
+            var range = new Range(4, 5, 1, 10, worksheet);
 
-            iWorksheet.SetNamedRange("MY.NAMEDRANGE", range);
+            worksheet.SetNamedRange("MY.NAMEDRANGE", range);
 
-            var namedRanges = iWorksheet.GetNamedRanges();
+            var namedRanges = worksheet.GetNamedRanges();
 
-Assert.Contains(namedRanges, v => string.Equals(v.Name, "MY.NAMEDRANGE"));
+            Assert.Contains(namedRanges, v => string.Equals(v.Name, "MY.NAMEDRANGE"));
 
             namedRanges = workbook.GetNamedRanges();
 
@@ -633,20 +643,20 @@ Assert.Contains(namedRanges, v => string.Equals(v.Name, "MY.NAMEDRANGE"));
 
             var workbook = addIn.Workbooks[0];
 
-            var iWorksheet = workbook.Worksheets.FirstOrDefault(v => v.Name == "2");
+            var worksheet = workbook.Worksheets.First(v => v.Name == "2");
 
-            var range = new Range(4, 5, 1, 10, iWorksheet);
+            var range = new Range(4, 5, 1, 10, worksheet);
 
-            iWorksheet.SetNamedRange("MY.NAMEDRANGE", range);
+            worksheet.SetNamedRange("MY.NAMEDRANGE", range);
 
-            var namedRanges = iWorksheet.GetNamedRanges();
+            var namedRanges = worksheet.GetNamedRanges();
 
             Assert.Contains(namedRanges, v => string.Equals(v.Name, "MY.NAMEDRANGE"));
 
-            range = new Range(8, 10, 2, 4, iWorksheet);
-            iWorksheet.SetNamedRange("MY.NAMEDRANGE", range);
+            range = new Range(8, 10, 2, 4, worksheet);
+            worksheet.SetNamedRange("MY.NAMEDRANGE", range);
 
-            var namedRange = iWorksheet.GetNamedRanges().First(v => string.Equals(v.Name, "MY.NAMEDRANGE"));
+            var namedRange = worksheet.GetNamedRanges().First(v => string.Equals(v.Name, "MY.NAMEDRANGE"));
 
             Assert.Equal(8, namedRange.Row);
             Assert.Equal(10, namedRange.Column);

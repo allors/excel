@@ -11,15 +11,14 @@ namespace Allors.Excel.Tests
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Threading;
-    using System.Threading.Tasks;
-    using Moq;
     using Xunit;
-    using Range = Excel.Range;
-
+    using Range = Allors.Excel.Range;
 
     public abstract class WorksheetTests : ExcelTest
     {
-        private DirectoryInfo tempDirectory;
+        private readonly DirectoryInfo tempDirectory;
+        private ContextTag expectedContextTag;
+        private List<ContextTag> expectedContextTags;
 
         protected WorksheetTests()
         {
@@ -36,6 +35,7 @@ namespace Allors.Excel.Tests
                     }
                     catch
                     {
+                        // ignored
                     }
                 }
             }
@@ -176,74 +176,75 @@ namespace Allors.Excel.Tests
             sheet2.HideInputMessage(cell, clearInputMessage: true);
         }
 
-        //[Fact]
-        //public void SetCustomProperties()
-        //{
-        //    var program = new Mock<IProgram>();
+        /*
+        [Fact]
+        public void SetCustomProperties()
+        {
+            var program = new Mock<IProgram>();
 
-        //    var addIn = new AddIn(this.application, program.Object);
+            var addIn = new AddIn(this.application, program.Object);
 
-        //    this.AddWorkbook();
+            this.AddWorkbook();
 
-        //    var workbook = addIn.Workbooks[0];
+            var workbook = addIn.Workbooks[0];
 
-        //    // Sheet with content
-        //    var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
+            // Sheet with content
+            var sheet2 = workbook.Worksheets.Single(v => v.Name == "2");
 
-        //    var expectedDate = DateTime.Now;
+            var expectedDate = DateTime.Now;
 
-        //    var dict = new OldCustomProperties();
-        //    dict.Add("Showcase.IsInvoiceSheet", false);
-        //    dict.Add("Showcase.IsSheet2", true);
-        //    dict.Add("Showcase.Sheet2.Date", expectedDate);
-        //    dict.Add("Showcase.Sheet2.Decimal", 123.45M);
+            var dict = new OldCustomProperties();
+            dict.Add("Showcase.IsInvoiceSheet", false);
+            dict.Add("Showcase.IsSheet2", true);
+            dict.Add("Showcase.Sheet2.Date", expectedDate);
+            dict.Add("Showcase.Sheet2.Decimal", 123.45M);
 
-        //    var nullableDecimal = new decimal?(123.45M);
-        //    dict.Add("Showcase.Sheet2.NullableDecimal", nullableDecimal);
+            var nullableDecimal = new decimal?(123.45M);
+            dict.Add("Showcase.Sheet2.NullableDecimal", nullableDecimal);
 
-        //    dict.Add("Showcase.Sheet2.Int", 12);
+            dict.Add("Showcase.Sheet2.Int", 12);
 
-        //    var nullableInt = new int?(12);
-        //    dict.Add("Showcase.Sheet2.NullableInt", nullableInt);
+            var nullableInt = new int?(12);
+            dict.Add("Showcase.Sheet2.NullableInt", nullableInt);
 
-        //    dict.Add("Company.Name", "Zonsoft.be");
-        //    dict.Add("Company.Street", "Uikhoverstraat 158");
+            dict.Add("Company.Name", "Zonsoft.be");
+            dict.Add("Company.Street", "Uikhoverstraat 158");
 
-        //    // Duplicates will be overwritten
-        //    dict.Add("Company.City", "3631 Maasmechelen");
-        //    dict.Add("Company.City", "3631 Uikhoven");
+            // Duplicates will be overwritten
+            dict.Add("Company.City", "3631 Maasmechelen");
+            dict.Add("Company.City", "3631 Uikhoven");
 
-        //    dict.Add("Company.Country", "BE België");
+            dict.Add("Company.Country", "BE België");
 
-        //    dict.Add("Showcase.Sheet2.Null", null);
+            dict.Add("Showcase.Sheet2.Null", null);
 
-        //    sheet2.SetCustomProperties(dict);
+            sheet2.SetCustomProperties(dict);
 
-        //    var customProperties = sheet2.GetCustomProperties();
+            var customProperties = sheet2.GetCustomProperties();
 
-        //    Assert.Equal(dict.Count, customProperties.Count);
+            Assert.Equal(dict.Count, customProperties.Count);
 
-        //    Assert.False(customProperties.Get<bool>("Showcase.IsInvoiceSheet"));
-        //    Assert.True(customProperties.Get<bool>("Showcase.IsSheet2"));
+            Assert.False(customProperties.Get<bool>("Showcase.IsInvoiceSheet"));
+            Assert.True(customProperties.Get<bool>("Showcase.IsSheet2"));
 
-        //    // fractions of MS are not preserved!
-        //    Assert.Equal(expectedDate.Date, customProperties.Get<DateTime>("Showcase.Sheet2.Date").Date);
+            // fractions of MS are not preserved!
+            Assert.Equal(expectedDate.Date, customProperties.Get<DateTime>("Showcase.Sheet2.Date").Date);
 
-        //    Assert.Equal(12, customProperties.Get<int>("Showcase.Sheet2.Int"));
-        //    Assert.Equal(12, customProperties.Get<int?>("Showcase.Sheet2.NullableInt"));
-        //    Assert.Null(customProperties.Get<int?>("Showcase.Sheet2.Null"));
+            Assert.Equal(12, customProperties.Get<int>("Showcase.Sheet2.Int"));
+            Assert.Equal(12, customProperties.Get<int?>("Showcase.Sheet2.NullableInt"));
+            Assert.Null(customProperties.Get<int?>("Showcase.Sheet2.Null"));
 
-        //    Assert.Equal(123.45M, customProperties.Get<decimal>("Showcase.Sheet2.Decimal"));
-        //    Assert.Equal(123.45M, customProperties.Get<decimal>("Showcase.Sheet2.NullableDecimal"));
+            Assert.Equal(123.45M, customProperties.Get<decimal>("Showcase.Sheet2.Decimal"));
+            Assert.Equal(123.45M, customProperties.Get<decimal>("Showcase.Sheet2.NullableDecimal"));
 
-        //    Assert.Equal("Zonsoft.be", customProperties.Get<string>("Company.Name"));
-        //    Assert.Equal("BE België", customProperties.Get<string>("Company.Country"));
-        //    Assert.Equal("3631 Uikhoven", customProperties.Get<string>("Company.City"));
-
-        //}
+            Assert.Equal("Zonsoft.be", customProperties.Get<string>("Company.Name"));
+            Assert.Equal("BE België", customProperties.Get<string>("Company.Country"));
+            Assert.Equal("3631 Uikhoven", customProperties.Get<string>("Company.City"));
+        }
+        */
 
         [Fact]
-        public void SaveAsPDFWithNullThrowsException()
+        public void SaveAsPdfWithNullThrowsException()
         {
             var addIn = this.NewAddIn();
 
@@ -289,11 +290,11 @@ namespace Allors.Excel.Tests
             sheet2.SaveAsPdf(file, true);
             Assert.True(new FileInfo(file.FullName).Exists);
 
-            //sheet2.SaveAsPDF(file, true, true);
+            // sheet2.SaveAsPDF(file, true, true);
         }
 
         [Fact]
-        public void SaveAsPDFWithHeader()
+        public void SaveAsPdfWithHeader()
         {
             var addIn = this.NewAddIn();
 
@@ -327,7 +328,7 @@ namespace Allors.Excel.Tests
 
             Assert.True(new FileInfo(file.FullName).Exists);
 
-            //sheet2.SaveAsPDF(file, true, true);
+            // sheet2.SaveAsPDF(file, true, true);
         }
 
         [Fact]
@@ -359,11 +360,11 @@ namespace Allors.Excel.Tests
 
             Assert.True(new FileInfo(file.FullName).Exists);
 
-            //sheet2.SaveAsPDF(file, true, true);
+            // sheet2.SaveAsPDF(file, true, true);
         }
 
         [Fact]
-        public void SaveAsPDF()
+        public void SaveAsPdf()
         {
             var addIn = this.NewAddIn();
 
@@ -380,11 +381,11 @@ namespace Allors.Excel.Tests
 
             Assert.True(new FileInfo(file.FullName).Exists);
 
-            //sheet2.SaveAsPDF(file, true, true);
+            // sheet2.SaveAsPDF(file, true, true);
         }
 
         [Fact]
-        public void SaveAsPDFThrowsNoExceptionWhenEmpty()
+        public void SaveAsPdfThrowsNoExceptionWhenEmpty()
         {
             var addIn = this.NewAddIn();
 
@@ -400,7 +401,7 @@ namespace Allors.Excel.Tests
         }
 
         [Fact]
-        public void SaveAsPDFThrowsExceptionWhenFileExists()
+        public void SaveAsPdfThrowsExceptionWhenFileExists()
         {
             var addIn = this.NewAddIn();
 
@@ -430,7 +431,7 @@ namespace Allors.Excel.Tests
         }
 
         [Fact]
-        public void SaveAsXPS()
+        public void SaveAsXps()
         {
             var addIn = this.NewAddIn();
 
@@ -447,11 +448,11 @@ namespace Allors.Excel.Tests
 
             Assert.True(new FileInfo(file.FullName).Exists);
 
-            //sheet2.SaveAsPDF(file, true, true);
+            // sheet2.SaveAsPDF(file, true, true);
         }
 
         [Fact]
-        public void SaveAsXPSSetsExtensiontoXPS()
+        public void SaveAsXpsSetsExtensionToXps()
         {
             var addIn = this.NewAddIn();
 
@@ -471,11 +472,11 @@ namespace Allors.Excel.Tests
             file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(sheet2)}.xps"));
             Assert.True(new FileInfo(file.FullName).Exists);
 
-            //sheet2.SaveAsPDF(file, true, true);
+            // sheet2.SaveAsPDF(file, true, true);
         }
 
         [Fact]
-        public void SaveAsPDFSetsExtensiontoXPS()
+        public void SaveAsPdfSetsExtensiontoXps()
         {
             var addIn = this.NewAddIn();
 
@@ -497,7 +498,8 @@ namespace Allors.Excel.Tests
 
             file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(sheet2)}"));
             Assert.False(new FileInfo(file.FullName).Exists);
-            //sheet2.SaveAsPDF(file, true, true);
+
+            // sheet2.SaveAsPDF(file, true, true);
         }
 
         [Fact]
@@ -604,10 +606,10 @@ namespace Allors.Excel.Tests
 
             // Expected order => #3 | 1  | 2
             Assert.Equal(3, workbook.Worksheets.Length);
-            Assert.Equal(3, ((IWorkbook)workbook).WorksheetsByIndex.Length);
+            Assert.Equal(3, workbook.WorksheetsByIndex.Length);
             Assert.Equal(1, worksheet.Index);
 
-            var worksheetsByIndex = ((IWorkbook)workbook).WorksheetsByIndex;
+            var worksheetsByIndex = workbook.WorksheetsByIndex;
             Assert.Equal("#3", worksheetsByIndex[0].Name);
             Assert.Equal("1", worksheetsByIndex[1].Name);
             Assert.Equal("2", worksheetsByIndex[2].Name);
@@ -617,9 +619,9 @@ namespace Allors.Excel.Tests
             worksheet.Name = "#4";
 
             // Expected order => #3 | 1  | #4 | 2
-            worksheetsByIndex = ((IWorkbook)workbook).WorksheetsByIndex;
+            worksheetsByIndex = workbook.WorksheetsByIndex;
             Assert.Equal(4, workbook.Worksheets.Length);
-            Assert.Equal(4, ((IWorkbook)workbook).WorksheetsByIndex.Length);
+            Assert.Equal(4, workbook.WorksheetsByIndex.Length);
             Assert.Equal(3, worksheet.Index);
             Assert.Equal("#3", worksheetsByIndex[0].Name);
             Assert.Equal("1", worksheetsByIndex[1].Name);
@@ -627,13 +629,13 @@ namespace Allors.Excel.Tests
             Assert.Equal("2", worksheetsByIndex[3].Name);
 
             // Add after "1"
-            worksheet = (IWorksheet)workbook.AddWorksheet(null, null, sheet1);
+            worksheet = workbook.AddWorksheet(null, null, sheet1);
             worksheet.Name = "#5";
 
             // Expected order => #3 | 1 | #5 | #4 | 2
-            worksheetsByIndex = ((IWorkbook)workbook).WorksheetsByIndex;
+            worksheetsByIndex = workbook.WorksheetsByIndex;
             Assert.Equal(5, workbook.Worksheets.Length);
-            Assert.Equal(5, ((IWorkbook)workbook).WorksheetsByIndex.Length);
+            Assert.Equal(5, workbook.WorksheetsByIndex.Length);
             Assert.Equal(3, worksheet.Index);
             Assert.Equal("#3", worksheetsByIndex[0].Name);
             Assert.Equal("1", worksheetsByIndex[1].Name);
@@ -642,13 +644,13 @@ namespace Allors.Excel.Tests
             Assert.Equal("2", worksheetsByIndex[4].Name);
 
             // Add after "2"
-            worksheet = (IWorksheet)workbook.AddWorksheet(null, null, sheet2);
+            worksheet = workbook.AddWorksheet(null, null, sheet2);
             worksheet.Name = "#6";
 
             // Expected order => #3 | 1 | #5 | #4 | 2 | #6
-            worksheetsByIndex = ((IWorkbook)workbook).WorksheetsByIndex;
+            worksheetsByIndex = workbook.WorksheetsByIndex;
             Assert.Equal(6, workbook.Worksheets.Length);
-            Assert.Equal(6, ((IWorkbook)workbook).WorksheetsByIndex.Length);
+            Assert.Equal(6, workbook.WorksheetsByIndex.Length);
             Assert.Equal(6, worksheet.Index);
             Assert.Equal("#3", worksheetsByIndex[0].Name);
             Assert.Equal("1", worksheetsByIndex[1].Name);
@@ -673,21 +675,20 @@ namespace Allors.Excel.Tests
             Assert.Equal("2", last.Name);
 
             // At before index 1
-            var worksheet = (IWorksheet)workbook.AddWorksheet(1);
-            var worksheetsByIndex = ((IWorkbook)workbook).WorksheetsByIndex;
+            var worksheet = workbook.AddWorksheet(1);
+            var worksheetsByIndex = workbook.WorksheetsByIndex;
             Assert.Equal(3, workbook.Worksheets.Length);
             Assert.Equal(3, worksheetsByIndex.Length);
             Assert.Equal(1, worksheet.Index);
 
             // Expected order => Sheet3 | 1  | 2
-
             Assert.Equal("5", worksheetsByIndex[0].Name);
             Assert.Equal("1", worksheetsByIndex[1].Name);
             Assert.Equal("2", worksheetsByIndex[2].Name);
 
             // Add before index 2
-            worksheet = (IWorksheet)workbook.AddWorksheet(2);
-            worksheetsByIndex = ((IWorkbook)workbook).WorksheetsByIndex;
+            worksheet = workbook.AddWorksheet(2);
+            worksheetsByIndex = workbook.WorksheetsByIndex;
 
             Assert.Equal(4, workbook.Worksheets.Length);
             Assert.Equal(4, worksheetsByIndex.Length);
@@ -700,8 +701,8 @@ namespace Allors.Excel.Tests
             Assert.Equal("2", worksheetsByIndex[3].Name);
 
             // 0 Adds Before the Active Sheet (being the last added sheet here)
-            worksheet = (IWorksheet)workbook.AddWorksheet(0);
-            worksheetsByIndex = ((IWorkbook)workbook).WorksheetsByIndex;
+            worksheet = workbook.AddWorksheet(0);
+            worksheetsByIndex = workbook.WorksheetsByIndex;
 
             Assert.Equal(5, workbook.Worksheets.Length);
             Assert.Equal(5, worksheetsByIndex.Length);
@@ -718,7 +719,7 @@ namespace Allors.Excel.Tests
         [Fact]
         public void CellTagContainsCustomObject()
         {
-            this.ExpectedContextTags = new List<ContextTag>();
+            this.expectedContextTags = new List<ContextTag>();
 
             var addIn = this.NewAddIn();
 
@@ -728,49 +729,32 @@ namespace Allors.Excel.Tests
 
             Assert.Equal(2, workbook.Worksheets.Length);
 
-            var worksheet = (IWorksheet)workbook.AddWorksheet(null, null, workbook.Worksheets.Last());
+            var worksheet = workbook.AddWorksheet(null, null, workbook.Worksheets.Last());
 
             worksheet.CellsChanged += this.Worksheet_CellsChanged;
 
             var tag1 = new ContextTag { Context = "Cell00" };
             var tag2 = new ContextTag { Context = "Cell01" };
-            this.ExpectedContextTags.Add(tag1);
-            this.ExpectedContextTags.Add(tag2);
+            this.expectedContextTags.Add(tag1);
+            this.expectedContextTags.Add(tag2);
 
             var cell00 = worksheet[(0, 0)];
             cell00.Tag = tag1;
 
-            Assert.NotEmpty(this.ExpectedContextTags);
+            Assert.NotEmpty(this.expectedContextTags);
 
             // Change the cell will trigger the Change Event
-            this.ExpectedContextTag = tag1;
+            this.expectedContextTag = tag1;
             worksheet[1, 1].Value = "i am cell00";
 
             var cell01 = worksheet[(0, 1)];
             cell01.Tag = tag2;
 
             // Change the cell will trigger the Change Event
-            this.ExpectedContextTag = tag2;
+            this.expectedContextTag = tag2;
             worksheet[1, 2].Value = "i am cell01";
 
-            Assert.Empty(this.ExpectedContextTags);
-        }
-
-        private ContextTag ExpectedContextTag;
-        private List<ContextTag> ExpectedContextTags;
-
-        private class ContextTag
-        {
-            public string Context { get; set; }
-        }
-
-        private void Worksheet_CellsChanged(object sender, CellChangedEvent e)
-        {
-            var tag = (ContextTag)e.Cells[0].Tag;
-
-            Assert.Equal(this.ExpectedContextTag, tag);
-
-            this.ExpectedContextTags.Remove(tag);
+            Assert.Empty(this.expectedContextTags);
         }
 
         [Fact]
@@ -811,7 +795,7 @@ namespace Allors.Excel.Tests
         [Fact]
         public void InsertRows()
         {
-            ICell cell = null;
+            ICell cell;
 
             var addIn = this.NewAddIn();
 
@@ -819,7 +803,7 @@ namespace Allors.Excel.Tests
 
             var workbook = addIn.Workbooks[0];
 
-            var worksheet = workbook.Worksheets.FirstOrDefault(v => v.Name == "2");
+            var worksheet = workbook.Worksheets.First(v => v.Name == "2");
 
             for (var i = 0; i < 10; i++)
             {
@@ -832,16 +816,16 @@ namespace Allors.Excel.Tests
             worksheet.InsertRows(3, 1);
 
             cell = worksheet[0, 0];
-            Assert.True(cell.ValueAsString == "Cell A0");
+            Assert.Equal("Cell A0", cell.ValueAsString);
 
             cell = worksheet[1, 0];
-            Assert.True(cell.ValueAsString == "Cell A1");
+            Assert.Equal("Cell A1", cell.ValueAsString);
 
             cell = worksheet[2, 0];
-            Assert.True(cell.ValueAsString == "Cell A2");
+            Assert.Equal("Cell A2", cell.ValueAsString);
 
             cell = worksheet[3, 0];
-            Assert.True(cell.ValueAsString == "Cell A3");
+            Assert.Equal("Cell A3", cell.ValueAsString);
 
             // newly inserted cell has no value
             cell = worksheet[4, 0];
@@ -849,13 +833,13 @@ namespace Allors.Excel.Tests
 
             // shifted cell 1 down. The cell that was at row 4 is now in Row 5
             cell = worksheet[5, 0];
-            Assert.True(cell.ValueAsString == "Cell A4");
+            Assert.Equal("Cell A4", cell.ValueAsString);
         }
 
         [Fact]
         public void DeleteRows()
         {
-            ICell cell = null;
+            ICell cell;
 
             var addIn = this.NewAddIn();
 
@@ -863,7 +847,7 @@ namespace Allors.Excel.Tests
 
             var workbook = addIn.Workbooks[0];
 
-            var worksheet = workbook.Worksheets.FirstOrDefault(v => v.Name == "2");
+            var worksheet = workbook.Worksheets.First(v => v.Name == "2");
 
             for (var i = 0; i < 10; i++)
             {
@@ -879,22 +863,22 @@ namespace Allors.Excel.Tests
             worksheet.Flush();
 
             cell = worksheet[0, 0];
-            Assert.True(Convert.ToString(cell.Value) == "Cell A0");
+            Assert.Equal("Cell A0", Convert.ToString(cell.Value));
 
             cell = worksheet[1, 0];
-            Assert.True(Convert.ToString(cell.Value) == "Cell A1");
+            Assert.Equal("Cell A1", Convert.ToString(cell.Value));
 
             cell = worksheet[2, 0];
-            Assert.True(Convert.ToString(cell.Value) == "Cell A5");
+            Assert.Equal("Cell A5", Convert.ToString(cell.Value));
 
             cell = worksheet[3, 0];
-            Assert.True(Convert.ToString(cell.Value) == "Cell A6");
+            Assert.Equal("Cell A6", Convert.ToString(cell.Value));
         }
 
         [Fact]
         public void InsertColumn()
         {
-            ICell cell = null;
+            ICell cell;
 
             var addIn = this.NewAddIn();
 
@@ -902,39 +886,39 @@ namespace Allors.Excel.Tests
 
             var workbook = addIn.Workbooks[0];
 
-            var iWorksheet = workbook.Worksheets.FirstOrDefault(v => v.Name == "2");
+            var worksheet = workbook.Worksheets.First(v => v.Name == "2");
 
             for (var i = 0; i < 10; i++)
             {
-                cell = iWorksheet[i, 0];
+                cell = worksheet[i, 0];
                 cell.Value = $"Cell A{i}";
 
-                cell = iWorksheet[i, 1];
+                cell = worksheet[i, 1];
                 cell.Value = $"Cell B{i}";
 
-                cell = iWorksheet[i, 2];
+                cell = worksheet[i, 2];
                 cell.Value = $"Cell C{i}";
             }
 
-            iWorksheet.Flush();
+            worksheet.Flush();
 
-            iWorksheet.InsertColumns(0, 1);
+            worksheet.InsertColumns(0, 1);
 
-            cell = iWorksheet[0, 0];
-            Assert.True(Convert.ToString(cell.Value) == "Cell A0");
+            cell = worksheet[0, 0];
+            Assert.Equal("Cell A0", Convert.ToString(cell.Value));
 
             // newly inserted cell has no value
-            cell = iWorksheet[0, 1];
+            cell = worksheet[0, 1];
             Assert.Null(cell.Value);
 
-            cell = iWorksheet[0, 2];
-            Assert.True(Convert.ToString(cell.Value) == "Cell B0");
+            cell = worksheet[0, 2];
+            Assert.Equal("Cell B0", Convert.ToString(cell.Value));
         }
 
         [Fact]
         public void InsertColumns()
         {
-            ICell cell = null;
+            ICell cell;
 
             var addIn = this.NewAddIn();
 
@@ -942,7 +926,7 @@ namespace Allors.Excel.Tests
 
             var workbook = addIn.Workbooks[0];
 
-            var worksheet = workbook.Worksheets.FirstOrDefault(v => v.Name == "2");
+            var worksheet = workbook.Worksheets.First(v => v.Name == "2");
 
             for (var i = 0; i < 10; i++)
             {
@@ -961,7 +945,7 @@ namespace Allors.Excel.Tests
             worksheet.InsertColumns(0, 2);
 
             cell = worksheet[0, 0];
-            Assert.True(Convert.ToString(cell.Value) == "Cell A0");
+            Assert.Equal("Cell A0", Convert.ToString(cell.Value));
 
             // newly inserted cell has no value
             cell = worksheet[0, 1];
@@ -971,13 +955,13 @@ namespace Allors.Excel.Tests
             Assert.Null(cell.Value);
 
             cell = worksheet[0, 3];
-            Assert.True(Convert.ToString(cell.Value) == "Cell B0");
+            Assert.Equal("Cell B0", Convert.ToString(cell.Value));
         }
 
         [Fact]
         public void DeleteColumn()
         {
-            ICell cell = null;
+            ICell cell;
 
             var addIn = this.NewAddIn();
 
@@ -985,7 +969,7 @@ namespace Allors.Excel.Tests
 
             var workbook = addIn.Workbooks[0];
 
-            var worksheet = workbook.Worksheets.FirstOrDefault(v => v.Name == "2");
+            var worksheet = workbook.Worksheets.First(v => v.Name == "2");
 
             for (var i = 0; i < 10; i++)
             {
@@ -1008,30 +992,29 @@ namespace Allors.Excel.Tests
             worksheet.DeleteColumns(1, 1);
 
             cell = worksheet[0, 0];
-            Assert.True(Convert.ToString(cell.Value) == "Cell A0");
+            Assert.Equal("Cell A0", Convert.ToString(cell.Value));
 
             cell = worksheet[1, 0];
-            Assert.True(Convert.ToString(cell.Value) == "Cell A1");
+            Assert.Equal("Cell A1", Convert.ToString(cell.Value));
 
             // B is Gone!
-
             cell = worksheet[0, 1];
-            Assert.True(Convert.ToString(cell.Value) == "Cell C0");
+            Assert.Equal("Cell C0", Convert.ToString(cell.Value));
 
             cell = worksheet[1, 1];
-            Assert.True(Convert.ToString(cell.Value) == "Cell C1");
+            Assert.Equal("Cell C1", Convert.ToString(cell.Value));
 
             cell = worksheet[0, 2];
-            Assert.True(Convert.ToString(cell.Value) == "Cell D0");
+            Assert.Equal("Cell D0", Convert.ToString(cell.Value));
 
             cell = worksheet[1, 2];
-            Assert.True(Convert.ToString(cell.Value) == "Cell D1");
+            Assert.Equal("Cell D1", Convert.ToString(cell.Value));
         }
 
         [Fact]
         public void DeleteColumns()
         {
-            ICell cell = null;
+            ICell cell;
 
             var addIn = this.NewAddIn();
 
@@ -1039,7 +1022,7 @@ namespace Allors.Excel.Tests
 
             var workbook = addIn.Workbooks[0];
 
-            var worksheet = workbook.Worksheets.FirstOrDefault(v => v.Name == "2");
+            var worksheet = workbook.Worksheets.First(v => v.Name == "2");
 
             for (var i = 0; i < 10; i++)
             {
@@ -1062,26 +1045,23 @@ namespace Allors.Excel.Tests
             worksheet.DeleteColumns(1, 2);
 
             cell = worksheet[0, 0];
-            Assert.True(Convert.ToString(cell.Value) == "Cell A0");
+            Assert.Equal("Cell A0", Convert.ToString(cell.Value));
 
             cell = worksheet[1, 0];
-            Assert.True(Convert.ToString(cell.Value) == "Cell A1");
+            Assert.Equal("Cell A1", Convert.ToString(cell.Value));
 
             // B is Gone!
             // C is Gone!
-
             cell = worksheet[0, 1];
-            Assert.True(Convert.ToString(cell.Value) == "Cell D0");
+            Assert.Equal("Cell D0", Convert.ToString(cell.Value));
 
             cell = worksheet[1, 1];
-            Assert.True(Convert.ToString(cell.Value) == "Cell D1");
+            Assert.Equal("Cell D1", Convert.ToString(cell.Value));
         }
 
         [Fact]
         public void SetIsActiveWorksheet()
         {
-            ICell cell = null;
-
             var addIn = this.NewAddIn();
 
             this.AddWorkbook();
@@ -1114,7 +1094,7 @@ namespace Allors.Excel.Tests
             var range = sheet1.GetRange(null);
             Assert.Null(range);
 
-            range = sheet1.GetRange("");
+            range = sheet1.GetRange(string.Empty);
             Assert.Null(range);
 
             range = sheet1.GetRange("  ");
@@ -1388,6 +1368,20 @@ namespace Allors.Excel.Tests
             var sheet1 = workbook.AddWorksheet(0);
 
             Assert.True(sheet1.IsActive);
+        }
+
+        private void Worksheet_CellsChanged(object sender, CellChangedEvent e)
+        {
+            var tag = (ContextTag)e.Cells[0].Tag;
+
+            Assert.Equal(this.expectedContextTag, tag);
+
+            this.expectedContextTags.Remove(tag);
+        }
+
+        private class ContextTag
+        {
+            public string Context { get; set; }
         }
     }
 }
