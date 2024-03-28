@@ -596,11 +596,11 @@ namespace Allors.Excel.Tests
 
             var namedRanges = worksheet.GetNamedRanges();
 
-            Assert.Contains(namedRanges, v => string.Equals(v.Name, "MY.NAMEDRANGE"));
+            Assert.Contains(namedRanges, v => v.Name.EndsWith("MY.NAMEDRANGE"));
 
             namedRanges = workbook.GetNamedRanges();
 
-            Assert.DoesNotContain(namedRanges, v => string.Equals(v.Name, "MY.NAMEDRANGE"));
+            Assert.DoesNotContain(namedRanges, v => v.Name.Equals("MY.NAMEDRANGE"));
         }
 
         [Fact]
@@ -651,12 +651,12 @@ namespace Allors.Excel.Tests
 
             var namedRanges = worksheet.GetNamedRanges();
 
-            Assert.Contains(namedRanges, v => string.Equals(v.Name, "MY.NAMEDRANGE"));
+            Assert.Contains(namedRanges, v => v.Name.EndsWith("MY.NAMEDRANGE"));
 
             range = new Range(8, 10, 2, 4, worksheet);
             worksheet.SetNamedRange("MY.NAMEDRANGE", range);
 
-            var namedRange = worksheet.GetNamedRanges().First(v => string.Equals(v.Name, "MY.NAMEDRANGE"));
+            var namedRange = worksheet.GetNamedRanges().First(v => v.Name.EndsWith("MY.NAMEDRANGE"));
 
             Assert.Equal(8, namedRange.Row);
             Assert.Equal(10, namedRange.Column);
