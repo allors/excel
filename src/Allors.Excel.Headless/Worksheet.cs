@@ -162,7 +162,35 @@ namespace Allors.Excel.Headless
             return this.NamedRangeByName.Values.ToArray();
         }
 
-        public Rectangle GetRectangle(string namedRange) => Rectangle.Empty;
+        public Rectangle GetRectangle(string namedRange)
+        {
+            if (string.IsNullOrEmpty(namedRange))
+            {
+                throw new ArgumentException("Named range cannot be null or empty.", nameof(namedRange));
+            }
+
+            if (!this.NamedRangeByName.TryGetValue(namedRange, out var range))
+            {
+                throw new ArgumentException($"No range found with the name {namedRange}.", nameof(namedRange));
+            }
+
+            // Assuming that the Range object has properties for the start and end rows and columns
+            int startRow = range.Row;
+            int startColumn = range.Column;
+            int endRow = (int)(range.Row + range.Rows - 1);
+            int endColumn = (int)(range.Column + range.Columns - 1);
+
+            // Calculate the width and height of the rectangle
+            int width = endColumn - startColumn + 1;
+            int height = endRow - startRow + 1;
+
+            // Create a new Rectangle object with the calculated properties
+            return new Rectangle(startColumn, startRow, width, height);
+        }
+
+
+
+
 
         public void SetNamedRange(string name, Range range)
         {
@@ -256,13 +284,141 @@ namespace Allors.Excel.Headless
             }
         }
 
-        public Range GetRange(string cell1, string cell2 = null) => throw new NotImplementedException();
+        public Range? GetRange(string? cell1, string? cell2 = null)
+        {
+            if (string.IsNullOrWhiteSpace(cell1))
+            {
+                return null;
+            }
 
-        public Range GetUsedRange() => throw new NotImplementedException();
+            
+            if (cell1.Length == 5 && cell1[2] == ':' && cell2 == null)
+            {
+                cell2 = cell1.Substring(3);
+                cell1 = cell1.Substring(0, 2);
+            } else if (cell1.Length == 3 && cell1[1] == ':' && cell2 == null) {
+                cell2 = cell1[2] + "1048576"; // Excel has 1,048,576 rows.
+                cell1 = cell1[0] + "1";
+            } else if (cell1.Length == 3 && cell2.Length == 3 && cell1[1] == ':' && cell2[1] == ':')
+            {
+                cell2 = cell2[0] + "1048576";
+                cell1 = cell1[0] + "1";
+            }
+            else if (cell2 == null)
+            {
+                cell2 = cell1;
+            }
 
-        public Range GetUsedRange(string column) => throw new NotImplementedException();
+            var parsedCell1 = ParseCellName(cell1);
+            var parsedCell2 = ParseCellName(cell2);
 
-        public Range GetUsedRange(int row) => throw new NotImplementedException();
+            if (!parsedCell1.HasValue || !parsedCell2.HasValue)
+            {
+                return null;
+            }
+
+            var (row1, column1) = parsedCell1.Value;
+            var (row2, column2) = parsedCell2.Value;
+
+            if (row1 < 0 || column1 < 0 || row2 < 0 || column2 < 0)
+            {
+                return null;
+            }
+
+            return new Range(row1, column1, row2 - row1 + 1, column2 - column1 + 1, this);
+
+            (int, int)? ParseCellName(string cellName)
+            {
+                if (string.IsNullOrWhiteSpace(cellName))
+                {
+                    return null;
+                }
+
+                var column = 0;
+                var row = 0;
+
+                var i = 0;
+                while (i < cellName.Length && char.IsLetter(cellName[i]))
+                {
+                    column = column * 26 + cellName[i] - 'A' + 1;
+                    i++;
+                }
+
+                if (i < cellName.Length && char.IsDigit(cellName[i]))
+                {
+                    try
+                    {
+                        row = int.Parse(cellName.Substring(i)) - 1;
+                    }
+                    catch (FormatException)
+                    {
+                        return null;  // Return null if the row number is not a valid number.
+                    }
+                }
+                else
+                {
+                    return null;  // Return null if the cell name doesn't contain a row number.
+                }
+
+                return (row, column - 1);
+            }
+        }
+
+        public Range GetUsedRange()
+        {
+            var minRow = this.CellByCoordinates.Keys.Min(key => key.Item1);
+            var maxRow = this.CellByCoordinates.Keys.Max(key => key.Item1);
+            var minColumn = this.CellByCoordinates.Keys.Min(key => key.Item2);
+            var maxColumn = this.CellByCoordinates.Keys.Max(key => key.Item2);
+
+            return new Range(minRow, minColumn, maxRow - minRow + 1, maxColumn - minColumn + 1, this);
+        }
+
+
+        public Range GetUsedRange(string column)
+        {
+            if (string.IsNullOrEmpty(column))
+            {
+                throw new ArgumentException("Column cannot be null or empty.", nameof(column));
+            }
+
+            var columnIndex = column.ToUpper()[0] - 'A'; // Convert column letter to zero-based index
+            var rowsInColumn = this.CellByCoordinates.Keys.Where(key => key.Item2 == columnIndex).ToList();
+            if (!rowsInColumn.Any())
+            {
+                throw new ArgumentException($"No cells found in column {column}.", nameof(column));
+            }
+
+            var minRow = rowsInColumn.Min(key => key.Item1);
+            var maxRow = rowsInColumn.Max(key => key.Item1);
+
+            return new Range(minRow, columnIndex, maxRow - minRow + 1, 1, this);
+        }
+
+
+        public Range GetUsedRange(int row)
+        {
+            if (row < 0)
+            {
+                throw new ArgumentException("Row index cannot be negative.", nameof(row));
+            }
+
+            var columnsInRow = this.CellByCoordinates.Keys.Where(key => key.Item1 == row).ToList();
+            if (!columnsInRow.Any())
+            {
+                throw new ArgumentException($"No cells found in row {row}.", nameof(row));
+            }
+
+            var minColumn = columnsInRow.Min(key => key.Item2);
+            var maxColumn = columnsInRow.Max(key => key.Item2);
+
+            // Removed the unnecessary if statement and maxColumn; line
+
+            // No need to subtract 1 from the number of columns
+            return new Range(row, minColumn, 1, maxColumn - minColumn + 1, this);
+        }
+
+
 
         public Range FrozenRange { get; private set; }
 
@@ -302,43 +458,43 @@ namespace Allors.Excel.Headless
                 throw new COMException("Cannot save an empty file as PDF.");
             }
             Document.Create(container =>
-                                                                                                                                                          {
-                                                                                                                                                              container.Page(page =>
-                                                                                                                                                              {
-                                                                                                                                                                  page.Size(PageSizes.A4);
-                                                                                                                                                                  page.Margin(2, Unit.Centimetre);
-                                                                                                                                                                  page.PageColor(Colors.White);
-                                                                                                                                                                  page.DefaultTextStyle(x => x.FontSize(20));
+                    {
+                        container.Page(page =>
+                        {
+                            page.Size(PageSizes.A4);
+                            page.Margin(2, Unit.Centimetre);
+                            page.PageColor(Colors.White);
+                            page.DefaultTextStyle(x => x.FontSize(20));
 
-                                                                                                                                                                  page.Header()
-                                                                                                                                                                      .Text("Hello PDF!")
-                                                                                                                                                                      .SemiBold().FontSize(36).FontColor(Colors.Blue.Medium);
+                            page.Header()
+                                .Text("Hello PDF!")
+                                .SemiBold().FontSize(36).FontColor(Colors.Blue.Medium);
 
-                                                                                                                                                                  page.Content()
-                                                                                                                                                                      .PaddingVertical(1, Unit.Centimetre)
-                                                                                                                                                                      .Column(x =>
-                                                                                                                                                                      {
-                                                                                                                                                                          x.Spacing(20);
-
-
-                                                                                                                                                                          foreach (var cell in this.CellByCoordinates)
-                                                                                                                                                                          {
-                                                                                                                                                                              x.Item().Text(cell.Value.Value);
-                                                                                                                                                                          }
+                            page.Content()
+                                .PaddingVertical(1, Unit.Centimetre)
+                                .Column(x =>
+                                {
+                                    x.Spacing(20);
 
 
-                                                                                                                                                                      });
+                                    foreach (var cell in this.CellByCoordinates)
+                                    {
+                                        x.Item().Text(cell.Value.Value);
+                                    }
 
-                                                                                                                                                                  page.Footer()
-                                                                                                                                                                      .AlignCenter()
-                                                                                                                                                                      .Text(x =>
-                                                                                                                                                                      {
-                                                                                                                                                                          x.Span("Page ");
-                                                                                                                                                                          x.CurrentPageNumber();
-                                                                                                                                                                      });
-                                                                                                                                                              });
-                                                                                                                                                          })
-  .GeneratePdf(fullName);
+
+                                });
+
+                            page.Footer()
+                                .AlignCenter()
+                                .Text(x =>
+                                {
+                                    x.Span("Page ");
+                                    x.CurrentPageNumber();
+                                });
+                        });
+                    })
+    .GeneratePdf(fullName);
         }
 
         public void SaveAsXps(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true)
