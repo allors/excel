@@ -374,52 +374,6 @@ namespace Allors.Excel.Headless
             return new Range(minRow, minColumn, maxRow - minRow + 1, maxColumn - minColumn + 1, this);
         }
 
-
-        public Range GetUsedRange(string column)
-        {
-            if (string.IsNullOrEmpty(column))
-            {
-                throw new ArgumentException("Column cannot be null or empty.", nameof(column));
-            }
-
-            var columnIndex = column.ToUpper()[0] - 'A'; // Convert column letter to zero-based index
-            var rowsInColumn = this.CellByCoordinates.Keys.Where(key => key.Item2 == columnIndex).ToList();
-            if (!rowsInColumn.Any())
-            {
-                throw new ArgumentException($"No cells found in column {column}.", nameof(column));
-            }
-
-            var minRow = rowsInColumn.Min(key => key.Item1);
-            var maxRow = rowsInColumn.Max(key => key.Item1);
-
-            return new Range(minRow, columnIndex, maxRow - minRow + 1, 1, this);
-        }
-
-
-        public Range GetUsedRange(int row)
-        {
-            if (row < 0)
-            {
-                throw new ArgumentException("Row index cannot be negative.", nameof(row));
-            }
-
-            var columnsInRow = this.CellByCoordinates.Keys.Where(key => key.Item1 == row).ToList();
-            if (!columnsInRow.Any())
-            {
-                throw new ArgumentException($"No cells found in row {row}.", nameof(row));
-            }
-
-            var minColumn = columnsInRow.Min(key => key.Item2);
-            var maxColumn = columnsInRow.Max(key => key.Item2);
-
-            // Removed the unnecessary if statement and maxColumn; line
-
-            // No need to subtract 1 from the number of columns
-            return new Range(row, minColumn, 1, maxColumn - minColumn + 1, this);
-        }
-
-
-
         public Range FrozenRange { get; private set; }
 
         public void FreezePanes(Range range)

@@ -117,7 +117,7 @@ namespace Allors.Excel.Headless
 
         private string customXml;
         private Dictionary<string, XmlDocument> CustomXmlParts = new Dictionary<string, XmlDocument>();
-        public string SetCustomXML(XmlDocument xmlDocument)
+        public string SetCustomXml(XmlDocument xmlDocument)
         {
             var id = Guid.NewGuid().ToString(); // Generate a unique ID for the custom XML part
 
@@ -128,7 +128,7 @@ namespace Allors.Excel.Headless
         
         public IWorksheet[] WorksheetsByIndex => this.Worksheets;
 
-        public XmlDocument GetCustomXMLById(string id)
+        public XmlDocument GetCustomXmlById(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -143,7 +143,7 @@ namespace Allors.Excel.Headless
             return null;
         }
 
-        public bool TryDeleteCustomXMLById(string id)
+        public bool TryDeleteCustomXmlById(string id)
         {
             if (string.IsNullOrEmpty(id))
             {

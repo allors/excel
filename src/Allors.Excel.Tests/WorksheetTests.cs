@@ -17,8 +17,6 @@ namespace Allors.Excel.Tests
     public abstract class WorksheetTests : ExcelTest
     {
         private readonly DirectoryInfo tempDirectory;
-        private ContextTag expectedContextTag;
-        private List<ContextTag> expectedContextTags;
 
         protected WorksheetTests()
         {
@@ -681,7 +679,7 @@ namespace Allors.Excel.Tests
             Assert.Equal(3, worksheetsByIndex.Length);
             Assert.Equal(1, worksheet.Index);
 
-            // Expected order => Sheet3 | 1  | 2
+            // Expected order => 5 | 1  | 2
             Assert.Equal("5", worksheetsByIndex[0].Name);
             Assert.Equal("1", worksheetsByIndex[1].Name);
             Assert.Equal("2", worksheetsByIndex[2].Name);
@@ -694,7 +692,7 @@ namespace Allors.Excel.Tests
             Assert.Equal(4, worksheetsByIndex.Length);
             Assert.Equal(2, worksheet.Index);
 
-            // Expected order => Sheet3 | Sheet4 | 1 | 2  !! Order is determined dynamically, so it changes after the first AddWorksheet()
+            // Expected order => 5 | 6 | 1 | 2  !! Order is determined dynamically, so it changes after the first AddWorksheet()
             Assert.Equal("5", worksheetsByIndex[0].Name);
             Assert.Equal("6", worksheetsByIndex[1].Name);
             Assert.Equal("1", worksheetsByIndex[2].Name);
@@ -708,53 +706,12 @@ namespace Allors.Excel.Tests
             Assert.Equal(5, worksheetsByIndex.Length);
             Assert.Equal(2, worksheet.Index);
 
-            // Expected order => Sheet3 | Sheet5 | Sheet4 | 1 | 2  !! Order is determined dynamically, so it changes after the first AddWorksheet()
+            // Expected order => 5 | 7 | 6 | 1 | 2  !! Order is determined dynamically, so it changes after the first AddWorksheet()
             Assert.Equal("5", worksheetsByIndex[0].Name);
             Assert.Equal("7", worksheetsByIndex[1].Name);
             Assert.Equal("6", worksheetsByIndex[2].Name);
             Assert.Equal("1", worksheetsByIndex[3].Name);
             Assert.Equal("2", worksheetsByIndex[4].Name);
-        }
-
-        [Fact]
-        public void CellTagContainsCustomObject()
-        {
-            this.expectedContextTags = new List<ContextTag>();
-
-            var addIn = this.NewAddIn();
-
-            this.AddWorkbook();
-
-            var workbook = addIn.Workbooks[0];
-
-            Assert.Equal(2, workbook.Worksheets.Length);
-
-            var worksheet = workbook.AddWorksheet(null, null, workbook.Worksheets.Last());
-
-            worksheet.CellsChanged += this.Worksheet_CellsChanged;
-
-            var tag1 = new ContextTag { Context = "Cell00" };
-            var tag2 = new ContextTag { Context = "Cell01" };
-            this.expectedContextTags.Add(tag1);
-            this.expectedContextTags.Add(tag2);
-
-            var cell00 = worksheet[(0, 0)];
-            cell00.Tag = tag1;
-
-            Assert.NotEmpty(this.expectedContextTags);
-
-            // Change the cell will trigger the Change Event
-            this.expectedContextTag = tag1;
-            worksheet[1, 1].Value = "i am cell00";
-
-            var cell01 = worksheet[(0, 1)];
-            cell01.Tag = tag2;
-
-            // Change the cell will trigger the Change Event
-            this.expectedContextTag = tag2;
-            worksheet[1, 2].Value = "i am cell01";
-
-            Assert.Empty(this.expectedContextTags);
         }
 
         [Fact]
@@ -1180,162 +1137,6 @@ namespace Allors.Excel.Tests
 
             Assert.Equal(0, range.Column);
             Assert.Equal(15, range.Columns);
-
-            // for Column
-            range = sheet1.GetUsedRange("B");
-            Assert.Equal(0, range.Row);
-            Assert.Equal(50, range.Rows);
-
-            Assert.Equal(1, range.Column);
-            Assert.Equal(1, range.Columns);
-
-            range = sheet1.GetUsedRange("L");
-            Assert.Equal(2, range.Row);
-            Assert.Equal(1, range.Rows);
-
-            Assert.Equal(11, range.Column);
-            Assert.Equal(1, range.Columns);
-
-            // for Row
-            range = sheet1.GetUsedRange(0);
-            Assert.Equal(0, range.Row);
-            Assert.Equal(1, range.Rows);
-
-            Assert.Equal(0, range.Column);
-            Assert.Equal(10, range.Columns);
-
-            range = sheet1.GetUsedRange(2);
-            Assert.Equal(2, range.Row);
-            Assert.Equal(1, range.Rows);
-            Assert.Equal(0, range.Column);
-            Assert.Equal(12, range.Columns);
-
-            range = sheet1.GetUsedRange(3);
-            Assert.Equal(3, range.Row);
-            Assert.Equal(1, range.Rows);
-            Assert.Equal(0, range.Column);
-            Assert.Equal(15, range.Columns);
-
-            // Zero based row index
-            sheet1[50, 2].Value = "x";
-            sheet1[50, 3].Value = "y";
-            sheet1[50, 4].Value = "z";
-
-            sheet1.Flush();
-
-            range = sheet1.GetUsedRange(50);
-            Assert.Equal(50, range.Row);
-            Assert.Equal(1, range.Rows);
-
-            Assert.Equal(2, range.Column);
-            Assert.Equal(3, range.Columns);
-        }
-
-        [Fact]
-        public void GetUsedRangeColumn()
-        {
-            var addIn = this.NewAddIn();
-
-            this.AddWorkbook();
-
-            var workbook = addIn.Workbooks[0];
-
-            var sheet1 = workbook.Worksheets[1];
-
-            var range = sheet1.GetUsedRange();
-            Assert.Equal(0, range.Row);
-            Assert.Equal(50, range.Rows);
-
-            Assert.Equal(0, range.Column);
-            Assert.Equal(15, range.Columns);
-
-            // for Column
-            range = sheet1.GetUsedRange("B");
-            Assert.Equal(0, range.Row);
-            Assert.Equal(50, range.Rows);
-
-            Assert.Equal(1, range.Column);
-            Assert.Equal(1, range.Columns);
-
-            range = sheet1.GetUsedRange("L");
-            Assert.Equal(2, range.Row);
-            Assert.Equal(1, range.Rows);
-
-            Assert.Equal(11, range.Column);
-            Assert.Equal(1, range.Columns);
-
-            sheet1[50, 30].Value = "x";
-            sheet1[51, 30].Value = "y";
-            sheet1[52, 30].Value = "z";
-
-            sheet1.Flush();
-
-            var columnName = Utils.ExcelColumnFromNumber(31);
-
-            range = sheet1.GetUsedRange(columnName);
-            Assert.Equal(50, range.Row);
-            Assert.Equal(3, range.Rows);
-
-            Assert.Equal(30, range.Column);
-            Assert.Equal(1, range.Columns);
-
-            // Blank line is still counted as a row
-            sheet1[54, 30].Value = "aa";
-
-            sheet1.Flush();
-
-            range = sheet1.GetUsedRange(columnName);
-            Assert.Equal(50, range.Row);
-            Assert.Equal(5, range.Rows);
-
-            Assert.Equal(30, range.Column);
-            Assert.Equal(1, range.Columns);
-        }
-
-        [Fact]
-        public void GetUsedRangeRow()
-        {
-            var addIn = this.NewAddIn();
-
-            this.AddWorkbook();
-
-            var workbook = addIn.Workbooks[0];
-
-            var sheet1 = workbook.Worksheets[1];
-
-            // for Row
-            var range = sheet1.GetUsedRange(0);
-            Assert.Equal(0, range.Row);
-            Assert.Equal(1, range.Rows);
-
-            Assert.Equal(0, range.Column);
-            Assert.Equal(10, range.Columns);
-
-            range = sheet1.GetUsedRange(2);
-            Assert.Equal(2, range.Row);
-            Assert.Equal(1, range.Rows);
-            Assert.Equal(0, range.Column);
-            Assert.Equal(12, range.Columns);
-
-            range = sheet1.GetUsedRange(3);
-            Assert.Equal(3, range.Row);
-            Assert.Equal(1, range.Rows);
-            Assert.Equal(0, range.Column);
-            Assert.Equal(15, range.Columns);
-
-            // Zero based row index
-            sheet1[50, 2].Value = "x";
-            sheet1[50, 3].Value = "y";
-            sheet1[50, 4].Value = "z";
-
-            sheet1.Flush();
-
-            range = sheet1.GetUsedRange(50);
-            Assert.Equal(50, range.Row);
-            Assert.Equal(1, range.Rows);
-
-            Assert.Equal(2, range.Column);
-            Assert.Equal(3, range.Columns);
         }
 
         [Fact]
@@ -1368,20 +1169,6 @@ namespace Allors.Excel.Tests
             var sheet1 = workbook.AddWorksheet(0);
 
             Assert.True(sheet1.IsActive);
-        }
-
-        private void Worksheet_CellsChanged(object sender, CellChangedEvent e)
-        {
-            var tag = (ContextTag)e.Cells[0].Tag;
-
-            Assert.Equal(this.expectedContextTag, tag);
-
-            this.expectedContextTags.Remove(tag);
-        }
-
-        private class ContextTag
-        {
-            public string Context { get; set; }
         }
     }
 }

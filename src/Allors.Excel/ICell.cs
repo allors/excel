@@ -34,7 +34,5 @@ namespace Allors.Excel
         IValueConverter ValueConverter { get; set; }
 
         void Clear();
-
-        object Tag { get; set; }
     }
 }

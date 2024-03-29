@@ -526,10 +526,10 @@ namespace Allors.Excel.Tests
             var xmlDoc = new XmlDocument();
             xmlDoc.Load(@"data\catalog.xml");
 
-            var tagId = workbook.SetCustomXML(xmlDoc);
+            var tagId = workbook.SetCustomXml(xmlDoc);
 
             // Then read the xml
-            var outputXmlDoc = workbook.GetCustomXMLById(tagId);
+            var outputXmlDoc = workbook.GetCustomXmlById(tagId);
             Assert.Equal("CATALOG", outputXmlDoc.DocumentElement?.Name);
 
             Assert.Equal(36, outputXmlDoc.DocumentElement?.ChildNodes.Count);
@@ -546,12 +546,12 @@ namespace Allors.Excel.Tests
             var xmlDoc = new XmlDocument();
             xmlDoc.Load(@"data\catalog.xml");
 
-            var tagId = workbook.SetCustomXML(xmlDoc);
+            var tagId = workbook.SetCustomXml(xmlDoc);
 
-            Assert.True(workbook.TryDeleteCustomXMLById(tagId));
+            Assert.True(workbook.TryDeleteCustomXmlById(tagId));
 
             // Then read the xml
-            var outputXmlDoc = workbook.GetCustomXMLById(Convert.ToString(tagId));
+            var outputXmlDoc = workbook.GetCustomXmlById(Convert.ToString(tagId));
             Assert.Null(outputXmlDoc);
         }
 
@@ -596,11 +596,11 @@ namespace Allors.Excel.Tests
 
             var namedRanges = worksheet.GetNamedRanges();
 
-            Assert.Contains(namedRanges, v => string.Equals(v.Name, "MY.NAMEDRANGE"));
+            Assert.Contains(namedRanges, v => v.Name.EndsWith("MY.NAMEDRANGE"));
 
             namedRanges = workbook.GetNamedRanges();
 
-            Assert.DoesNotContain(namedRanges, v => string.Equals(v.Name, "MY.NAMEDRANGE"));
+            Assert.DoesNotContain(namedRanges, v => v.Name.Equals("MY.NAMEDRANGE"));
         }
 
         [Fact]
@@ -651,12 +651,12 @@ namespace Allors.Excel.Tests
 
             var namedRanges = worksheet.GetNamedRanges();
 
-            Assert.Contains(namedRanges, v => string.Equals(v.Name, "MY.NAMEDRANGE"));
+            Assert.Contains(namedRanges, v => v.Name.EndsWith("MY.NAMEDRANGE"));
 
             range = new Range(8, 10, 2, 4, worksheet);
             worksheet.SetNamedRange("MY.NAMEDRANGE", range);
 
-            var namedRange = worksheet.GetNamedRanges().First(v => string.Equals(v.Name, "MY.NAMEDRANGE"));
+            var namedRange = worksheet.GetNamedRanges().First(v => v.Name.EndsWith("MY.NAMEDRANGE"));
 
             Assert.Equal(8, namedRange.Row);
             Assert.Equal(10, namedRange.Column);

@@ -12,31 +12,31 @@ namespace Allors.Excel
 
     public class Binder
     {
-        public event EventHandler ToDomained;
+        private readonly IDictionary<ICell, IBinding> bindingByCell = new ConcurrentDictionary<ICell, IBinding>();
 
-        public IWorksheet Worksheet { get; }
-
-        private IDictionary<ICell, IBinding> bindingByCell = new ConcurrentDictionary<ICell, IBinding>();
+        private readonly IDictionary<ICell, Style> changedCells;
 
         private IList<ICell> boundCells = new List<ICell>();
 
         private IList<ICell> bindingCells = new List<ICell>();
-
-        public readonly Style changedStyle;
-
-        private readonly IDictionary<ICell, Style> changedCells;
 
         public Binder(IWorksheet worksheet, Style changedStyle = null)
         {
             this.Worksheet = worksheet;
             this.Worksheet.CellsChanged += this.Worksheet_CellsChanged;
 
-            this.changedStyle = changedStyle;
-            if (this.changedStyle != null)
+            this.ChangedStyle = changedStyle;
+            if (this.ChangedStyle != null)
             {
                 this.changedCells = new Dictionary<ICell, Style>();
             }
         }
+
+        public event EventHandler ToDomained;
+
+        public IWorksheet Worksheet { get; }
+
+        public Style ChangedStyle { get; }
 
         public void Set(int row, int column, IBinding binding) => this.Set(this.Worksheet[row, column], binding);
 
@@ -67,36 +67,6 @@ namespace Allors.Excel
             return obsoleteCells;
         }
 
-        private void Worksheet_CellsChanged(object sender, CellChangedEvent e)
-        {
-            foreach (var cell in e.Cells)
-            {
-                if (this.bindingByCell.TryGetValue(cell, out var binding))
-                {
-                    if (binding.TwoWayBinding)
-                    {
-                        binding.ToDomain(cell);
-
-                        if (this.changedStyle != null && this.changedCells != null)
-                        {
-                            if (!this.changedCells.ContainsKey(cell))
-                            {
-                                this.changedCells.Add(cell, cell.Style);
-                            }
-
-                            cell.Style = this.changedStyle;
-                        }
-                    }
-                    else
-                    {
-                        binding.ToCell(cell);
-                    }
-                }
-            }
-
-            this.ToDomained?.Invoke(this, EventArgs.Empty);
-        }
-
         public void ResetChangedCells()
         {
             if (this.changedCells != null)
@@ -113,5 +83,35 @@ namespace Allors.Excel
         }
 
         public bool ExistBinding(int row, int column) => this.bindingCells.Any(v => v.Row.Index == row && v.Column.Index == column);
+
+        private void Worksheet_CellsChanged(object sender, CellChangedEvent e)
+        {
+            foreach (var cell in e.Cells)
+            {
+                if (this.bindingByCell.TryGetValue(cell, out var binding))
+                {
+                    if (binding.TwoWayBinding)
+                    {
+                        binding.ToDomain(cell);
+
+                        if (this.ChangedStyle != null && this.changedCells != null)
+                        {
+                            if (!this.changedCells.ContainsKey(cell))
+                            {
+                                this.changedCells.Add(cell, cell.Style);
+                            }
+
+                            cell.Style = this.ChangedStyle;
+                        }
+                    }
+                    else
+                    {
+                        binding.ToCell(cell);
+                    }
+                }
+            }
+
+            this.ToDomained?.Invoke(this, EventArgs.Empty);
+        }
     }
 }

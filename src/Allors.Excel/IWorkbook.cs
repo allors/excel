@@ -10,14 +10,7 @@ namespace Allors.Excel
 
     public interface IWorkbook
     {
-
         event EventHandler<Allors.Excel.Hyperlink> OnHyperlinkClicked;
-
-        /// <summary>
-        /// Event FollowHyperLink triggers to method call.
-        /// </summary>
-        /// <param name="textToDisplay">the textpart of the hyperlink</param>
-        void HyperlinkClicked(Hyperlink hyperlink);
 
         /// <summary>
         /// Gets the IsActive value.
@@ -28,6 +21,17 @@ namespace Allors.Excel
         /// Gets the List of worksheets in this workbook
         /// </summary>
         IWorksheet[] Worksheets { get; }
+
+        IBuiltinProperties BuiltinProperties { get; }
+
+        ICustomProperties CustomProperties { get; }
+
+        IWorksheet[] WorksheetsByIndex { get; }
+
+        /// <summary>
+        /// Event FollowHyperLink triggers to method call.
+        /// </summary>
+        void HyperlinkClicked(Hyperlink hyperlink);
 
         /// <summary>
         /// Closed the workbook with the given parameters
@@ -66,31 +70,25 @@ namespace Allors.Excel
         /// <param name="range"></param>
         void SetNamedRange(string name, Range range);
 
-        IBuiltinProperties BuiltinProperties { get; }
-
-        ICustomProperties CustomProperties { get; }
-
-        IWorksheet[] WorksheetsByIndex { get; }
-
         /// <summary>
         /// Sets the content of the xmldocument in the customxmlparts, and returns the id of the xmlpart.
         /// </summary>
         /// <param name="xmlDocument"></param>
         /// <returns></returns>
-        string SetCustomXML(XmlDocument xmlDocument);
+        string SetCustomXml(XmlDocument xmlDocument);
 
         /// <summary>
         /// Gets the content of the xmlpart (find by the given id), and returns as a xml document.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        XmlDocument GetCustomXMLById(string id);
+        XmlDocument GetCustomXmlById(string id);
 
         /// <summary>
         /// Delete the custom xml part.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        bool TryDeleteCustomXMLById(string id);
+        bool TryDeleteCustomXmlById(string id);
     }
 }

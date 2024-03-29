@@ -36,6 +36,13 @@ namespace Allors.Excel
         /// </summary>
         IWorkbook Workbook { get; }
 
+        bool IsVisible { get; set; }
+
+        /// <summary>
+        /// True when the sheet has pane that is frozen, otherwise, false
+        /// </summary>
+        bool HasFreezePanes { get; }
+
         ICustomProperties CustomProperties { get; }
 
         /// <summary>
@@ -54,6 +61,28 @@ namespace Allors.Excel
         bool IsActive { get; set; }
 
         /// <summary>
+        /// Indexer for getting the Cell by Row and Column index. If the cell does not exist, one will be created.
+        /// </summary>
+        /// <returns>
+        /// the existing or newly created cell at this coordinate
+        /// </returns>
+        ICell this[int row, int column]
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Indexer for getting the Cell by Row and Column index. If the cell does not exist, one will be created.
+        /// </summary>
+        /// <returns>
+        /// the existing or newly created cell at this coordinate
+        /// </returns>
+        ICell this[(int, int) coordinates]
+        {
+            get;
+        }
+
+        /// <summary>
         /// Indexer for getting the Row by index
         /// </summary>
         /// <param name="index"></param>
@@ -66,32 +95,6 @@ namespace Allors.Excel
         /// <param name="index"></param>
         /// <returns></returns>
         IColumn Column(int index);
-
-        /// <summary>
-        /// Indexer for getting the Cell by Row and Column index. If the cell does not exist, one will be created.
-        /// </summary>
-        /// <param name="row"></param>
-        /// <param name="column"></param>
-        /// <returns>
-        /// the existing or newly created cell at this coordinate
-        /// </returns>
-        ICell this[int row, int column]
-        {
-            get;
-        }
-
-        /// <summary>
-        /// Indexer for getting the Cell by Row and Column index. If the cell does not exist, one will be created.
-        /// </summary>
-        /// <param name="row"></param>
-        /// <param name="column"></param>
-        /// <returns>
-        /// the existing or newly created cell at this coordinate
-        /// </returns>
-        ICell this[(int, int) coordinates]
-        {
-            get;
-        }
 
         /// <summary>
         /// Flushes all ICells properties to the underlying implementation (interop or headless).
@@ -176,20 +179,6 @@ namespace Allors.Excel
 
         Range GetUsedRange();
 
-        /// <summary>
-        /// column equals the excel columns A,B,C, ...
-        /// </summary>
-        /// <param name="column"></param>
-        /// <returns></returns>
-        Range GetUsedRange(string column);
-
-        /// <summary>
-        /// row equals the zero-based index of excel rows (so 1 less than the excel rowindex)
-        /// </summary>
-        /// <param name="row"></param>
-        /// <returns></returns>
-        Range GetUsedRange(int row);
-
         void AutoFit();
 
         void SetChartObjectDataLabels(
@@ -208,8 +197,6 @@ namespace Allors.Excel
 
         void SetChartObjectSourceData(object chartObject, object pivotTable);
 
-        bool IsVisible { get; set; }
-
         /// <summary>
         /// Freeze the pane at the given range (row, column)
         /// </summary>
@@ -220,11 +207,6 @@ namespace Allors.Excel
         /// Removes the frozen pane from the worksheet
         /// </summary>
         void UnfreezePanes();
-
-        /// <summary>
-        /// True when the sheet has pane that is frozen, otherwise, false
-        /// </summary>
-        bool HasFreezePanes { get; }
 
         /// <summary>
         /// Saves the sheet as a PDF to the file, with the given parameters.

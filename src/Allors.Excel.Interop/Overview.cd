@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Allors.Excel.Interop.AddIn">
+    <Position X="1.5" Y="1.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAADAAACAAAAAAEBAAABAAAAAIAAAAgASAAAA=</HashCode>
+      <FileName>AddIn.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="workbookByInteropWorkbook" />
+      <Field Name="worksheetByInteropWorksheet" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Allors.Excel.Interop.Workbook">
+    <Position X="6.25" Y="1.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAAAAACEEEBAACACBAgEiCAAAAA0AAASAgAA=</HashCode>
+      <FileName>Workbook.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Allors.Excel.Interop.Worksheet">
+    <Position X="10.75" Y="1.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>hAYwAQCAMAQBV3esHAnQqJQNqAAAEigIg7mQAgCoQhg=</HashCode>
+      <FileName>Worksheet.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

@@ -23,8 +23,6 @@ namespace Allors.Excel
 
         public bool TwoWayBinding => !this.OneWayBinding;
 
-        public object Value { get; }
-
         public void ToCell(ICell cell) => this.toCell?.Invoke(cell);
 
         public void ToDomain(ICell cell) => this.toDomain?.Invoke(cell);

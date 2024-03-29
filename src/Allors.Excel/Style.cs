@@ -1,4 +1,4 @@
-// <copyright file="Style.cs" company="Allors bvba">
+﻿// <copyright file="Style.cs" company="Allors bvba">
 // Copyright (c) Allors bvba. All rights reserved.
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -22,7 +22,7 @@ namespace Allors.Excel
         public override bool Equals(object obj)
         {
             var that = obj as Style;
-            return this.BackgroundColor == that?.BackgroundColor && this.TextColor == that?.TextColor;
+            return this.BackgroundColor == that?.BackgroundColor && this.TextColor == that.TextColor;
         }
 
         public override int GetHashCode() => this.BackgroundColor.GetHashCode() + this.TextColor.GetHashCode();
