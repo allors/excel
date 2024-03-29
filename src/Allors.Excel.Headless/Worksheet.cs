@@ -12,10 +12,6 @@ namespace Allors.Excel.Headless
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Threading.Tasks;
-    using QuestPDF;
-    using QuestPDF.Fluent;
-    using QuestPDF.Helpers;
-    using QuestPDF.Infrastructure;
 
     public class Worksheet(Workbook workbook) : IWorksheet
     {
