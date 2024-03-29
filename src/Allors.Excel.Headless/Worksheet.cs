@@ -42,7 +42,7 @@ namespace Allors.Excel.Headless
         }
         //public int Index => throw new NotImplementedException();
 
-        public Dictionary<(int, int), Cell> CellByCoordinates { get; } = new();
+        public Dictionary<(int Row, int Column), Cell> CellByCoordinates { get; private set; } = new();
 
         public bool IsVisible { get; set; } = true;
 
@@ -205,7 +205,26 @@ namespace Allors.Excel.Headless
             range.Name = name;
         }
 
-        public void InsertRows(int startRowIndex, int numberOfRows) => throw new NotImplementedException();
+        public void InsertRows(int startRowIndex, int numberOfRows)
+        {
+            var newCellByCoordinates = new Dictionary<(int Row, int Column), Cell>();
+
+            foreach (var kvp in this.CellByCoordinates)
+            {
+                var coordinates = kvp.Key;
+                var cell = kvp.Value;
+
+                if (coordinates.Row > startRowIndex)
+                {
+                    coordinates = (coordinates.Row + numberOfRows, coordinates.Column);
+                }
+
+                newCellByCoordinates.Add(coordinates, cell);
+            }
+
+            this.CellByCoordinates = newCellByCoordinates;
+
+        }
 
         public void DeleteRows(int startRowIndex, int numberOfRows)
         {
