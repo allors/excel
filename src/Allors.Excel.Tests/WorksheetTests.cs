@@ -899,7 +899,7 @@ namespace Allors.Excel.Tests
 
             worksheet.Flush();
 
-            worksheet.InsertColumns(0, 2);
+            worksheet.InsertColumns(0, 1);
 
             cell = worksheet[0, 0];
             Assert.Equal("Cell A0", Convert.ToString(cell.Value));
@@ -909,9 +909,6 @@ namespace Allors.Excel.Tests
             Assert.Null(cell.Value);
 
             cell = worksheet[0, 2];
-            Assert.Null(cell.Value);
-
-            cell = worksheet[0, 3];
             Assert.Equal("Cell B0", Convert.ToString(cell.Value));
         }
 

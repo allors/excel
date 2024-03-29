@@ -188,10 +188,6 @@ namespace Allors.Excel.Headless
             return new Rectangle(startColumn, startRow, width, height);
         }
 
-
-
-
-
         public void SetNamedRange(string name, Range range)
         {
             if (string.IsNullOrEmpty(name))
@@ -246,8 +242,25 @@ namespace Allors.Excel.Headless
             }
         }
 
+        public void InsertColumns(int startColumnIndex, int numberOfColumns)
+        {
+            var newCellByCoordinates = new Dictionary<(int Row, int Column), Cell>();
 
-        public void InsertColumns(int startColumnIndex, int numberOfColumns) => throw new NotImplementedException();
+            foreach (var kvp in this.CellByCoordinates)
+            {
+                var coordinates = kvp.Key;
+                var cell = kvp.Value;
+
+                if (coordinates.Column > startColumnIndex)
+                {
+                    coordinates = (coordinates.Row, coordinates.Column + numberOfColumns);
+                }
+
+                newCellByCoordinates.Add(coordinates, cell);
+            }
+
+            this.CellByCoordinates = newCellByCoordinates;
+        }
 
         public void DeleteColumns(int startColumnIndex, int numberOfColumns)
         {
