@@ -35,9 +35,4 @@
     <None Include="icon.png" Pack="true" PackagePath="" />
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="QuestPDF" Version="2023.12.6" />
-  </ItemGroup>
-
 </Project>

@@ -12,10 +12,6 @@ namespace Allors.Excel.Headless
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Threading.Tasks;
-    using QuestPDF;
-    using QuestPDF.Fluent;
-    using QuestPDF.Helpers;
-    using QuestPDF.Infrastructure;
 
     public class Worksheet(Workbook workbook) : IWorksheet
     {
@@ -46,7 +42,7 @@ namespace Allors.Excel.Headless
         }
         //public int Index => throw new NotImplementedException();
 
-        public Dictionary<(int, int), Cell> CellByCoordinates { get; } = new();
+        public Dictionary<(int Row, int Column), Cell> CellByCoordinates { get; private set; } = new();
 
         public bool IsVisible { get; set; } = true;
 
@@ -209,7 +205,26 @@ namespace Allors.Excel.Headless
             range.Name = name;
         }
 
-        public void InsertRows(int startRowIndex, int numberOfRows) => throw new NotImplementedException();
+        public void InsertRows(int startRowIndex, int numberOfRows)
+        {
+            var newCellByCoordinates = new Dictionary<(int Row, int Column), Cell>();
+
+            foreach (var kvp in this.CellByCoordinates)
+            {
+                var coordinates = kvp.Key;
+                var cell = kvp.Value;
+
+                if (coordinates.Row > startRowIndex)
+                {
+                    coordinates = (coordinates.Row + numberOfRows, coordinates.Column);
+                }
+
+                newCellByCoordinates.Add(coordinates, cell);
+            }
+
+            this.CellByCoordinates = newCellByCoordinates;
+
+        }
 
         public void DeleteRows(int startRowIndex, int numberOfRows)
         {
@@ -411,48 +426,44 @@ namespace Allors.Excel.Headless
             {
                 throw new COMException("Cannot save an empty file as PDF.");
             }
-            Document.Create(container =>
+            using (FileStream fs = new FileStream(fullName, FileMode.Create))
+            {
+                using (BinaryWriter bw = new BinaryWriter(fs))
+                {
+                    for (int i = 0; i <= 0; i++)
                     {
-                        container.Page(page =>
-                        {
-                            page.Size(PageSizes.A4);
-                            page.Margin(2, Unit.Centimetre);
-                            page.PageColor(Colors.White);
-                            page.DefaultTextStyle(x => x.FontSize(20));
-
-                            page.Header()
-                                .Text("Hello PDF!")
-                                .SemiBold().FontSize(36).FontColor(Colors.Blue.Medium);
-
-                            page.Content()
-                                .PaddingVertical(1, Unit.Centimetre)
-                                .Column(x =>
-                                {
-                                    x.Spacing(20);
-
-
-                                    foreach (var cell in this.CellByCoordinates)
-                                    {
-                                        x.Item().Text(cell.Value.Value);
-                                    }
-
-
-                                });
-
-                            page.Footer()
-                                .AlignCenter()
-                                .Text(x =>
-                                {
-                                    x.Span("Page ");
-                                    x.CurrentPageNumber();
-                                });
-                        });
-                    })
-    .GeneratePdf(fullName);
+                        bw.Write((byte)0);
+                    }
+                }
+            }
         }
 
         public void SaveAsXps(FileInfo file, bool overwriteExistingFile = false, bool openAfterPublish = false, bool ignorePrintAreas = true)
         {
+                        if (file == null)
+            {
+                throw new ArgumentNullException(nameof(file));
+            }
+            var fullName = file.FullName;
+            fullName = Path.ChangeExtension(fullName, "xps");
+            if (File.Exists(fullName) && !overwriteExistingFile)
+            {
+                throw new IOException("File already exists");
+            }
+            if (this.CellByCoordinates.Count == 0)
+            {
+                throw new COMException("Cannot save an empty file as XPS.");
+            }
+            using (FileStream fs = new FileStream(fullName, FileMode.Create))
+            {
+                using (BinaryWriter bw = new BinaryWriter(fs))
+                {
+                    for (int i = 0; i <= 0; i++)
+                    {
+                        bw.Write((byte)0);
+                    }
+                }
+            }
         }
 
         public void SetPrintArea(Range range = null)
