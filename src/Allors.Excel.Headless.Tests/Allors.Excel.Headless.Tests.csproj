@@ -1,23 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net462</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Moq" Version="4.20.70" PrivateAssets="all" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" PrivateAssets="all" />
-    <PackageReference Include="xunit" Version="2.7.0" PrivateAssets="all" />
-    <PackageReference Include="xunit.analyzers" Version="1.11.0" PrivateAssets="all" />
-    <PackageReference Include="xunit.runner.console" Version="2.7.0" PrivateAssets="all" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7" PrivateAssets="all" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeStyle" Version="4.9.2" PrivateAssets="all" />
-    <PackageReference Include="Roslynator.Analyzers" Version="4.12.0" PrivateAssets="all" />
+    <PackageReference Include="Moq" Version="4.20.72" PrivateAssets="all" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.3" PrivateAssets="all" />
+    <PackageReference Include="xunit" Version="2.9.3" PrivateAssets="all" />
+    <PackageReference Include="xunit.analyzers" Version="1.26.0" PrivateAssets="all" />
+    <PackageReference Include="xunit.runner.console" Version="2.9.3" PrivateAssets="all" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" PrivateAssets="all" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Allors.Excel.Headless\Allors.Excel.Headless.csproj" />
     <ProjectReference Include="..\Allors.Excel.Tests\Allors.Excel.Tests.csproj" />
     <ProjectReference Include="..\Application\Application.csproj" />
   </ItemGroup>
+  
   <ItemGroup>
     <None Update="data\Catalog.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
