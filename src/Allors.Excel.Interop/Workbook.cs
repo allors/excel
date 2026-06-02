@@ -98,7 +98,9 @@ namespace Allors.Excel.Interop
                     }
                 }
 
-                return this.TryAdd(interopWorksheet);
+                var worksheet = this.TryAdd(interopWorksheet);
+                this.AddIn.Program.OnNew(worksheet).ConfigureAwait(false);
+                return worksheet;
             }
             finally
             {
@@ -227,11 +229,19 @@ namespace Allors.Excel.Interop
 
         private void ApplicationOnWorkbookNewSheet(InteropWorkbook wb, object sh)
         {
+            if (wb.FullName != this.InteropWorkbook.FullName)
+            {
+                // Application-level event: the new sheet belongs to another workbook.
+                return;
+            }
+
             if (sh is InteropWorksheet interopWorksheet)
             {
                 var worksheet = this.TryAdd(interopWorksheet);
 
                 interopWorksheet.BeforeDelete += async () => await this.AddIn.Program.OnBeforeDelete(worksheet);
+
+                this.AddIn.Program.OnNew(worksheet).ConfigureAwait(false);
             }
             else
             {

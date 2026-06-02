@@ -42,13 +42,15 @@ namespace Allors.Excel.Interop
                     workbook.New(interopWorksheet);
                 }
 
-                await this.Program.OnNew(workbook);
-
+                // Notify the existing worksheets first; worksheets added during
+                // OnNew(workbook) are notified by Workbook.AddWorksheet itself.
                 var worksheets = workbook.Worksheets;
                 foreach (var worksheet in worksheets)
                 {
                     await program.OnNew(worksheet);
                 }
+
+                await this.Program.OnNew(workbook);
             };
 
             this.Application.WorkbookOpen += async interopWorkbook =>
@@ -69,12 +71,15 @@ namespace Allors.Excel.Interop
                     workbook.New(interopWorksheet);
                 }
 
+                // Notify the existing worksheets first; worksheets added during
+                // OnNew(workbook) are notified by Workbook.AddWorksheet itself.
                 var worksheets = workbook.Worksheets;
-                await this.Program.OnNew(workbook);
                 foreach (var worksheet in worksheets)
                 {
                     await program.OnNew(worksheet);
                 }
+
+                await this.Program.OnNew(workbook);
             };
 
             this.Application.WorkbookActivate += interopWorkbook =>

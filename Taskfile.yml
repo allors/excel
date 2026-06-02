@@ -1,0 +1,114 @@
+# https://taskfile.dev
+# Build automation for Allors.Excel (replaces Nuke.build).
+# Entry point: task <target>   (install: choco install go-task / winget install Task.Task)
+#
+# Prerequisites: Windows, Visual Studio with Office/VSTO workload (msbuild.exe),
+# .NET 10 SDK, Microsoft Excel (only to RUN tests).
+# Versioning: Nerdbank.GitVersioning (version.json) - stamped automatically during build.
+# Configuration defaults to Debug; override: task ci CONFIGURATION=Release
+
+version: '3'
+
+run: once # each task at most once per invocation (matches Nuke target semantics)
+
+vars:
+  CONFIGURATION: '{{.CONFIGURATION | default "Debug"}}'
+  SRC: src
+  SOLUTION: src/Excel.sln
+  ARTIFACTS: artifacts
+  TESTS_DIR: artifacts/tests
+  NUGET_DIR: artifacts/nuget
+
+  # Full msbuild.exe (not on PATH); the legacy VSTO project and GAC Office
+  # references require full MSBuild. vswhere lives at a fixed installer location.
+  # PowerShell picks the first match and writes it without a trailing newline.
+  MSBUILD:
+    sh: >-
+      powershell -NoProfile -Command
+      "[Console]::Write((& '{{env "ProgramFiles(x86)"}}\Microsoft Visual Studio\Installer\vswhere.exe'
+      -latest -requires Microsoft.Component.MSBuild
+      -find 'MSBuild\**\Bin\MSBuild.exe' | Select-Object -First 1))"
+
+  # xunit.console.exe restored into the NuGet cache via the test projects'
+  # xunit.runner.console 2.7.0 PackageReference. Honors NUGET_PACKAGES override.
+  XUNIT_CONSOLE: '{{coalesce (env "NUGET_PACKAGES") (printf "%s/.nuget/packages" (env "USERPROFILE"))}}/xunit.runner.console/2.7.0/tools/net462/xunit.console.exe'
+
+tasks:
+  default:
+    desc: Run tests, then produce NuGet packages (mirrors Nuke Default).
+    cmds:
+      - task: test
+      - task: pack
+
+  clean:
+    desc: Create/clean the artifacts directory.
+    cmds:
+      - powershell -NoProfile -Command "if (Test-Path '{{.ARTIFACTS}}') { Remove-Item -Recurse -Force '{{.ARTIFACTS}}' }; New-Item -ItemType Directory -Force '{{.ARTIFACTS}}' | Out-Null"
+
+  restore:
+    desc: Restore solution packages (PackageReference + packages.config) and dotnet tools.
+    cmds:
+      - dotnet tool restore
+      - '"{{.MSBUILD}}" {{.SOLUTION}} /t:Restore /p:RestorePackagesConfig=true'
+
+  compile:
+    desc: Rebuild the test projects (nbgv stamps versions automatically).
+    deps: [restore]
+    cmds:
+      - '"{{.MSBUILD}}" {{.SRC}}/Allors.Excel.Headless.Tests/Allors.Excel.Headless.Tests.csproj /t:Rebuild /p:Configuration={{.CONFIGURATION}}'
+      - '"{{.MSBUILD}}" {{.SRC}}/Allors.Excel.Interop.Tests/Allors.Excel.Interop.Tests.csproj /t:Rebuild /p:Configuration={{.CONFIGURATION}}'
+      - '"{{.MSBUILD}}" {{.SRC}}/Allors.Excel.Interop.Vsto.Tests/Allors.Excel.Interop.Vsto.Tests.csproj /t:Rebuild /p:Configuration={{.CONFIGURATION}}'
+      - '"{{.MSBUILD}}" {{.SRC}}/Allors.Excel.Interop.Dna.Tests/Allors.Excel.Interop.Dna.Tests.csproj /t:Rebuild /p:Configuration={{.CONFIGURATION}}'
+
+  test:
+    desc: Run all test passes into artifacts/tests.
+    deps: [compile]
+    cmds:
+      - powershell -NoProfile -Command "New-Item -ItemType Directory -Force '{{.TESTS_DIR}}' | Out-Null"
+      # 1) dotnet test on the multi-targeted Interop.Tests (net462 + net10.0) -> TRX
+      - >-
+        dotnet test {{.SRC}}/Allors.Excel.Interop.Tests/Allors.Excel.Interop.Tests.csproj
+        --configuration {{.CONFIGURATION}} --no-build --no-restore
+        --logger "trx;LogFileName=interop-results-dotnet.trx"
+        --results-directory {{.TESTS_DIR}}
+      # 2-5) xunit.console on the net4x assemblies
+      - >-
+        "{{.XUNIT_CONSOLE}}"
+        {{.SRC}}/Allors.Excel.Interop.Tests/bin/{{.CONFIGURATION}}/net462/Allors.Excel.Interop.Tests.dll
+        -xml {{.TESTS_DIR}}/interop-results-framework.xml
+      - >-
+        "{{.XUNIT_CONSOLE}}"
+        {{.SRC}}/Allors.Excel.Interop.Vsto.Tests/bin/{{.CONFIGURATION}}/net462/Allors.Excel.Interop.Vsto.Tests.dll
+        -xml {{.TESTS_DIR}}/interop-vsto-results.xml
+      - >-
+        "{{.XUNIT_CONSOLE}}"
+        {{.SRC}}/Allors.Excel.Headless.Tests/bin/{{.CONFIGURATION}}/net462/Allors.Excel.Headless.Tests.dll
+        -xml {{.TESTS_DIR}}/headless-results.xml
+      - >-
+        "{{.XUNIT_CONSOLE}}"
+        {{.SRC}}/Allors.Excel.Interop.Dna.Tests/bin/{{.CONFIGURATION}}/net48/Allors.Excel.Interop.Dna.Tests.dll
+        -xml {{.TESTS_DIR}}/interop-dna-results.xml
+
+  pack:
+    desc: Produce NuGet packages into artifacts/nuget (versions from nbgv).
+    deps: [compile]
+    cmds:
+      - powershell -NoProfile -Command "New-Item -ItemType Directory -Force '{{.NUGET_DIR}}' | Out-Null"
+      - >-
+        dotnet pack {{.SRC}}/Allors.Excel/Allors.Excel.csproj
+        --configuration {{.CONFIGURATION}} --include-source --include-symbols
+        --output {{.NUGET_DIR}}
+      - >-
+        dotnet pack {{.SRC}}/Allors.Excel.Headless/Allors.Excel.Headless.csproj
+        --configuration {{.CONFIGURATION}} --include-source --include-symbols
+        --output {{.NUGET_DIR}}
+      # Full MSBuild required (Office PIA via GAC). PackageOutputPath must be
+      # absolute: msbuild resolves relative paths against the project directory.
+      - >-
+        "{{.MSBUILD}}" {{.SRC}}/Allors.Excel.Interop/Allors.Excel.Interop.csproj
+        /t:Pack /p:Configuration={{.CONFIGURATION}}
+        "/p:PackageOutputPath={{.ROOT_DIR}}/{{.NUGET_DIR}}"
+
+  ci:
+    desc: CI target (mirrors Nuke Ci - depends on test).
+    deps: [test]

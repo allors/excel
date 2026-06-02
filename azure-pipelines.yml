@@ -1,5 +1,5 @@
 trigger:
-- master
+- main
 - feature/*
 - issue/*
 
@@ -19,19 +19,19 @@ stages:
       matrix:
         Excel32:
           options: '--forcex86'
-          target: 'Ci'
+          target: 'ci'
         Excel64:
           options: ''
-          target: 'Ci'
+          target: 'ci'
       maxParallel: 4
 
     steps:
     - task: UseDotNet@2
       inputs:
         packageType: sdk
-        version: 8.0.x
+        version: 10.0.x
         includePreviewVersions: true
-      displayName: 'Use .NET 8.0 sdk'
+      displayName: 'Use .NET 10.0 sdk'
     - task: PowerShell@2
       inputs:
         targetType: 'inline'
@@ -43,15 +43,22 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          Import-PfxCertificate -FilePath $(Build.SourcesDirectory)/src/ExcelAddIn.VSTO/ExcelAddIn.VSTO_TemporaryKey.pfx -CertStoreLocation Cert:\CurrentUser\My
+          Import-PfxCertificate -FilePath $(Build.SourcesDirectory)/src/Allors.Excel.Interop.Vsto/ExcelAddIn.VSTO_TemporaryKey.pfx -CertStoreLocation Cert:\CurrentUser\My
         failOnStderr: true
       displayName: 'Add Excel PFX file to the certificate store.'
     - task: PowerShell@2
       inputs:
-        targetType: 'filePath'
-        filePath: 'build.ps1'
-        arguments: '-configuration $(buildConfiguration) -target $(target)'
+        targetType: 'inline'
+        script: |
+          choco install go-task -y
         failOnStderr: true
+      displayName: 'Install go-task'
+    - task: PowerShell@2
+      inputs:
+        targetType: 'inline'
+        script: |
+          task $(target) CONFIGURATION=$(buildConfiguration)
+        failOnStderr: false
       displayName: 'Build'
     - task: PublishTestResults@2
       inputs:

@@ -9,7 +9,6 @@ namespace Allors.Excel.Tests
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Runtime.InteropServices;
     using System.Threading;
     using Xunit;
     using Range = Allors.Excel.Range;
@@ -36,6 +35,10 @@ namespace Allors.Excel.Tests
                         // ignored
                     }
                 }
+            }
+            else
+            {
+                this.tempDirectory.Create();
             }
         }
 
@@ -393,9 +396,11 @@ namespace Allors.Excel.Tests
 
             var newSheet = workbook.AddWorksheet();
 
-            // There is nothing to print => exception
+            // Modern Excel exports an empty sheet to PDF without raising an error.
             var file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(newSheet)}.pdf"));
-            Assert.Throws<COMException>(() => newSheet.SaveAsPdf(file));
+            newSheet.SaveAsPdf(file);
+
+            Assert.True(File.Exists(file.FullName));
         }
 
         [Fact]

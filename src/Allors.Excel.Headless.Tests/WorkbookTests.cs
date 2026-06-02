@@ -8,7 +8,7 @@ namespace Allors.Excel.Headless.Tests
     using System;
     using Allors.Excel;
     using Allors.Excel.Headless;
-    using Application;
+    using Allors.Excel.Tests;
     using Moq;
 
     public class WorkbookTests : Excel.Tests.WorkbookTests
@@ -34,10 +34,8 @@ namespace Allors.Excel.Headless.Tests
                 throw new System.Exception("Only one AddIn allowed");
             }
 
-            var serviceLocator = new Mock<IServiceLocator>().Object;
             var ribbon = new Mock<IRibbon>().Object;
-            var program = new Program(serviceLocator);
-            this.addIn = new AddIn(program, ribbon);
+            this.addIn = new AddIn(new TestProgram(), ribbon);
 
             return this.addIn;
         }

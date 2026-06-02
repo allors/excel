@@ -435,10 +435,6 @@ namespace Allors.Excel.Headless
             {
                 throw new IOException("File already exists");
             }
-            if (this.CellByCoordinates.Count == 0)
-            {
-                throw new COMException("Cannot save an empty file as PDF.");
-            }
             using (FileStream fs = new FileStream(fullName, FileMode.Create))
             {
                 using (BinaryWriter bw = new BinaryWriter(fs))
@@ -462,10 +458,6 @@ namespace Allors.Excel.Headless
             if (File.Exists(fullName) && !overwriteExistingFile)
             {
                 throw new IOException("File already exists");
-            }
-            if (this.CellByCoordinates.Count == 0)
-            {
-                throw new COMException("Cannot save an empty file as XPS.");
             }
             using (FileStream fs = new FileStream(fullName, FileMode.Create))
             {
