@@ -3,7 +3,7 @@
 Allors.Excel is a c# Excel VSTO AddIn. It speeds up access to excel by using a virtual DOM to update cells.
 It contains useful features to programmatically manage workbooks, worksheets, cells.
 
-[![Build Status](https://dev.azure.com/allors/Excel/_apis/build/status%2FAllors.Excel?branchName=main)](https://dev.azure.com/allors/Excel/_build/latest?definitionId=8&branchName=main)
+[![CI](https://github.com/allors/excel/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/allors/excel/actions/workflows/ci.yml)
 
 # Building
 
