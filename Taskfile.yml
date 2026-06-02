@@ -61,33 +61,36 @@ tasks:
       - '"{{.MSBUILD}}" {{.SRC}}/Allors.Excel.Interop.Dna.Tests/Allors.Excel.Interop.Dna.Tests.csproj /t:Rebuild /p:Configuration={{.CONFIGURATION}}'
 
   test:
-    desc: Run all test passes into artifacts/tests.
+    desc: Run all test passes into artifacts/tests (every pass runs even if an earlier one fails).
     deps: [compile]
     cmds:
       - powershell -NoProfile -Command "New-Item -ItemType Directory -Force '{{.TESTS_DIR}}' | Out-Null"
-      # 1) dotnet test on the multi-targeted Interop.Tests (net462 + net10.0) -> TRX
-      - >-
-        dotnet test {{.SRC}}/Allors.Excel.Interop.Tests/Allors.Excel.Interop.Tests.csproj
-        --configuration {{.CONFIGURATION}} --no-build --no-restore
-        --logger "trx;LogFileName=interop-results-dotnet.trx"
-        --results-directory {{.TESTS_DIR}}
-      # 2-5) xunit.console on the net4x assemblies
-      - >-
-        "{{.XUNIT_CONSOLE}}"
-        {{.SRC}}/Allors.Excel.Interop.Tests/bin/{{.CONFIGURATION}}/net462/Allors.Excel.Interop.Tests.dll
-        -xml {{.TESTS_DIR}}/interop-results-framework.xml
-      - >-
-        "{{.XUNIT_CONSOLE}}"
-        {{.SRC}}/Allors.Excel.Interop.Vsto.Tests/bin/{{.CONFIGURATION}}/net462/Allors.Excel.Interop.Vsto.Tests.dll
-        -xml {{.TESTS_DIR}}/interop-vsto-results.xml
-      - >-
-        "{{.XUNIT_CONSOLE}}"
-        {{.SRC}}/Allors.Excel.Headless.Tests/bin/{{.CONFIGURATION}}/net462/Allors.Excel.Headless.Tests.dll
-        -xml {{.TESTS_DIR}}/headless-results.xml
-      - >-
-        "{{.XUNIT_CONSOLE}}"
-        {{.SRC}}/Allors.Excel.Interop.Dna.Tests/bin/{{.CONFIGURATION}}/net48/Allors.Excel.Interop.Dna.Tests.dll
-        -xml {{.TESTS_DIR}}/interop-dna-results.xml
+      # One script so a failing pass doesn't abort the remaining ones; the
+      # task still fails at the end when any pass failed.
+      - |
+        failed=""
+        # 1) dotnet test on the multi-targeted Interop.Tests (net462 + net10.0) -> TRX
+        dotnet test {{.SRC}}/Allors.Excel.Interop.Tests/Allors.Excel.Interop.Tests.csproj \
+          --configuration {{.CONFIGURATION}} --no-build --no-restore \
+          --logger "trx;LogFileName=interop-results-dotnet.trx" \
+          --results-directory {{.TESTS_DIR}} || failed="$failed interop-dotnet"
+        # 2-5) xunit.console on the net4x assemblies
+        "{{.XUNIT_CONSOLE}}" \
+          {{.SRC}}/Allors.Excel.Interop.Tests/bin/{{.CONFIGURATION}}/net462/Allors.Excel.Interop.Tests.dll \
+          -xml {{.TESTS_DIR}}/interop-results-framework.xml || failed="$failed interop-framework"
+        "{{.XUNIT_CONSOLE}}" \
+          {{.SRC}}/Allors.Excel.Interop.Vsto.Tests/bin/{{.CONFIGURATION}}/net462/Allors.Excel.Interop.Vsto.Tests.dll \
+          -xml {{.TESTS_DIR}}/interop-vsto-results.xml || failed="$failed interop-vsto"
+        "{{.XUNIT_CONSOLE}}" \
+          {{.SRC}}/Allors.Excel.Headless.Tests/bin/{{.CONFIGURATION}}/net462/Allors.Excel.Headless.Tests.dll \
+          -xml {{.TESTS_DIR}}/headless-results.xml || failed="$failed headless"
+        "{{.XUNIT_CONSOLE}}" \
+          {{.SRC}}/Allors.Excel.Interop.Dna.Tests/bin/{{.CONFIGURATION}}/net48/Allors.Excel.Interop.Dna.Tests.dll \
+          -xml {{.TESTS_DIR}}/interop-dna-results.xml || failed="$failed interop-dna"
+        if [ -n "$failed" ]; then
+          echo "Failed test passes:$failed"
+          exit 1
+        fi
 
   pack:
     desc: Produce NuGet packages into artifacts/nuget (versions from nbgv).
