@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Allors.Excel.Tests\Allors.Excel.Tests.csproj" />
+    <ProjectReference Include="..\Allors.Excel.Interop\Allors.Excel.Interop.csproj" />
+  </ItemGroup>
+</Project>

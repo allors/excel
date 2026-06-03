@@ -1,0 +1,7 @@
+<Project>
+  <!-- Version stamping via Nerdbank.GitVersioning (version.json at repo root).
+       The legacy VSTO project uses packages.config and cannot take PackageReference items. -->
+  <ItemGroup Condition="'$(MSBuildProjectName)' != 'Allors.Excel.Interop.Vsto'">
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.9.50" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

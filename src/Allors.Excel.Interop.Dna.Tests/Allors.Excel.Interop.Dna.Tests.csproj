@@ -10,11 +10,15 @@
   
   <ItemGroup>
     <ProjectReference Include="..\Allors.Excel.Tests\Allors.Excel.Tests.csproj" />
+    <ProjectReference Include="..\Allors.Excel.Interop.Tests.Shared\Allors.Excel.Interop.Tests.Shared.csproj" />
     <ProjectReference Include="..\Allors.Excel.Interop.Dna\Allors.Excel.Interop.Dna.csproj" />
   </ItemGroup>
   
   <ItemGroup>
     <None Update="data\Catalog.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="data\blank.xlsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

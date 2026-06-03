@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build (${{ matrix.name }})
+    runs-on: windows-latest
+    timeout-minutes: 180
+    permissions:
+      contents: read
+      checks: write          # test-results check run
+      pull-requests: write   # test-results PR comment
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Excel64
+            choco_options: ''
+          - name: Excel32
+            choco_options: '--forcex86'
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_NOLOGO: '1'
+      CONFIGURATION: Release
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0   # Nerdbank.GitVersioning needs full history
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install Excel
+        run: choco install office365business ${{ matrix.choco_options }} -y --no-progress
+
+      - name: Import VSTO signing certificate
+        run: Import-PfxCertificate -FilePath src/Allors.Excel.Interop.Vsto/ExcelAddIn.VSTO_TemporaryKey.pfx -CertStoreLocation Cert:\CurrentUser\My
+
+      - name: Install go-task
+        run: choco install go-task -y --no-progress
+
+      - name: Test
+        run: task ci CONFIGURATION=$env:CONFIGURATION
+
+      - name: Pack
+        if: matrix.name == 'Excel64'
+        run: task pack CONFIGURATION=$env:CONFIGURATION
+
+      - name: Publish test results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action/windows@v2
+        with:
+          check_name: Test Results (${{ matrix.name }})
+          files: |
+            artifacts/tests/*.xml
+            artifacts/tests/*.trx
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-${{ matrix.name }}
+          path: artifacts/tests/
+          if-no-files-found: warn
+
+      - name: Upload NuGet packages
+        if: matrix.name == 'Excel64'
+        uses: actions/upload-artifact@v7
+        with:
+          name: nuget-packages
+          path: artifacts/nuget/
+          if-no-files-found: error
