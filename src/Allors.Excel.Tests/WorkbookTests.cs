@@ -477,7 +477,8 @@ namespace Allors.Excel.Tests
                 Assert.Null(properties.GetString(prop));
             }
 
-            // Large strings
+            // Large strings. 1M chars (a 2 MB BSTR) is the cap: anything much
+            // larger cannot be marshaled into 32-bit Excel over COM (E_OUTOFMEMORY).
             foreach (var removeOrNot in removeOrNotOptions)
             {
                 const string prop = "MyStringProperty";
@@ -490,13 +491,6 @@ namespace Allors.Excel.Tests
                 DoRemoveOrNot(removeOrNot, prop);
 
                 length = 1000 * 1000;
-
-                properties.SetString(prop, $"{new string('A', length)}");
-                Assert.Equal($"{new string('A', length)}", properties.GetString(prop));
-
-                DoRemoveOrNot(removeOrNot, prop);
-
-                length = 1000 * 1000 * 1000;
 
                 properties.SetString(prop, $"{new string('A', length)}");
                 Assert.Equal($"{new string('A', length)}", properties.GetString(prop));
