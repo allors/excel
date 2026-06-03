@@ -5,7 +5,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using Allors.Excel;
 using Moq;
 using InteropApplication = Microsoft.Office.Interop.Excel.Application;
@@ -20,23 +22,49 @@ namespace Allors.Excel.Interop.Dna.Tests
     {
         private readonly InteropApplication application;
 
+        private readonly int processId;
+
         private readonly List<string> tempWorkbookFiles = new List<string>();
 
         public WorkbookTests()
         {
             this.application = new InteropApplication { Visible = true };
+
+            // Capture the pid now, while Excel is healthy: resolving it from the Hwnd
+            // is itself a COM call, so it cannot be done once Excel has crashed.
+            GetWindowThreadProcessId((IntPtr)this.application.Hwnd, out var pid);
+            this.processId = (int)pid;
+
             this.DisconnectResidentAddIn();
         }
 
         public override void Dispose()
         {
-            var workbooks = this.application.Workbooks;
-            foreach (InteropWorkbook workbook in workbooks)
+            try
             {
-                workbook.Close(false);
-            }
+                // Snapshot before closing: removing workbooks while enumerating the
+                // live COM collection is undefined.
+                var workbooks = new List<InteropWorkbook>();
+                foreach (InteropWorkbook workbook in this.application.Workbooks)
+                {
+                    workbooks.Add(workbook);
+                }
 
-            this.application.Quit();
+                foreach (var workbook in workbooks)
+                {
+                    workbook.Close(false);
+                }
+
+                this.application.Quit();
+            }
+            catch (COMException)
+            {
+                // Excel can crash mid-close (observed on CI: RPC failure 0x800706BE
+                // closing a workbook that carries an input-message validation). The
+                // test's assertions have already run; kill the instance so a hung
+                // Excel cannot linger and destabilize later tests.
+                this.KillExcelProcess();
+            }
 
             foreach (var file in this.tempWorkbookFiles)
             {
@@ -91,5 +119,26 @@ namespace Allors.Excel.Interop.Dna.Tests
                 }
             }
         }
+
+        // Last-resort cleanup when graceful Close/Quit failed; the process is
+        // usually already dead by then.
+        private void KillExcelProcess()
+        {
+            try
+            {
+                using (var process = Process.GetProcessById(this.processId))
+                {
+                    process.Kill();
+                    process.WaitForExit(5000);
+                }
+            }
+            catch
+            {
+                // already exited
+            }
+        }
+
+        [DllImport("user32.dll")]
+        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
     }
 }
