@@ -10,6 +10,7 @@ namespace Allors.Excel.Interop
     using System.Linq;
     using System.Reflection;
     using System.Runtime.InteropServices;
+    using System.Threading.Tasks;
     using System.Xml;
     using InteropName = Microsoft.Office.Interop.Excel.Name;
     using InteropWorkbook = Microsoft.Office.Interop.Excel.Workbook;
@@ -32,6 +33,10 @@ namespace Allors.Excel.Interop
         }
 
         public event EventHandler<Hyperlink> OnHyperlinkClicked;
+
+        // True while this wrapper's Application-level event handlers (wired up in the
+        // constructor) are still attached. AddIn.Close calls Disconnect to clear them.
+        internal bool Connected { get; private set; } = true;
 
         public AddIn AddIn { get; }
 
@@ -61,8 +66,12 @@ namespace Allors.Excel.Interop
         /// <param name="before"></param>
         /// <param name="after"></param>
         /// <returns></returns>
-        public Excel.IWorksheet AddWorksheet(int? index, Excel.IWorksheet before = null, Excel.IWorksheet after = null)
+        public async Task<Excel.IWorksheet> AddWorksheet(int? index, Excel.IWorksheet before = null, Excel.IWorksheet after = null)
         {
+            Worksheet worksheet;
+
+            // Keep the WorkbookNewSheet unsubscribe window tight (just the Sheets.Add); await
+            // OnNew afterwards so the new worksheet is fully notified before this returns.
             try
             {
                 this.AddIn.Application.WorkbookNewSheet -= this.ApplicationOnWorkbookNewSheet;
@@ -98,14 +107,16 @@ namespace Allors.Excel.Interop
                     }
                 }
 
-                var worksheet = this.TryAdd(interopWorksheet);
-                this.AddIn.Program.OnNew(worksheet).ConfigureAwait(false);
-                return worksheet;
+                worksheet = this.TryAdd(interopWorksheet);
+                worksheet.IsActive = true;
             }
             finally
             {
                 this.AddIn.Application.WorkbookNewSheet += this.ApplicationOnWorkbookNewSheet;
             }
+
+            await this.AddIn.Program.OnNew(worksheet);
+            return worksheet;
         }
 
         /// <inheritdoc/>
@@ -119,6 +130,7 @@ namespace Allors.Excel.Interop
 
             var copied = (InteropWorksheet)this.InteropWorkbook.Sheets[index];
             var copiedWorksheet = this.New(copied);
+            copiedWorksheet.IsActive = true;
 
             copied.Visible = InteropXlSheetVisibility.xlSheetVisible;
 
@@ -168,8 +180,15 @@ namespace Allors.Excel.Interop
                 {
                     var interopWorksheet = ((Worksheet)range.Worksheet!).InteropWorksheet;
 
+                    // A Range may carry only Rows or only Columns; the missing one is a
+                    // single row/column (see Range.EffectiveRows/EffectiveColumns). Without this
+                    // the nullable arithmetic below yields a null coordinate and the named range
+                    // silently fails.
+                    var rows = range.EffectiveRows;
+                    var columns = range.EffectiveColumns;
+
                     var topLeft = interopWorksheet.Cells[range.Row + 1, range.Column + 1];
-                    var bottomRight = interopWorksheet.Cells[range.Row + range.Rows, range.Column + range.Columns];
+                    var bottomRight = interopWorksheet.Cells[range.Row + rows, range.Column + columns];
 
                     var refersTo = interopWorksheet.Range[topLeft, bottomRight];
 
@@ -227,7 +246,22 @@ namespace Allors.Excel.Interop
 
         public void HyperlinkClicked(Hyperlink hyperlink) => this.OnHyperlinkClicked?.Invoke(this, hyperlink);
 
-        private void ApplicationOnWorkbookNewSheet(InteropWorkbook wb, object sh)
+        // Detaches the Application-level event handlers wired up in the constructor, so a
+        // closed workbook does not leak and its handlers stop firing for the lifetime of
+        // the Application. Called by AddIn.Close.
+        internal void Disconnect()
+        {
+            if (!this.Connected)
+            {
+                return;
+            }
+
+            this.AddIn.Application.WorkbookNewSheet -= this.ApplicationOnWorkbookNewSheet;
+            this.AddIn.Application.SheetBeforeDelete -= this.ApplicationOnSheetBeforeDelete;
+            this.Connected = false;
+        }
+
+        private async void ApplicationOnWorkbookNewSheet(InteropWorkbook wb, object sh)
         {
             if (wb.FullName != this.InteropWorkbook.FullName)
             {
@@ -238,14 +272,31 @@ namespace Allors.Excel.Interop
             if (sh is InteropWorksheet interopWorksheet)
             {
                 var worksheet = this.TryAdd(interopWorksheet);
+                worksheet.IsActive = true;
 
-                interopWorksheet.BeforeDelete += async () => await this.AddIn.Program.OnBeforeDelete(worksheet);
+                interopWorksheet.BeforeDelete += async () => await this.SafeExecute(() => this.AddIn.Program.OnBeforeDelete(worksheet));
 
-                this.AddIn.Program.OnNew(worksheet).ConfigureAwait(false);
+                await this.SafeExecute(() => this.AddIn.Program.OnNew(worksheet));
             }
             else
             {
                 Console.WriteLine("Not a InteropWorksheet");
+            }
+        }
+
+        // Runs program work triggered from an async-void COM event handler (or a fire-and-forget
+        // COM event lambda), surfacing any exception instead of letting it escape. An exception that
+        // escapes an async void is re-thrown on the STA SynchronizationContext, where it goes
+        // unhandled and can tear down the Excel host (the VSTO ThisAddIn handlers guard the same way).
+        private async Task SafeExecute(Func<Task> action)
+        {
+            try
+            {
+                await action();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
             }
         }
 
@@ -257,7 +308,9 @@ namespace Allors.Excel.Interop
                 this.worksheetByInteropWorksheet.Add(interopWorksheet, worksheet);
             }
 
-            worksheet.IsActive = true;
+            // Registration alone must NOT activate the sheet: the workbook-open loop registers
+            // every existing sheet, and force-activating each would change the active sheet as a
+            // side effect. Activation is done explicitly by the callers that add a new sheet.
             return worksheet;
         }
 

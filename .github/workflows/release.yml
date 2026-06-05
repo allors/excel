@@ -54,10 +54,18 @@ jobs:
 
       - name: Push to NuGet.org
         run: |
+          $source = 'https://api.nuget.org/v3/index.json'
+          $key = '${{ steps.nuget-login.outputs.NUGET_API_KEY }}'
+          # Primary packages first (NuGet.org needs the package before its symbols);
+          # --no-symbols so the .snupkg pass below is the explicit symbol publisher.
           $packages = Get-ChildItem artifacts/nuget -Filter *.nupkg |
             Where-Object { $_.Name -notlike '*.symbols.nupkg' }
           foreach ($p in $packages) {
-            dotnet nuget push $p.FullName --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+            dotnet nuget push $p.FullName --api-key $key --source $source --skip-duplicate --no-symbols
+          }
+          # Symbol packages (.snupkg).
+          foreach ($p in Get-ChildItem artifacts/nuget -Filter *.snupkg) {
+            dotnet nuget push $p.FullName --api-key $key --source $source --skip-duplicate
           }
 
       - name: Create GitHub Release

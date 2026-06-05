@@ -15,9 +15,9 @@ namespace Allors.Excel.Headless
 
     public class Worksheet(Workbook workbook) : IWorksheet
     {
-        private readonly Dictionary<int, Row> rowByIndex = new();
+        private Dictionary<int, Row> rowByIndex = new();
 
-        private readonly Dictionary<int, Column> columnByIndex = new();
+        private Dictionary<int, Column> columnByIndex = new();
         private bool isActive;
 
         IWorkbook IWorksheet.Workbook => this.Workbook;
@@ -173,8 +173,8 @@ namespace Allors.Excel.Headless
             // Assuming that the Range object has properties for the start and end rows and columns
             int startRow = range.Row;
             int startColumn = range.Column;
-            int endRow = (int)(range.Row + range.Rows - 1);
-            int endColumn = (int)(range.Column + range.Columns - 1);
+            int endRow = range.Row + range.EffectiveRows - 1;
+            int endColumn = range.Column + range.EffectiveColumns - 1;
 
             // Calculate the width and height of the rectangle
             int width = endColumn - startColumn + 1;
@@ -203,23 +203,31 @@ namespace Allors.Excel.Headless
 
         public void InsertRows(int startRowIndex, int numberOfRows)
         {
+            // Insert-after semantics (matches interop): everything strictly below
+            // startRowIndex shifts down by numberOfRows. Both the cell map and the row
+            // map (and the shared Row objects' Index) are kept consistent.
             var newCellByCoordinates = new Dictionary<(int Row, int Column), Cell>();
-
             foreach (var kvp in this.CellByCoordinates)
             {
-                var coordinates = kvp.Key;
-                var cell = kvp.Value;
-
-                if (coordinates.Row > startRowIndex)
-                {
-                    coordinates = (coordinates.Row + numberOfRows, coordinates.Column);
-                }
-
-                newCellByCoordinates.Add(coordinates, cell);
+                var (row, column) = kvp.Key;
+                var newRow = row > startRowIndex ? row + numberOfRows : row;
+                newCellByCoordinates.Add((newRow, column), kvp.Value);
             }
 
             this.CellByCoordinates = newCellByCoordinates;
 
+            var newRowByIndex = new Dictionary<int, Row>();
+            foreach (var row in this.rowByIndex.Values)
+            {
+                if (row.Index > startRowIndex)
+                {
+                    row.Index += numberOfRows;
+                }
+
+                newRowByIndex.Add(row.Index, row);
+            }
+
+            this.rowByIndex = newRowByIndex;
         }
 
         public void DeleteRows(int startRowIndex, int numberOfRows)
@@ -229,52 +237,70 @@ namespace Allors.Excel.Headless
                 throw new ArgumentException("Start index and number of rows must be non-negative.");
             }
 
-            // Remove the rows from the dictionary
-            for (int i = startRowIndex; i < startRowIndex + numberOfRows; i++)
+            var endRowIndex = startRowIndex + numberOfRows; // exclusive
+
+            // Drop the cells inside the deleted range, shift the cells below it up.
+            var newCellByCoordinates = new Dictionary<(int Row, int Column), Cell>();
+            foreach (var kvp in this.CellByCoordinates)
             {
-                if (this.rowByIndex.ContainsKey(i))
+                var (row, column) = kvp.Key;
+                if (row >= startRowIndex && row < endRowIndex)
                 {
-                    this.rowByIndex.Remove(i);
+                    continue;
                 }
+
+                var newRow = row >= endRowIndex ? row - numberOfRows : row;
+                newCellByCoordinates.Add((newRow, column), kvp.Value);
             }
 
-            // Shift the remaining rows up
-            var keys = new List<int>(this.rowByIndex.Keys.Where(key => key >= startRowIndex + numberOfRows));
-            foreach (var key in keys)
+            this.CellByCoordinates = newCellByCoordinates;
+
+            // Mirror the same removal/shift on the row map so Row.Index stays in sync.
+            var newRowByIndex = new Dictionary<int, Row>();
+            foreach (var row in this.rowByIndex.Values)
             {
-                var value = this.rowByIndex[key];
-                this.rowByIndex.Remove(key);
-                this.rowByIndex[key - numberOfRows] = value;
+                if (row.Index >= startRowIndex && row.Index < endRowIndex)
+                {
+                    continue;
+                }
+
+                if (row.Index >= endRowIndex)
+                {
+                    row.Index -= numberOfRows;
+                }
+
+                newRowByIndex.Add(row.Index, row);
             }
 
-            // Shift the cells in the rows to the up
-            var cellKeys = new List<(int, int)>(this.CellByCoordinates.Keys.Where(key => key.Item1 >= startRowIndex + numberOfRows));
-            foreach (var key in cellKeys)
-            {
-                var cell = this.CellByCoordinates[key];
-                this.CellByCoordinates.Remove(key);
-                this.CellByCoordinates[(key.Item1 - numberOfRows, key.Item2)] = cell;
-            }
+            this.rowByIndex = newRowByIndex;
         }
 
         public void InsertColumns(int startColumnIndex, int numberOfColumns)
         {
+            // Insert-after semantics (matches interop): everything strictly right of
+            // startColumnIndex shifts right by numberOfColumns.
             var newCellByCoordinates = new Dictionary<(int Row, int Column), Cell>();
-
             foreach (var kvp in this.CellByCoordinates)
             {
-                var coordinates = kvp.Key;
-                var cell = kvp.Value;
-
-                if (coordinates.Column > startColumnIndex)
-                {
-                    coordinates = (coordinates.Row, coordinates.Column + numberOfColumns);
-                }
-
-                newCellByCoordinates.Add(coordinates, cell);
+                var (row, column) = kvp.Key;
+                var newColumn = column > startColumnIndex ? column + numberOfColumns : column;
+                newCellByCoordinates.Add((row, newColumn), kvp.Value);
             }
 
             this.CellByCoordinates = newCellByCoordinates;
+
+            var newColumnByIndex = new Dictionary<int, Column>();
+            foreach (var column in this.columnByIndex.Values)
+            {
+                if (column.Index > startColumnIndex)
+                {
+                    column.Index += numberOfColumns;
+                }
+
+                newColumnByIndex.Add(column.Index, column);
+            }
+
+            this.columnByIndex = newColumnByIndex;
         }
 
         public void DeleteColumns(int startColumnIndex, int numberOfColumns)
@@ -284,32 +310,41 @@ namespace Allors.Excel.Headless
                 throw new ArgumentException("Start index and number of columns must be non-negative.");
             }
 
-            // Remove the columns from the dictionary
-            for (int i = startColumnIndex; i < startColumnIndex + numberOfColumns; i++)
+            var endColumnIndex = startColumnIndex + numberOfColumns; // exclusive
+
+            // Drop the cells inside the deleted range, shift the cells right of it left.
+            var newCellByCoordinates = new Dictionary<(int Row, int Column), Cell>();
+            foreach (var kvp in this.CellByCoordinates)
             {
-                if (this.columnByIndex.ContainsKey(i))
+                var (row, column) = kvp.Key;
+                if (column >= startColumnIndex && column < endColumnIndex)
                 {
-                    this.columnByIndex.Remove(i);
+                    continue;
                 }
+
+                var newColumn = column >= endColumnIndex ? column - numberOfColumns : column;
+                newCellByCoordinates.Add((row, newColumn), kvp.Value);
             }
 
-            // Shift the remaining columns to the left
-            var keys = new List<int>(this.columnByIndex.Keys.Where(key => key >= startColumnIndex + numberOfColumns));
-            foreach (var key in keys)
+            this.CellByCoordinates = newCellByCoordinates;
+
+            var newColumnByIndex = new Dictionary<int, Column>();
+            foreach (var column in this.columnByIndex.Values)
             {
-                var value = this.columnByIndex[key];
-                this.columnByIndex.Remove(key);
-                this.columnByIndex[key - numberOfColumns] = value;
+                if (column.Index >= startColumnIndex && column.Index < endColumnIndex)
+                {
+                    continue;
+                }
+
+                if (column.Index >= endColumnIndex)
+                {
+                    column.Index -= numberOfColumns;
+                }
+
+                newColumnByIndex.Add(column.Index, column);
             }
 
-            // Shift the cells in the columns to the left
-            var cellKeys = new List<(int, int)>(this.CellByCoordinates.Keys.Where(key => key.Item2 >= startColumnIndex + numberOfColumns));
-            foreach (var key in cellKeys)
-            {
-                var cell = this.CellByCoordinates[key];
-                this.CellByCoordinates.Remove(key);
-                this.CellByCoordinates[(key.Item1, key.Item2 - numberOfColumns)] = cell;
-            }
+            this.columnByIndex = newColumnByIndex;
         }
 
         public Range? GetRange(string? cell1, string? cell2 = null)
@@ -327,7 +362,7 @@ namespace Allors.Excel.Headless
             } else if (cell1.Length == 3 && cell1[1] == ':' && cell2 == null) {
                 cell2 = cell1[2] + "1048576"; // Excel has 1,048,576 rows.
                 cell1 = cell1[0] + "1";
-            } else if (cell1.Length == 3 && cell2.Length == 3 && cell1[1] == ':' && cell2[1] == ':')
+            } else if (cell1.Length == 3 && cell2 != null && cell2.Length == 3 && cell1[1] == ':' && cell2[1] == ':')
             {
                 cell2 = cell2[0] + "1048576";
                 cell1 = cell1[0] + "1";
@@ -394,6 +429,13 @@ namespace Allors.Excel.Headless
 
         public Range GetUsedRange()
         {
+            if (this.CellByCoordinates.Count == 0)
+            {
+                // Mirror Excel's UsedRange on an empty sheet: a degenerate A1 range,
+                // rather than throwing InvalidOperationException from Min/Max.
+                return new Range(0, 0, 1, 1, this);
+            }
+
             var minRow = this.CellByCoordinates.Keys.Min(key => key.Item1);
             var maxRow = this.CellByCoordinates.Keys.Max(key => key.Item1);
             var minColumn = this.CellByCoordinates.Keys.Min(key => key.Item2);

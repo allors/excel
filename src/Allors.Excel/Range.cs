@@ -52,5 +52,19 @@ namespace Allors.Excel
         /// Gets the number of columns in the Range
         /// </summary>
         public int? Columns { get; }
+
+        /// <summary>
+        /// Gets the number of rows, treating an unset (null) <see cref="Rows"/> as a single row.
+        /// Use this for coordinate arithmetic; <see cref="Rows"/> stays nullable so callers can
+        /// still distinguish "unset" from an explicit 1.
+        /// </summary>
+        public int EffectiveRows => this.Rows ?? 1;
+
+        /// <summary>
+        /// Gets the number of columns, treating an unset (null) <see cref="Columns"/> as a single
+        /// column. Use this for coordinate arithmetic; <see cref="Columns"/> stays nullable so
+        /// callers can still distinguish "unset" from an explicit 1.
+        /// </summary>
+        public int EffectiveColumns => this.Columns ?? 1;
     }
 }

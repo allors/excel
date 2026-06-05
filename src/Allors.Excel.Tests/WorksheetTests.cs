@@ -10,6 +10,7 @@ namespace Allors.Excel.Tests
     using System.IO;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
     using Xunit;
     using Range = Allors.Excel.Range;
 
@@ -59,7 +60,7 @@ namespace Allors.Excel.Tests
         }
 
         [Fact]
-        public void NewSheetAtActiveSheetHasIndex()
+        public async Task NewSheetAtActiveSheetHasIndex()
         {
             var addIn = this.NewAddIn();
 
@@ -74,14 +75,14 @@ namespace Allors.Excel.Tests
             Assert.Equal(2, sheet2.Index);
 
             // Add sheet to the left of the activeSheet (== sheet 2)
-            var sheet = workbook.AddWorksheet(0);
+            var sheet = await workbook.AddWorksheet(0);
             Assert.Equal(1, sheet1.Index);
             Assert.Equal(2, sheet.Index);
             Assert.Equal(3, sheet2.Index);
         }
 
         [Fact]
-        public void NewSheetBeforeSheetHasIndex()
+        public async Task NewSheetBeforeSheetHasIndex()
         {
             var addIn = this.NewAddIn();
 
@@ -96,14 +97,14 @@ namespace Allors.Excel.Tests
             Assert.Equal(2, sheet2.Index);
 
             // Add sheet to the left of the sheet 2
-            var sheet = workbook.AddWorksheet(null, sheet2);
+            var sheet = await workbook.AddWorksheet(null, sheet2);
             Assert.Equal(1, sheet1.Index);
             Assert.Equal(2, sheet.Index);
             Assert.Equal(3, sheet2.Index);
         }
 
         [Fact]
-        public void NewSheetAtIndexHasIndex()
+        public async Task NewSheetAtIndexHasIndex()
         {
             var addIn = this.NewAddIn();
 
@@ -118,21 +119,21 @@ namespace Allors.Excel.Tests
             Assert.Equal(2, sheet2.Index);
 
             // Add sheet to right of index 99 (index > sheets.Count will add sheet after last index)
-            var sheet = workbook.AddWorksheet(99);
+            var sheet = await workbook.AddWorksheet(99);
             Assert.Equal(1, sheet1.Index);
             Assert.Equal(2, sheet2.Index);
             Assert.Equal(3, sheet.Index);
 
             // Add sheet at index 2 will add before sheet 2 (sheet with index 2)
             // So it will get the index we want it to have.
-            sheet = workbook.AddWorksheet(2);
+            sheet = await workbook.AddWorksheet(2);
             Assert.Equal(1, sheet1.Index);
             Assert.Equal(3, sheet2.Index);
             Assert.Equal(2, sheet.Index);
         }
 
         [Fact]
-        public void NewSheetAfterSheetHasIndex()
+        public async Task NewSheetAfterSheetHasIndex()
         {
             var addIn = this.NewAddIn();
 
@@ -147,7 +148,7 @@ namespace Allors.Excel.Tests
             Assert.Equal(2, sheet2.Index);
 
             // Add sheet to the right of the sheet 1
-            var sheet = workbook.AddWorksheet(null, null, sheet1);
+            var sheet = await workbook.AddWorksheet(null, null, sheet1);
             Assert.Equal(1, sheet1.Index);
             Assert.Equal(2, sheet.Index);
             Assert.Equal(3, sheet2.Index);
@@ -386,7 +387,7 @@ namespace Allors.Excel.Tests
         }
 
         [Fact]
-        public void SaveAsPdfThrowsNoExceptionWhenEmpty()
+        public async Task SaveAsPdfThrowsNoExceptionWhenEmpty()
         {
             var addIn = this.NewAddIn();
 
@@ -394,7 +395,7 @@ namespace Allors.Excel.Tests
 
             var workbook = addIn.Workbooks[0];
 
-            var newSheet = workbook.AddWorksheet();
+            var newSheet = await workbook.AddWorksheet();
 
             // Modern Excel exports an empty sheet to PDF without raising an error.
             var file = new FileInfo(Path.Combine(this.tempDirectory.FullName, $"{nameof(newSheet)}.pdf"));
@@ -587,7 +588,7 @@ namespace Allors.Excel.Tests
         }
 
         [Fact]
-        public void AddWorksheetsBeforeAndAfter()
+        public async Task AddWorksheetsBeforeAndAfter()
         {
             var addIn = this.NewAddIn();
 
@@ -604,7 +605,7 @@ namespace Allors.Excel.Tests
             // 1  | 2
 
             // Add before "1"
-            var worksheet = workbook.AddWorksheet(null, sheet1);
+            var worksheet = await workbook.AddWorksheet(null, sheet1);
             worksheet.Name = "#3";
 
             // Expected order => #3 | 1  | 2
@@ -618,7 +619,7 @@ namespace Allors.Excel.Tests
             Assert.Equal("2", worksheetsByIndex[2].Name);
 
             // Add before "2"
-            worksheet = workbook.AddWorksheet(null, sheet2);
+            worksheet = await workbook.AddWorksheet(null, sheet2);
             worksheet.Name = "#4";
 
             // Expected order => #3 | 1  | #4 | 2
@@ -632,7 +633,7 @@ namespace Allors.Excel.Tests
             Assert.Equal("2", worksheetsByIndex[3].Name);
 
             // Add after "1"
-            worksheet = workbook.AddWorksheet(null, null, sheet1);
+            worksheet = await workbook.AddWorksheet(null, null, sheet1);
             worksheet.Name = "#5";
 
             // Expected order => #3 | 1 | #5 | #4 | 2
@@ -647,7 +648,7 @@ namespace Allors.Excel.Tests
             Assert.Equal("2", worksheetsByIndex[4].Name);
 
             // Add after "2"
-            worksheet = workbook.AddWorksheet(null, null, sheet2);
+            worksheet = await workbook.AddWorksheet(null, null, sheet2);
             worksheet.Name = "#6";
 
             // Expected order => #3 | 1 | #5 | #4 | 2 | #6
@@ -664,7 +665,7 @@ namespace Allors.Excel.Tests
         }
 
         [Fact]
-        public void AddWorksheetsByIndex()
+        public async Task AddWorksheetsByIndex()
         {
             var addIn = this.NewAddIn();
 
@@ -678,7 +679,7 @@ namespace Allors.Excel.Tests
             Assert.Equal("2", last.Name);
 
             // At before index 1
-            var worksheet = workbook.AddWorksheet(1);
+            var worksheet = await workbook.AddWorksheet(1);
             var worksheetsByIndex = workbook.WorksheetsByIndex;
             Assert.Equal(3, workbook.Worksheets.Length);
             Assert.Equal(3, worksheetsByIndex.Length);
@@ -690,7 +691,7 @@ namespace Allors.Excel.Tests
             Assert.Equal("2", worksheetsByIndex[2].Name);
 
             // Add before index 2
-            worksheet = workbook.AddWorksheet(2);
+            worksheet = await workbook.AddWorksheet(2);
             worksheetsByIndex = workbook.WorksheetsByIndex;
 
             Assert.Equal(4, workbook.Worksheets.Length);
@@ -704,7 +705,7 @@ namespace Allors.Excel.Tests
             Assert.Equal("2", worksheetsByIndex[3].Name);
 
             // 0 Adds Before the Active Sheet (being the last added sheet here)
-            worksheet = workbook.AddWorksheet(0);
+            worksheet = await workbook.AddWorksheet(0);
             worksheetsByIndex = workbook.WorksheetsByIndex;
 
             Assert.Equal(5, workbook.Worksheets.Length);
@@ -1120,6 +1121,56 @@ namespace Allors.Excel.Tests
 
             Assert.Equal(2, range.Column);
             Assert.Equal(2, range.Columns);
+
+            // 3-character single-cell reference (column letter + two row digits)
+            range = sheet1.GetRange("A10");
+
+            Assert.Equal(9, range.Row);
+            Assert.Equal(1, range.Rows);
+
+            Assert.Equal(0, range.Column);
+            Assert.Equal(1, range.Columns);
+        }
+
+        [Fact]
+        public void FlushManyChunks()
+        {
+            var addIn = this.NewAddIn();
+
+            this.AddWorkbook();
+
+            var workbook = addIn.Workbooks[0];
+
+            var worksheet = workbook.Worksheets[0];
+
+            // A checkerboard of dirty cells: no two are adjacent, so the chunker emits
+            // a separate rectangular chunk per cell. This is the render path that
+            // previously fanned the per-chunk Excel COM writes out over Parallel.ForEach
+            // (STA COM accessed from worker threads). Flushing many chunks must complete
+            // without error and leave every value intact.
+            for (var row = 0; row < 16; row++)
+            {
+                for (var column = 0; column < 16; column++)
+                {
+                    if ((row + column) % 2 == 0)
+                    {
+                        worksheet[row, column].Value = $"R{row}C{column}";
+                    }
+                }
+            }
+
+            worksheet.Flush();
+
+            for (var row = 0; row < 16; row++)
+            {
+                for (var column = 0; column < 16; column++)
+                {
+                    if ((row + column) % 2 == 0)
+                    {
+                        Assert.Equal($"R{row}C{column}", worksheet[row, column].ValueAsString);
+                    }
+                }
+            }
         }
 
         [Fact]
@@ -1142,6 +1193,127 @@ namespace Allors.Excel.Tests
         }
 
         [Fact]
+        public async Task GetUsedRangeEmpty()
+        {
+            var addIn = this.NewAddIn();
+
+            this.AddWorkbook();
+
+            var workbook = addIn.Workbooks[0];
+
+            // A freshly added worksheet has no cells; GetUsedRange must not throw and should
+            // report a degenerate A1 range (mirroring Excel's UsedRange on an empty sheet).
+            var worksheet = await workbook.AddWorksheet();
+
+            var range = worksheet.GetUsedRange();
+
+            Assert.Equal(0, range.Row);
+            Assert.Equal(0, range.Column);
+            Assert.Equal(1, range.Rows);
+            Assert.Equal(1, range.Columns);
+        }
+
+        [Fact]
+        public async Task DeleteRowsRemovesDeletedCells()
+        {
+            var addIn = this.NewAddIn();
+
+            this.AddWorkbook();
+
+            var worksheet = await addIn.Workbooks[0].AddWorksheet();
+
+            for (var row = 0; row <= 5; row++)
+            {
+                worksheet[row, 0].Value = $"R{row}";
+            }
+
+            worksheet.Flush();
+
+            // Delete the last two used rows: nothing shifts over them, so a cell that
+            // is not removed would linger at its old coordinates.
+            worksheet.DeleteRows(4, 2);
+            worksheet.Flush();
+
+            Assert.Equal("R0", worksheet[0, 0].ValueAsString);
+            Assert.Equal("R3", worksheet[3, 0].ValueAsString);
+            Assert.Null(worksheet[4, 0].Value);
+            Assert.Null(worksheet[5, 0].Value);
+        }
+
+        [Fact]
+        public async Task DeleteColumnsRemovesDeletedCells()
+        {
+            var addIn = this.NewAddIn();
+
+            this.AddWorkbook();
+
+            var worksheet = await addIn.Workbooks[0].AddWorksheet();
+
+            for (var column = 0; column <= 5; column++)
+            {
+                worksheet[0, column].Value = $"C{column}";
+            }
+
+            worksheet.Flush();
+
+            worksheet.DeleteColumns(4, 2);
+            worksheet.Flush();
+
+            Assert.Equal("C0", worksheet[0, 0].ValueAsString);
+            Assert.Equal("C3", worksheet[0, 3].ValueAsString);
+            Assert.Null(worksheet[0, 4].Value);
+            Assert.Null(worksheet[0, 5].Value);
+        }
+
+        [Fact]
+        public async Task DeleteRowsKeepsCellRowIndexConsistent()
+        {
+            var addIn = this.NewAddIn();
+
+            this.AddWorkbook();
+
+            var worksheet = await addIn.Workbooks[0].AddWorksheet();
+
+            for (var row = 0; row <= 9; row++)
+            {
+                worksheet[row, 0].Value = $"R{row}";
+            }
+
+            worksheet.Flush();
+
+            // Rows 2,3,4 are deleted; "R5" shifts up to row 2 and its Row.Index must follow.
+            worksheet.DeleteRows(2, 3);
+
+            var cell = worksheet[2, 0];
+            Assert.Equal("R5", cell.ValueAsString);
+            Assert.Equal(2, cell.Row.Index);
+        }
+
+        [Fact]
+        public async Task InsertRowsKeepsCellRowIndexConsistent()
+        {
+            var addIn = this.NewAddIn();
+
+            this.AddWorkbook();
+
+            var worksheet = await addIn.Workbooks[0].AddWorksheet();
+
+            for (var row = 0; row <= 5; row++)
+            {
+                worksheet[row, 0].Value = $"R{row}";
+            }
+
+            worksheet.Flush();
+
+            // Rows below index 2 shift down by 2; "R3" moves to row 5 and its Row.Index must follow.
+            worksheet.InsertRows(2, 2);
+
+            var cell = worksheet[5, 0];
+            Assert.Equal("R3", cell.ValueAsString);
+            Assert.Equal(5, cell.Row.Index);
+        }
+
+        [Fact]
         public void GetRectangle()
         {
             var addIn = this.NewAddIn();
@@ -1160,7 +1332,7 @@ namespace Allors.Excel.Tests
         }
 
         [Fact]
-        public void NewSheetIsActive()
+        public async Task NewSheetIsActive()
         {
             var addIn = this.NewAddIn();
 
@@ -1168,7 +1340,7 @@ namespace Allors.Excel.Tests
 
             var workbook = addIn.Workbooks[0];
 
-            var sheet1 = workbook.AddWorksheet(0);
+            var sheet1 = await workbook.AddWorksheet(0);
 
             Assert.True(sheet1.IsActive);
         }

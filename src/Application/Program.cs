@@ -69,19 +69,19 @@ namespace Application
 
         public Task OnStop() => Task.CompletedTask;
 
-        public Task OnNew(IWorkbook workbook)
+        public async Task OnNew(IWorkbook workbook)
         {
             this.CanWriteCellStyle = new Style(Color.LightBlue, Color.Black);
             this.CanNotWriteCellStyle = new Style(Color.MistyRose, Color.Black);
             this.ChangedCellStyle = new Style(Color.DeepSkyBlue, Color.Black);
 
-            var sheet = workbook.AddWorksheet();
+            var sheet = await workbook.AddWorksheet();
 
             for (var i = 0; i < 50; i++)
             {
                 for (var j = 0; j < 10; j++)
                 {
-                    sheet[i, j].Value = decimal.Parse($"{i},{j}");
+                    sheet[i, j].Value = i + (j / 10m);
                     if (j == 0 || j == 2)
                     {
                         sheet[i, j].Style = this.CanWriteCellStyle;
@@ -130,8 +130,6 @@ namespace Application
             sheet.Flush();
 
             sheet.AutoFit();
-
-            return Task.CompletedTask;
         }
 
         public async Task OnNew(IWorksheet worksheet)
@@ -143,9 +141,26 @@ namespace Application
 
         public void OnClose(IWorkbook workbook, ref bool cancel)
         {
+            // Dispose every Binder belonging to a worksheet of the closing workbook so their
+            // CellsChanged subscriptions are detached and the Binders do not leak.
+            foreach (var entry in this.binderByWorksheet.Where(kvp => Equals(kvp.Key.Workbook, workbook)).ToList())
+            {
+                entry.Value.Dispose();
+                this.binderByWorksheet.Remove(entry.Key);
+            }
         }
 
-        public Task OnBeforeDelete(IWorksheet worksheet) => Task.CompletedTask;
+        public Task OnBeforeDelete(IWorksheet worksheet)
+        {
+            // The worksheet is going away: dispose its Binder (detaching CellsChanged) and drop it.
+            if (this.binderByWorksheet.TryGetValue(worksheet, out var binder))
+            {
+                binder.Dispose();
+                this.binderByWorksheet.Remove(worksheet);
+            }
+
+            return Task.CompletedTask;
+        }
 
         public async Task OnLogin() => await Task.CompletedTask;
 

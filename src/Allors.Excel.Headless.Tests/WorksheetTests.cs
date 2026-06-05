@@ -6,14 +6,38 @@
 
 namespace Allors.Excel.Headless.Tests
 {
+    using System.Threading.Tasks;
     using Allors.Excel;
     using Allors.Excel.Headless;
     using Allors.Excel.Tests;
     using Moq;
+    using Xunit;
 
     public class WorksheetTests : Excel.Tests.WorksheetTests
     {
         private AddIn addIn;
+
+        [Fact]
+        public async Task GetRectangleForSingleDimensionNamedRange()
+        {
+            this.NewAddIn();
+            this.AddWorkbook();
+
+            var worksheet = await this.addIn.Workbooks[0].AddWorksheet();
+
+            // A columns-only range (Rows == null) must not throw: the missing dimension is a
+            // single row (Range.EffectiveRows), so the rectangle is 1 row high and 3 wide.
+            worksheet.SetNamedRange("COLUMNS.ONLY", new Allors.Excel.Range(4, 5, columns: 3, worksheet: worksheet));
+            var columnsOnly = worksheet.GetRectangle("COLUMNS.ONLY");
+            Assert.Equal(3, columnsOnly.Width);
+            Assert.Equal(1, columnsOnly.Height);
+
+            // ... and a rows-only range is 1 column wide and 3 rows high.
+            worksheet.SetNamedRange("ROWS.ONLY", new Allors.Excel.Range(4, 5, rows: 3, worksheet: worksheet));
+            var rowsOnly = worksheet.GetRectangle("ROWS.ONLY");
+            Assert.Equal(1, rowsOnly.Width);
+            Assert.Equal(3, rowsOnly.Height);
+        }
 
         public override void Dispose()
         {
@@ -35,11 +59,11 @@ namespace Allors.Excel.Headless.Tests
             }
 
             var ribbon = new Mock<IRibbon>().Object;
-            this.addIn = new AddIn(new TestProgram(), ribbon);
+            this.addIn = AddIn.CreateAsync(new TestProgram(), ribbon).GetAwaiter().GetResult();
 
             return this.addIn;
         }
 
-        protected override void AddWorkbook() => this.addIn.AddWorkbook();
+        protected override void AddWorkbook() => this.addIn.AddWorkbook().GetAwaiter().GetResult();
     }
 }

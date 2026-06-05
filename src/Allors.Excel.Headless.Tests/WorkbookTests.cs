@@ -35,11 +35,11 @@ namespace Allors.Excel.Headless.Tests
             }
 
             var ribbon = new Mock<IRibbon>().Object;
-            this.addIn = new AddIn(new TestProgram(), ribbon);
+            this.addIn = AddIn.CreateAsync(new TestProgram(), ribbon).GetAwaiter().GetResult();
 
             return this.addIn;
         }
 
-        protected override void AddWorkbook() => this.addIn.AddWorkbook();
+        protected override void AddWorkbook() => this.addIn.AddWorkbook().GetAwaiter().GetResult();
     }
 }

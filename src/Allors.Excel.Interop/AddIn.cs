@@ -12,6 +12,20 @@ namespace Allors.Excel.Interop
     using InteropWorkbook = Microsoft.Office.Interop.Excel.Workbook;
     using InteropWorksheet = Microsoft.Office.Interop.Excel.Worksheet;
 
+    /// <summary>
+    /// The interop (VSTO) <see cref="IAddIn"/> implementation, wrapping the live Excel object model.
+    /// </summary>
+    /// <remarks>
+    /// COM lifetime policy: this interop layer deliberately does NOT call
+    /// <c>Marshal.ReleaseComObject</c>. Runtime Callable Wrappers are released by the CLR's
+    /// finalizer/GC, which is sufficient for the in-process VSTO add-in scenario (Excel hosts the
+    /// process, so every wrapper is freed when the add-in unloads). Explicit release is avoided on
+    /// purpose: the virtual DOM retains some COM objects (e.g. the worksheet and workbook) for their
+    /// lifetime, and the CLR caches a single wrapper per COM identity, so a stray release would risk
+    /// an <c>InvalidComObjectException</c> on a still-referenced object. Callers that drive Excel
+    /// out-of-process and need prompt teardown should force collection (<c>GC.Collect()</c> +
+    /// <c>GC.WaitForPendingFinalizers()</c>) or quit/kill the instance, as the interop test fixture does.
+    /// </remarks>
     public class AddIn : IAddIn
     {
         private readonly Dictionary<InteropWorkbook, Workbook> workbookByInteropWorkbook;
@@ -148,7 +162,17 @@ namespace Allors.Excel.Interop
             return workbook;
         }
 
-        public void Close(InteropWorkbook interopWorkbook) => this.workbookByInteropWorkbook.Remove(interopWorkbook);
+        public void Close(InteropWorkbook interopWorkbook)
+        {
+            if (this.workbookByInteropWorkbook.TryGetValue(interopWorkbook, out var workbook))
+            {
+                // Detach the workbook's Application-level event handlers before dropping it,
+                // otherwise the closed workbook leaks via those still-attached handlers.
+                workbook.Disconnect();
+            }
+
+            this.workbookByInteropWorkbook.Remove(interopWorkbook);
+        }
 
         public void DisplayAlerts(bool displayAlerts) => this.Application.DisplayAlerts = displayAlerts;
     }

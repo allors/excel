@@ -6,6 +6,7 @@
 namespace Allors.Excel
 {
     using System;
+    using System.Threading.Tasks;
     using System.Xml;
 
     public interface IWorkbook
@@ -47,7 +48,7 @@ namespace Allors.Excel
         /// <param name="before"></param>
         /// <param name="after"></param>
         /// <returns></returns>
-        IWorksheet AddWorksheet(int? index = null, IWorksheet before = null, IWorksheet after = null);
+        Task<IWorksheet> AddWorksheet(int? index = null, IWorksheet before = null, IWorksheet after = null);
 
         /// <summary>
         /// Copies a worksheet at the given beforeWorksheet

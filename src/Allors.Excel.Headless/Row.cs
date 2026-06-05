@@ -9,7 +9,7 @@ namespace Allors.Excel.Headless
     {
         public IWorksheet Worksheet { get; } = worksheet;
 
-        public int Index { get; } = index;
+        public int Index { get; internal set; } = index;
 
         public bool Hidden { get; set; }
     }

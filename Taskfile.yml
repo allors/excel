@@ -99,11 +99,11 @@ tasks:
       - powershell -NoProfile -Command "New-Item -ItemType Directory -Force '{{.NUGET_DIR}}' | Out-Null"
       - >-
         dotnet pack {{.SRC}}/Allors.Excel/Allors.Excel.csproj
-        --configuration {{.CONFIGURATION}} --include-source --include-symbols
+        --configuration {{.CONFIGURATION}} --include-symbols
         --output {{.NUGET_DIR}}
       - >-
         dotnet pack {{.SRC}}/Allors.Excel.Headless/Allors.Excel.Headless.csproj
-        --configuration {{.CONFIGURATION}} --include-source --include-symbols
+        --configuration {{.CONFIGURATION}} --include-symbols
         --output {{.NUGET_DIR}}
       # Full MSBuild required (Office PIA via GAC). PackageOutputPath must be
       # absolute: msbuild resolves relative paths against the project directory.

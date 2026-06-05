@@ -16,18 +16,21 @@ namespace Allors.Excel.Tests
     public abstract class WorkbookTests : ExcelTest
     {
         [Fact]
-        public async void OnNew()
+        public void OnNew()
         {
-            var program = new Mock<IProgram>();
-            this.NewAddIn();
+            var addIn = this.NewAddIn();
+            var countBefore = addIn.Workbooks.Length;
 
-            // Set up the AddWorkbook method to call OnNew on the program
             this.AddWorkbook();
-            await program.Object.OnNew(It.IsAny<IWorkbook>());
 
-            program.Verify(mock => mock.OnNew(It.IsAny<IWorkbook>()), Times.Once());
+            Assert.Equal(countBefore + 1, addIn.Workbooks.Length);
 
-            await Task.CompletedTask;
+            // Adding a workbook must invoke Program.OnNew(workbook). The TestProgram proves
+            // this by adding and populating a worksheet (cell A1 = "0.0"). (The previous
+            // version was async void and verified a mock.OnNew call the test itself made,
+            // so it asserted nothing about the add-in.)
+            var workbook = addIn.Workbooks.Last();
+            Assert.Contains(workbook.Worksheets, worksheet => string.Equals(worksheet[0, 0].ValueAsString, "0.0"));
         }
 
         [Fact]
@@ -676,6 +679,31 @@ namespace Allors.Excel.Tests
             var namedRanges = workbook.GetNamedRanges("2");
 
             Assert.Contains(namedRanges, v => string.Equals(v.Name, "MY.NAMEDRANGE"));
+        }
+
+        [Fact]
+        public void SetNamedRangeSingleDimension()
+        {
+            var addIn = this.NewAddIn();
+
+            this.AddWorkbook();
+
+            var workbook = addIn.Workbooks[0];
+
+            var worksheet = workbook.Worksheets.First(v => v.Name == "2");
+
+            // A Range is valid with only Rows set (Columns null): a single-column,
+            // multi-row region. SetNamedRange must create it, not silently swallow it.
+            var rowsOnly = new Range(4, 5, rows: 3, worksheet: worksheet);
+            worksheet.SetNamedRange("ROWS.ONLY", rowsOnly);
+
+            Assert.Contains(worksheet.GetNamedRanges(), v => v.Name.EndsWith("ROWS.ONLY"));
+
+            // ... and likewise with only Columns set (Rows null): a single-row region.
+            var columnsOnly = new Range(4, 5, columns: 3, worksheet: worksheet);
+            workbook.SetNamedRange("COLUMNS.ONLY", columnsOnly);
+
+            Assert.Contains(workbook.GetNamedRanges(), v => string.Equals(v.Name, "COLUMNS.ONLY"));
         }
     }
 }

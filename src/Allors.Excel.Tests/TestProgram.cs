@@ -26,17 +26,15 @@ namespace Allors.Excel.Tests
 
         public Task OnStop() => Task.CompletedTask;
 
-        public Task OnNew(IWorkbook workbook)
+        public async Task OnNew(IWorkbook workbook)
         {
-            var sheet = workbook.AddWorksheet();
+            var sheet = await workbook.AddWorksheet();
 
             // Deterministic content: the GetUsedRange test asserts a used range of
             // 50 rows by 15 columns on this sheet (rows 0-49, columns 0-14).
             sheet[0, 0].Value = "0.0";
             sheet[49, 14].Value = "49.14";
             sheet.Flush();
-
-            return Task.CompletedTask;
         }
 
         public void OnClose(IWorkbook workbook, ref bool cancel)

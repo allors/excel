@@ -10,7 +10,7 @@ namespace Allors.Excel
     using System.Collections.Generic;
     using System.Linq;
 
-    public class Binder
+    public class Binder : IDisposable
     {
         private readonly IDictionary<ICell, IBinding> bindingByCell = new ConcurrentDictionary<ICell, IBinding>();
 
@@ -112,6 +112,13 @@ namespace Allors.Excel
             }
 
             this.ToDomained?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void Dispose()
+        {
+            // The constructor subscribed to the worksheet's CellsChanged; detach so the
+            // Binder (and everything it references) does not leak for the worksheet's lifetime.
+            this.Worksheet.CellsChanged -= this.Worksheet_CellsChanged;
         }
     }
 }

@@ -7,18 +7,28 @@ namespace Allors.Excel.Headless
 {
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
 
     public class AddIn : IAddIn
     {
-        public AddIn(IProgram program, IRibbon ribbon)
+        // Private: construction creates the initial workbook and notifies the program, which
+        // is asynchronous. Use CreateAsync so OnNew/OnStart are awaited rather than fire-and-forget
+        // (a constructor cannot await).
+        private AddIn(IProgram program, IRibbon ribbon)
         {
             this.Program = program;
             this.Ribbon = ribbon;
             this.WorkbookList = new List<Workbook>();
+        }
 
-            this.AddWorkbook();
+        public static async Task<AddIn> CreateAsync(IProgram program, IRibbon ribbon)
+        {
+            var addIn = new AddIn(program, ribbon);
 
-            this.Program.OnStart(this).ConfigureAwait(false);
+            await addIn.AddWorkbook();
+            await program.OnStart(addIn);
+
+            return addIn;
         }
 
         public IProgram Program { get; }
@@ -31,15 +41,15 @@ namespace Allors.Excel.Headless
 
         public string ExistentialAttribute { get; set; }
 
-        public Workbook AddWorkbook()
+        public async Task<Workbook> AddWorkbook()
         {
             var workbook = new Workbook(this);
             this.WorkbookList.Add(workbook);
             workbook.Activate();
 
-            workbook.AddWorksheet();
+            await workbook.AddWorksheet();
 
-            this.Program.OnNew(workbook).ConfigureAwait(false);
+            await this.Program.OnNew(workbook);
 
             return workbook;
         }

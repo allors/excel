@@ -8,6 +8,7 @@ namespace Allors.Excel.Headless
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using System.Xml;
 
     public class Workbook(AddIn addIn) : IWorkbook
@@ -29,7 +30,7 @@ namespace Allors.Excel.Headless
 
         public event EventHandler<Allors.Excel.Hyperlink> OnHyperlinkClicked;
 
-        public IWorksheet AddWorksheet(int? index = null, IWorksheet before = null, IWorksheet after = null)
+        public async Task<IWorksheet> AddWorksheet(int? index = null, IWorksheet before = null, IWorksheet after = null)
         {
             var worksheet = new Worksheet(this)
             {
@@ -41,7 +42,8 @@ namespace Allors.Excel.Headless
                 if (index == 0)
                 {
                     var active = this.WorksheetList.FirstOrDefault(v => v.IsActive);
-                    this.WorksheetList.Insert(this.WorksheetList.IndexOf(active), worksheet);
+                    var insertAt = active != null ? this.WorksheetList.IndexOf(active) : 0;
+                    this.WorksheetList.Insert(insertAt, worksheet);
                 }
                 else
                 {
@@ -70,7 +72,7 @@ namespace Allors.Excel.Headless
 
             worksheet.Activate();
 
-            this.AddIn.Program.OnNew(worksheet).ConfigureAwait(false);
+            await this.AddIn.Program.OnNew(worksheet);
 
             return worksheet;
         }
