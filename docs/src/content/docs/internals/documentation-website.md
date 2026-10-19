@@ -1,16 +1,17 @@
 ---
 title: "Documentation website"
-description: "The adoption of the Allors documentation standard for Allors Excel, what was reused, how it was validated, and the unpublished state of the website."
+description: "The adoption of the Allors documentation standard for Allors Excel, what was reused, how it was validated, and where the website is published."
 audience: "Maintainers"
 kind: "Decision record"
-status: "Planned"
+status: "Current"
 sidebar:
   order: 4
 ---
 
-> **Status: Planned.** The website, its Markdown exports and the checks that the documentation
-> workflow runs are built and pass for both deployment paths. Publication to GitHub Pages has not
-> been run and the repository's Pages settings are unchanged.
+> **Status: Current.** The website, its Markdown exports and the checks that the documentation
+> workflow runs are built and pass for both deployment paths, and the website is published at
+> `https://docs.allors.com/excel/`, beneath the Allors documentation home, from the repository's
+> Pages source **GitHub Actions**.
 
 This record describes the documentation website of Allors Excel: what was decided, what was
 reused from the other Allors projects and what remains to do. The
@@ -35,7 +36,7 @@ proportional to its scope, with the same writing and accuracy standard.
 | Readers | Human documentation serves users, who write programs and host them in Excel or run them headless, and maintainers. Agent instructions in `AGENTS.md` point to the same content. |
 | Site | Astro with Starlight. `docs/` is the website project, with the content in `docs/src/content/docs/`. User and maintainer content have separate navigation groups. |
 | Authoring | Markdown. MDX and components are available when a page needs them; none is used yet. |
-| Hosting | GitHub Pages, built with GitHub Actions, at the path `/excel/` beneath the shared origin `https://allors.github.io`, with `/` also validated. |
+| Hosting | GitHub Pages, built with GitHub Actions, at the path `/excel/` beneath the shared origin `https://docs.allors.com`, whose root is the Allors documentation home, with `/` also validated. The sidebar's first entry links to the home, and the link checker leaves that link to the home's own build. The origin's own site and its custom domain belong to the documentation home, not to this repository. |
 | Version context | Pages and exports identify the documented version as `main · 1.1 (unreleased)`: the version from `version.json`, which Nerdbank.GitVersioning stamps on the packages, and the fact that releases are built from tags, so that `main` is unreleased. |
 | Visuals | Mermaid where suitable; the diagrams in [How the virtual workbook works](../virtual-workbook.md) and [Architecture](architecture.md) are the first. No interactive component yet. |
 | Language and structure | Oxford English, precise practitioner terminology and Diátaxis, as defined in the writing guide. |
@@ -86,12 +87,6 @@ requires editorial review of changed pages and of representative exports.
 
 ## Remaining work
 
-- Publish the site: configure the repository's Pages source as GitHub Actions and its
-  `github-pages` environment, then run the `Documentation` workflow on `main` with `publish`
-  selected. The shared origin's own site and the custom domain are decisions of the documentation
-  home, not of this repository.
 - Decide with the other Allors repositories whether to extract the reused tooling.
 - Release from `main`, then update the README and [Packages and versions](../packages.md) so that
   they no longer say the published packages predate the API.
-- Revisit this record when the website is published; mark it Historical once publication has run
-  and the index links to the published site.

@@ -7,6 +7,9 @@ export const description = 'Documentation for developers who build Excel add-ins
 export const version = `main · ${versionJson.version} (unreleased)`;
 export const repository = 'https://github.com/allors/excel';
 export const branch = 'main';
-export const site = process.env.DOCS_SITE || 'https://allors.github.io';
+export const site = process.env.DOCS_SITE || 'https://docs.allors.com';
 const trimmed = (process.env.DOCS_BASE || '/excel/').split('/').filter(Boolean).join('/');
 export const base = trimmed ? `/${trimmed}/` : '/';
+// The documentation home is published at the root of the same origin by allors/allors.github.io. The
+// sidebar links to it, and the link checker leaves that link to the home's own build.
+export const home = new URL('/', site).href;
