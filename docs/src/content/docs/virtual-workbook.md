@@ -71,10 +71,17 @@ The headless `AddIn` has no host. Its constructor creates one workbook with one 
 calls `OnNew(IWorksheet)`, `OnNew(IWorkbook)` and then `OnStart(IAddIn)`, in that order, so
 `OnNew` runs before `OnStart`. Every `AddWorkbook()` creates another workbook the same way.
 
-The callbacks return `Task`, but the library does not await them: it calls them and continues.
-Work that must be finished before the add-in continues, such as filling a new workbook, should
-therefore complete synchronously, as the examples in this documentation do. An exception thrown
-after the first `await` of a callback is not observed by the library.
+Whether a returned `Task` is awaited depends on the caller. The interop `NewWorkbook` and
+`WorkbookOpen` handlers await each existing sheet's `OnNew` in turn, then await the workbook's
+`OnNew`. The worksheet's `BeforeDelete` handler awaits `OnBeforeDelete`. These are `async void`
+event handlers: the awaits order work within the handler, but do not make Excel wait for it to
+finish. Exceptions from awaited tasks propagate through the event handler.
+
+The headless add-in does not await `OnNew` or `OnStart`. Neither implementation awaits a sheet's
+`OnNew` from `AddWorksheet`, and the interop `WorkbookNewSheet` handler does not await it either.
+For those paths, work that must finish before the caller continues should complete synchronously,
+as the examples do; failures of the returned tasks are not observed by the library. The
+repository's Excel-DNA host awaits `OnStart`, and its VSTO host awaits `OnStart` and `OnStop`.
 
 The interop add-in tracks a workbook from the moment Excel reports it as new or opened, or when
 it is activated. Workbooks that were already open when the add-in started appear in `Workbooks`
@@ -123,12 +130,11 @@ with the same `CellChangedEvent` listing the collected cells. A change that span
 cells as a row has columns, which is what inserting or deleting rows produces, makes the worksheet
 re-read the used range instead: cells that disappeared are cleared and reported as changed too.
 
-`DefaultValueConverter` keeps the type a cell already had. Excel reports numbers as `double`; for
-a cell whose value was a `decimal` or an `int`, the converter converts the number back to that
-type, clamping it to the type's range, and for a `DateTime` it converts the OLE automation date.
-For a cell whose value was a `string`, `null` becomes the empty string and any other value is
-converted to text. Otherwise the reported value is stored as it is. Set `ValueConverter` on a cell
-to decide differently.
+`DefaultValueConverter` uses the cell's previous value to choose numeric, date and text
+conversions. It does not always preserve that value's type: a number beyond the decimal bounds
+can become a `double`, and conversion at a rounded boundary can throw. The
+[value conversion reference](api.md#value-conversion) describes the conversions and their limits.
+Set `ValueConverter` on a cell to decide differently.
 
 Rows and columns that the program inserts or deletes through `InsertRows`, `DeleteRows`,
 `InsertColumns` and `DeleteColumns` are changed in Excel with the change event suppressed, and the

@@ -34,7 +34,7 @@ definitions.
 | Flush | `IWorksheet.Flush()`: writing every dirty change of a worksheet to Excel in blocks. Say that a worksheet is flushed; the implementation's methods are called `Render…`, but *render* is not used in prose. |
 | Chunk | A rectangular block of adjacent dirty cells that the interop implementation writes with one COM call. |
 | Change event | `CellsChanged` and `SheetChanged`: raised by a worksheet with the cells whose values Excel reported as changed. |
-| Value converter | An `IValueConverter` that turns the value Excel reports into the value the cell keeps; `DefaultValueConverter` keeps the type the cell had. |
+| Value converter | An `IValueConverter` that turns the value Excel reports into the value the cell keeps; `DefaultValueConverter` uses the cell's previous value to choose a conversion. [Value conversion](api.md#value-conversion) describes its rules and limits. |
 | Binding | A `Binding` registered with a `Binder`: how a cell's value is produced from the model and, for a two-way binding, how an edit goes back to the model. See [Bind cells to your model](bind-cells.md). |
 | Existential attribute | `IAddIn.ExistentialAttribute`: the name of a custom document property; when set, the interop add-in tracks only workbooks that have that property. |
 
