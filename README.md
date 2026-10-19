@@ -1,66 +1,104 @@
 # Allors Excel
 
-Allors.Excel is a c# Excel VSTO AddIn. It speeds up access to excel by using a virtual DOM to update cells.
-It contains useful features to programmatically manage workbooks, worksheets, cells.
-
+[![Allors.Excel](https://img.shields.io/nuget/v/Allors.Excel?label=Allors.Excel)](https://www.nuget.org/packages/Allors.Excel)
+[![Allors.Excel.Headless](https://img.shields.io/nuget/v/Allors.Excel.Headless?label=Allors.Excel.Headless)](https://www.nuget.org/packages/Allors.Excel.Headless)
+[![Allors.Excel.Interop](https://img.shields.io/nuget/v/Allors.Excel.Interop?label=Allors.Excel.Interop)](https://www.nuget.org/packages/Allors.Excel.Interop)
 [![CI](https://github.com/allors/excel/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/allors/excel/actions/workflows/ci.yml)
 
-# Building
+A virtual workbook for Excel add-ins.
 
-This repository builds on Windows only (legacy VSTO add-in + Excel COM automation tests).
+Allors Excel is a .NET library for Excel add-ins. Your add-in reads and writes workbooks,
+worksheets and cells as ordinary objects with zero-based coordinates. The changes are collected
+and written to Excel in blocks when a worksheet is flushed, and the changes a user makes in Excel
+come back as events. The same program runs against an in-memory workbook, so the logic of an
+add-in can be tested without Excel.
 
-## Prerequisites
-- Visual Studio with the **Office/VSTO** workload (provides `msbuild.exe` and VSTO targets)
-- .NET 10 SDK
-- [go-task](https://taskfile.dev): `choco install go-task` or `winget install Task.Task`
-- Microsoft Excel (required only to run the tests)
+## Documentation
 
-## Commands (from the repository root)
-| Command        | Description                                       |
-| -------------- | ------------------------------------------------- |
-| `task`         | Run tests, then produce NuGet packages            |
-| `task clean`   | Create/clean `artifacts/`                         |
-| `task restore` | Restore solution packages and dotnet tools        |
-| `task compile` | Rebuild the test projects                         |
-| `task test`    | Run all test passes into `artifacts/tests`        |
-| `task pack`    | Produce NuGet packages into `artifacts/nuget`     |
-| `task ci`      | CI target (build + test)                          |
+The [documentation](https://github.com/allors/excel/blob/main/docs/src/content/docs/index.md)
+is written for users and for maintainers. Start with
+[Getting started](https://github.com/allors/excel/blob/main/docs/src/content/docs/getting-started.md),
+a tutorial that fills a worksheet without Excel, then
+[How the virtual workbook works](https://github.com/allors/excel/blob/main/docs/src/content/docs/virtual-workbook.md)
+and [Build an Excel add-in](https://github.com/allors/excel/blob/main/docs/src/content/docs/build-an-add-in.md).
+The [API reference](https://github.com/allors/excel/blob/main/docs/src/content/docs/api.md) lists
+every member. Agent instructions are in `AGENTS.md`.
 
-Configuration defaults to `Debug`; override with `task <target> CONFIGURATION=Release`.
-Versions come from [Nerdbank.GitVersioning](https://github.com/dotnet/Nerdbank.GitVersioning) (`version.json`); inspect with `dotnet nbgv get-version`.
+## Example
 
-# Installing via Nuget
-	Install-Package Allors.Excel
- 
-# Features
+A program fills the first worksheet of every workbook the add-in starts to track:
 
-## Workbook
+```csharp
+public sealed class LedgerProgram : IProgram
+{
+    public Task OnNew(IWorkbook workbook)
+    {
+        var sheet = workbook.Worksheets[0];
+        sheet[0, 0].Value = "Item";
+        sheet[0, 1].Value = "Amount";
+        sheet[1, 0].Value = "Paper";
+        sheet[1, 1].Value = 45m;
+        sheet[1, 1].NumberFormat = "0.00";
+        sheet[2, 1].Formula = "=SUM(B2:B2)";
+        sheet.Flush();
+        return Task.CompletedTask;
+    }
 
-### Properties
-- IsActive will activate that workbook
-- Worksheets contains the worksheets inside the workbook
+    // The other members of IProgram return Task.CompletedTask or do nothing.
+}
+```
 
-### Methods
-- GetNamedRanges(string refersToSheetName)
-	
-	Return a list of Excel.Ranges
-- SetNamedRange(string name, Excel.Range range)
+Inside Excel, an Excel-DNA or VSTO host creates `Allors.Excel.Interop.AddIn` with Excel's
+`Application` object and the program. In a test, the headless add-in plays the host:
 
-	Adds or updates the namedRange
+```csharp
+var addIn = new Allors.Excel.Headless.AddIn(new LedgerProgram(), new NoRibbon());
+var sheet = addIn.Workbooks[0].Worksheets[0];
+Assert.Equal("Paper", sheet[1, 0].ValueAsString);
+```
 
-- Copy(IWorksheet source, IWorksheet beforeWorksheet)
+## Install
 
-	Copies the source workbook to this workbook
+```sh
+dotnet add package Allors.Excel.Headless   # the abstractions and the in-memory workbook, for tests and tools
+dotnet add package Allors.Excel.Interop    # the implementation that runs inside Excel
+```
 
-## Worksheet
+The packages on nuget.org, version `1.0.73` from March 2024, predate renames made on `main`
+since; [Packages and versions](https://github.com/allors/excel/blob/main/docs/src/content/docs/packages.md)
+lists them. Until a release is tagged from `main`, reference the projects from a clone of the
+repository, as the tutorial does.
 
-### Properties
+## Building
 
+The repository builds on Windows only: the VSTO host needs Visual Studio with the Office/VSTO
+workload, and the interop tests drive a real Excel.
 
-### Methods
+```sh
+task compile                     # restore and build the solution
+task test                        # run the five test passes into artifacts/tests
+task pack CONFIGURATION=Release  # create the NuGet packages in artifacts/nuget
+```
 
+[Build and test](https://github.com/allors/excel/blob/main/docs/src/content/docs/internals/build-and-test.md)
+describes the prerequisites, the targets, the tests, CI and the release workflow.
 
-### Indexers
+## Solution structure
 
+| Project | Description |
+|---|---|
+| `src/Allors.Excel` | The abstractions: `IAddIn`, `IProgram`, `IWorkbook`, `IWorksheet`, `ICell` and their value types |
+| `src/Allors.Excel.Headless` | The in-memory implementation, for tests and tools |
+| `src/Allors.Excel.Interop` | The implementation that runs inside Excel through COM |
+| `src/Allors.Excel.Interop.Dna` | A host built with Excel-DNA |
+| `src/Allors.Excel.Interop.Vsto` | A host built with VSTO |
+| `src/Application` | A sample program for the hosts |
+| `src/Allors.Excel.Tests` | The shared facts, run against both implementations |
+| `src/Allors.Excel.Headless.Tests` | The shared facts against the headless implementation |
+| `src/Allors.Excel.Interop.Tests.Shared`, `src/Allors.Excel.Interop.Dna.Tests`, `src/Allors.Excel.Interop.Vsto.Tests` | The Excel fixture and the shared facts against a real Excel |
+| `src/Allors.Excel.Interop.Tests` | Tests of the chunking of cells |
+| `docs` | The documentation website |
 
-### Events
+## Licence
+
+LGPL-3.0-or-later
