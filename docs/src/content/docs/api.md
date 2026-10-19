@@ -50,8 +50,9 @@ also exposes `Program`, a settable `Ribbon`, `WorkbookList`, `AddWorkbook()` and
 | `Task OnLogin()`, `Task OnLogout()` | The host. |
 | `bool IsEnabled(string controlId, string controlTag)` | The host's `getEnabled` callbacks. |
 
-The returned tasks are not awaited by the library; see
-[The lifecycle of a program](virtual-workbook.md#the-lifecycle-of-a-program).
+Some callers await the returned tasks and others discard them;
+[The lifecycle of a program](virtual-workbook.md#the-lifecycle-of-a-program) identifies each path
+and its ordering and exception behaviour.
 
 ## IRibbon
 
@@ -106,7 +107,7 @@ The returned tasks are not awaited by the library; see
 | `void DeleteRows(int startRowIndex, int numberOfRows)` | Deletes rows `startRowIndex` to `startRowIndex + numberOfRows - 1`; the rows below move up. Headless throws `ArgumentException` for a negative argument. |
 | `void InsertColumns(int startColumnIndex, int numberOfColumns)` | Inserts columns to the right of column `startColumnIndex`. |
 | `void DeleteColumns(int startColumnIndex, int numberOfColumns)` | Deletes columns `startColumnIndex` to `startColumnIndex + numberOfColumns - 1`. |
-| `Range GetRange(string cell1, string cell2 = null)` | A zero-based range from A1-style references, with `Worksheet` set. Interop: whatever Excel resolves, such as `A1`, `A1:C5`, `A:A` or two references; `null` when Excel rejects it or `cell1` is blank. Headless: a parser that understands `A1`, `A1:C5` with one letter and one digit on each side, `A:A`, `A:C` and two separate references; anything else returns `null`. |
+| `Range GetRange(string cell1, string cell2 = null)` | A zero-based range from A1-style references, with `Worksheet` set. Interop: whatever Excel resolves, such as `A1`, `A1:C5`, `A:A` or two references; `null` when Excel rejects it or `cell1` is blank. Headless: a limited parser that can return `null` or throw; see [Headless range parsing](#headless-range-parsing). |
 | `Range GetUsedRange()` | Interop: Excel's used range. Headless: the block from the first to the last cell that exists; throws `InvalidOperationException` when no cell exists. |
 | `void AutoFit()` | Interop: fits the columns of the used range. Headless: nothing. |
 | `void SetChartObjectDataLabels(object chartObject, int seriesIndex, object seriesXValues, object seriesValues, bool showValues, bool showRange, string chartFieldRange, float baselineOffset, bool bold, bool italic, Color foreColor, object size)` | Interop: sets the values and data labels of a series of the chart object named or numbered by `chartObject`, then refreshes the chart. Headless: nothing. |
@@ -120,11 +121,20 @@ The returned tasks are not awaited by the library; see
 | `void HideInputMessage(ICell cell, bool clearInputMessage = false)` | Interop: stops showing the input message; with `clearInputMessage`, clears the validation's error message and title, not the input message. Headless: nothing. |
 | `void SetPageSetup(PageSetup pageSetup)` | Interop: sets the orientation, the paper size when it is 1 to 41, and the header and footer margins and texts. Headless: nothing. |
 
+### Headless range parsing
+
+The headless `GetRange` parser accepts single references such as `A1`, colon ranges such as
+`A1:C5` with one letter and one digit on each side, whole-column ranges such as `A:A` and `A:C`,
+and two separate references. It does not reliably return `null` for input it cannot parse.
+With `cell2` omitted, three-character references such as `A10` and `AA1` throw
+`NullReferenceException`; pass the reference twice, such as `GetRange("A10", "A10")`, to avoid
+that defect. A row number too large for an `int` can also throw `OverflowException`.
+
 ## ICell, IRow and IColumn
 
 | Member | Meaning |
 | --- | --- |
-| `IWorksheet Worksheet`, `IRow Row`, `IColumn Column` | Where the cell is. After rows or columns are inserted or deleted, `Row` and `Column` are the cell's new position. |
+| `IWorksheet Worksheet`, `IRow Row`, `IColumn Column` | Where the cell is. Interop: after rows or columns are inserted or deleted, a moved cell's `Row` and `Column` reflect its new position. Headless: the worksheet lookup moves the cell, but its `Row` and `Column` keep their original positions. |
 | `object Value { get; set; }` | The value. Interop: marks the cell dirty when first set, `null` included, and afterwards when it changes; at `Flush`, written as the cell's value. |
 | `string ValueAsString { get; }` | `Value` converted to text in the current culture. |
 | `string Formula { get; set; }` | The formula text, such as `=SUM(A1:A3)`. Interop: dirty when first set or changed; written after the values, so it wins over a value set on the same cell. Headless: stored, not calculated. |
@@ -171,10 +181,18 @@ of `long`.
 ## Value conversion
 
 `IValueConverter.Convert(ICell cell, object excelValue)` returns the value to store for a value
-Excel reported. `DefaultValueConverter` keeps the type the cell had: a `double` becomes a
-`decimal` or an `int` when the cell held one, clamped to the type's range, or a `DateTime` from
-the OLE automation date when the cell held a date; for a cell that held a `string`, `null` becomes
-the empty string and any other value its text; otherwise the reported value is returned.
+Excel reported. `DefaultValueConverter` chooses a conversion from the cell's previous value.
+For a cell that held an `int`, a reported `double` is converted to an `int`, clamped to its
+minimum or maximum when outside that range. For a cell that held a `DateTime`, a `double` is
+converted from an OLE automation date. For a cell that held a `string`, `null` becomes the empty
+string and any other value its text. Otherwise the reported value is returned, except for the
+decimal case below.
+
+For a cell that held a `decimal`, a reported `double` below `(double)decimal.MinValue` or above
+`(double)decimal.MaxValue` becomes the corresponding bound as a `double`, not a `decimal`.
+Otherwise the converter calls `Convert.ToDecimal`; the rounded boundary values themselves and
+`double.NaN` throw `OverflowException`. A caller cannot assume that every reported number
+preserves the cell's decimal type.
 
 ## Binding
 
@@ -221,4 +239,5 @@ implements `IBinding` with `ToCell`, `ToDomain`, `OneWayBinding` and `TwoWayBind
 | `IWorksheet.SaveAsPdf`, `SaveAsXps` | A one-byte placeholder file. |
 | `IWorkbook.GetNamedRanges(refersToSheetName)` | Ignores the filter. |
 | `ICell.Clear` | Keeps the formula. |
+| `ICell.Row`, `ICell.Column` | Keep their original positions when row or column operations move the cell in the worksheet lookup. |
 | `IAddIn.ExistentialAttribute` | Stored, without effect. |

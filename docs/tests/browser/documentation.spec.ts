@@ -51,6 +51,7 @@ test('skip link and sidebar navigation work from the keyboard', async ({ page })
   await page.keyboard.press('Enter');
   await expect(page.getByRole('heading', { level: 1, name: explanationTitle, exact: true })).toBeVisible();
   await expect(page.locator('#starlight__sidebar:popover-open')).toHaveCount(0);
+  await expect(page.locator('pre.mermaid svg')).toBeVisible();
   await expectNoPageOverflow(page);
 });
 
@@ -72,6 +73,7 @@ test('keyboard search finds the explanation of dirty cells', async ({ page }) =>
   await page.keyboard.press('Enter');
   await expect(page.getByRole('heading', { level: 1, name: explanationTitle, exact: true })).toBeVisible();
   await expect(dialog).not.toBeVisible();
+  await expect(page.locator('pre.mermaid svg')).toBeVisible();
   await expectNoPageOverflow(page);
 });
 

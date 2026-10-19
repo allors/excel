@@ -62,8 +62,8 @@ style; the analysers are warnings, not errors.
 ## The interop implementation
 
 `AddIn` subscribes to the application's workbook events. `NewWorkbook` and `WorkbookOpen` create a
-`Workbook`, create a `Worksheet` for each of its sheets, call the program's `OnNew` for the sheets
-and then for the workbook; `WorkbookActivate` creates the `Workbook` when it is unknown and marks
+`Workbook`, create a `Worksheet` for each of its sheets, await the program's `OnNew` for each sheet
+in turn and then for the workbook; `WorkbookActivate` creates the `Workbook` when it is unknown and marks
 it active; `WorkbookBeforeClose` calls `OnClose` and, unless cancelled, forgets the workbook. With
 `ExistentialAttribute` set, each handler first checks the workbook's custom document properties.
 
@@ -163,6 +163,12 @@ Observed on 2026-10-19 in the source and in the local run described in
 - The VSTO host's `Ribbon.xml` names the callbacks `GetDoSomethingLabel` and `OnClick`, and its
   `Ribbon` class implements neither, so its buttons cannot work.
 - The headless `Worksheet.CustomProperties` is never assigned and is `null`.
+- The headless `GetRange` can throw for ordinary single-cell references such as `A10` and `AA1`;
+  [Headless range parsing](../api.md#headless-range-parsing) describes the limits and a workaround.
+- Headless row and column operations move cells in the worksheet lookup without updating their
+  `Row` and `Column` references; see [the cell reference](../api.md#icell-irow-and-icolumn).
+- `DefaultValueConverter` does not always preserve a decimal cell's type and can throw at its
+  rounded boundaries; see [Value conversion](../api.md#value-conversion).
 - `IWorkbook.TryDeleteCustomXmlById` catches `COMException` only; an unknown id makes
   `SelectByID` return `null`, and the call throws `NullReferenceException`.
 - `IWorksheet.HideInputMessage(cell, clearInputMessage: true)` clears the validation's
