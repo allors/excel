@@ -47,7 +47,7 @@ not rely on them: they can change with any version.
 | [Architecture](internals/architecture.md) | Explanation | Current | The projects and their references, the interop render pipeline, the headless implementation, the shared tests and the Excel fixture, and the known defects. |
 | [Build and test](internals/build-and-test.md) | How-to guide | Current | Prerequisites, the Task targets, the five test passes, CI, versioning and the release workflow. |
 | [Writing documentation](internals/writing-documentation.md) | How-to guide | Current | Audience, Diátaxis, status, Oxford English, stable terminology, visual explanations and review. |
-| [Documentation website](internals/documentation-website.md) | Decision record | Planned | The adoption of the Allors documentation standard, what was reused, validation and the unpublished state of the website. |
+| [Documentation website](internals/documentation-website.md) | Decision record | Current | The adoption of the Allors documentation standard, what was reused, validation and where the website is published. |
 
 The writing guide defines [page kinds](internals/writing-documentation.md#choose-the-audience-and-purpose)
 and [statuses](internals/writing-documentation.md#state-what-is-current). Audience, kind and
