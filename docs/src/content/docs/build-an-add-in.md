@@ -30,7 +30,8 @@ targets `netstandard2.0` and uses the Office primary interop assemblies; see
 
 The Excel-DNA host is a ribbon class. Excel-DNA calls `GetCustomUI` when it loads the ribbon and
 `OnLoad` when the ribbon is ready; the repository's `Ribbon` in `src/Allors.Excel.Interop.Dna/Ribbon.cs`
-creates the add-in in the first and starts the program in the second:
+creates the add-in in the first and starts the program in the second. Its essential members,
+with the `try` blocks that show an exception in a message box left out:
 
 ```csharp
 [ComVisible(true)]
@@ -45,7 +46,8 @@ public class Ribbon : ExcelRibbon, IRibbon
     public override string GetCustomUI(string _)
     {
         var application = ExcelDnaUtil.Application;
-        this.Program = new Program(new ServiceLocator());
+        var serviceLocator = new ServiceLocator();
+        this.Program = new Program(serviceLocator);
         this.AddIn = new AddIn((InteropApplication)application, this.Program, this);
         return RibbonResources.Ribbon;
     }
@@ -56,9 +58,10 @@ public class Ribbon : ExcelRibbon, IRibbon
         await this.Program.OnStart(this.AddIn);
     }
 
-    public override object LoadImage(string imageId) => RibbonResources.ResourceManager.GetObject(imageId);
+    public override object LoadImage(string imageId) =>
+        RibbonResources.ResourceManager.GetObject(imageId);
 
-    public void OnButtonPressed(IRibbonControl control) => MessageBox.Show("Hello!");
+    public void OnButtonPressed(IRibbonControl control) => System.Windows.Forms.MessageBox.Show("Hello!");
 
     public void Invalidate() => this.RibbonUI.Invalidate();
 }
@@ -102,7 +105,9 @@ private async void ThisAddIn_Shutdown(object sender, EventArgs e) => await Task.
 
 protected override IRibbonExtensibility CreateRibbonExtensibilityObject()
 {
-    SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+    SynchronizationContext windowsFormsSynchronizationContext = new WindowsFormsSynchronizationContext();
+    SynchronizationContext.SetSynchronizationContext(windowsFormsSynchronizationContext);
+
     this.Ribbon = new Ribbon();
     return this.Ribbon;
 }
