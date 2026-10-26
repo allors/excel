@@ -3,6 +3,40 @@
 Instructions for agents working in this repository. The technical facts live in the human
 documentation; this file says where to find them and how to work here.
 
+## Change policy
+
+Visibility: public. Change policy: conservative.
+
+- Make only changes required by the explicit request. Preserve existing architecture,
+  organization and conventions unless directly instructed otherwise.
+- Follow existing test placement, fixtures and patterns; do not introduce a separate
+  testing approach. Preserve established test expectations unless the requested change
+  explicitly changes that behaviour.
+- Edit documentation, including README files, changelogs, diagrams and guides, only when
+  explicitly requested. Report related improvements or documentation implications
+  without implementing them.
+- An exception applies only to the change directly authorized; it does not waive the
+  remaining rules. Change this policy only when explicitly instructed.
+
+## Working agreement
+
+- Stay within the approved objective and preserve unrelated work. Keep explanations and
+  authorized documentation concise.
+- Before asking for a decision, explain it fully in chat: the mechanism and relevant code,
+  consequences, options, actual costs and available measurements, and a recommendation
+  including the argument against it. Ask the question in plain text at the end.
+- For long work explicitly divided into subtasks, describe the current subtask's changes,
+  files or systems and validation before starting. Approval of a multi-subtask plan
+  authorizes only its first subtask.
+- At each boundary, summarize changes and verification, describe the next subtask and its
+  validation, then wait for explicit approval. Proceed across boundaries only when the
+  user explicitly authorizes it for the session. Re-check materially expanded scope.
+- Do not invent subtask boundaries for simple tasks or routine implementation steps.
+- At agreed boundaries, assess whether a fresh session would help. Before recommending
+  one, record the branch, commit SHAs, validation, uncommitted work, pending decisions and
+  exact next step. Use authorized project notes, otherwise provide the record in chat.
+  Include a 2–4-line restart prompt; do not require a restart after every small task.
+
 ## Scope
 
 - Allors Excel is a .NET library for Excel add-ins. A program implements `IProgram` and works
@@ -34,58 +68,60 @@ documentation; this file says where to find them and how to work here.
   and its `Render…` step.
 - [Architecture](docs/src/content/docs/internals/architecture.md#known-defects) lists the known
   defects. Do not describe a defective member as working until the fix has shipped.
-- Follow existing naming and structure; avoid new conventions without reason. Error messages
-  should be actionable.
+- Error messages should be actionable.
 
 ## Git
 
-- Pull requests are the default. Creating a pull request requires approval.
-- Use one branch and one pull request for an agreed body of work. Its parts land as focused
-  commits on that branch. Create the pull request only when that work is complete; if one already
-  exists, update it.
-- Keep the title and description of a pull request correct for everything on its branch, and
-  update them when the branch changes. For a squash merge, the title is the commit subject and the
-  description is the commit body, describing the final changes and their validation.
-- Use the conventional commit format `type(scope): description`. Keep commits focused and
-  well-described. No AI attribution in commits or pull requests.
-- Use purpose prefixes for branch names, such as `feature/`, `fix/`, `docs/` or `chore/`, not the
-  name of an agent or tool.
+- Pull requests are the default. Creating or merging a pull request requires explicit
+  approval. Keep one branch and one PR for an agreed body of work, with focused commits;
+  open the PR when that work is complete.
+- Use purpose prefixes such as `feature/`, `fix/`, `docs/` or `chore/`, not agent/tool names.
+  Use conventional commits (`type(scope): description`) with no AI attribution.
+- Keep the PR title and body accurate for the final diff. Update them when the branch's
+  scope changes, including after review commits; describe the resulting behaviour and
+  validation, not the development history.
+- Default to squash merge. Use the PR title as the commit subject and its full description
+  as the body, with wording that remains true after the merge.
+
+## Release
+
 - Nothing is published automatically. A release is a tag `vX.Y.Z`, which the `Release` workflow
   publishes to nuget.org; see [Build and test](docs/src/content/docs/internals/build-and-test.md#release).
   Changes limited to `docs/`, the documentation workflow and this file do not run `CI`.
 
 ## Workflow
 
-- Verify that the build succeeds and the tests pass before considering a task complete:
-  `task test`, or `task compile` and the headless and chunk passes when no usable Excel is
-  available, saying so in the pull request.
-- When fixing a bug, first write a failing test or amend an existing one. Add a new test to a
-  suitable existing class. Do not change an existing test unless instructed to.
-- Keep implementation facts beside the code: in tests, in code comments and in the documentation
-  pages; do not maintain a second account of them here.
+- For code changes, verify that the build succeeds and the tests pass before considering the
+  task complete: `task test`, or `task compile` and the headless and chunk passes when no usable
+  Excel is available, saying so in the pull request.
+- Follow test-driven development for requested behaviour changes. Add a failing regression case
+  in a suitable existing class before implementing a fix.
+- Use tests, code comments and human documentation for implementation facts; do not maintain
+  a second account of them here.
 
 ## Documentation
 
-- `docs/src/content/docs/` is human documentation for users and maintainers. Before changing
-  documentation, comments or public-facing explanations, read and apply the
+- `docs/src/content/docs/` is human documentation for users and maintainers. For explicitly
+  requested documentation work, read and apply the
   [writing guide](docs/src/content/docs/internals/writing-documentation.md) and the
   [terminology reference](docs/src/content/docs/terminology.md). The guide owns the audience,
   Diátaxis, status, Oxford English and visual explanation rules. Preserve exact identifiers and
   external names.
 - Do not rename an established concept or substitute a competing term without prior agreement;
   explain the proposed meaning, reason and affected scope first. Apply an approved change
-  consistently across code, prose, diagrams, examples and pull request text.
-- Update pages made untrue by a change in the same pull request. Maintain the index, page
-  statuses and links according to the writing guide. The README stays an introduction with
-  absolute links to the pages, because it is packed into the NuGet packages.
-- Date a verification that depends on an external state, such as a published package version or
-  an observed failure, and say what was checked. Run a tutorial from a clean directory before
-  changing its steps or its shown output.
-- Before completing work, review the changed material for factual accuracy, agreed terminology,
-  Oxford spelling and clear practitioner language, including labels, example output and pull
-  request text. Editorial review is required; no prose linter is part of the tooling.
-- The website in `docs/` has its own checks. Run them from `docs/` before completing documentation
-  work, as [docs/README.md](docs/README.md) describes: `npm test`, `npm run check`,
+  consistently within the explicitly authorized scope; report implications outside it.
+- Within authorized documentation work, maintain the affected index, page statuses and links
+  according to the writing guide. The README stays an introduction with absolute links to the
+  pages, because it is packed into the NuGet packages.
+- In authorized documentation, date a verification that depends on an external state, such as
+  a published package version or an observed failure, and say what was checked. Run a tutorial
+  from a clean directory before changing its steps or its shown output.
+- Before completing authorized documentation work, review the changed material for factual
+  accuracy, agreed terminology, Oxford spelling and clear practitioner language, including
+  labels, example output and pull request text. Editorial review is required; no prose linter
+  is part of the tooling.
+- For explicitly requested website documentation changes, run the checks from `docs/`, as
+  [docs/README.md](docs/README.md) describes: `npm test`, `npm run check`,
   `npm run build`, `npm run check:links` and `npm run test:browser`.
 
 ## Build commands
