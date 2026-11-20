@@ -84,6 +84,14 @@ are the same, byte for byte, in all five: the four integrations, the link checke
 schema, the page title component, the stylesheet and the Playwright and TypeScript configuration.
 A copy differs in `site.mjs`, `astro.config.mjs`, its tests, its workflow and its content.
 
+Since [#37](https://github.com/allors/excel/pull/37) the website takes `mermaid` 12 and shows
+every diagram at its natural size: `astro.config.mjs` sets `flowchart.useMaxWidth` to `false`, and
+the stylesheet gives a diagram neither a minimum nor a maximum width. A label is 16px on every
+screen, and a diagram that is wider than its column scrolls. Before, the stylesheet gave every
+diagram a minimum width of 34rem, which enlarged the narrower diagrams that `mermaid` 12 draws.
+The rule is the same in the five copies of the tooling. It covers flowcharts, the one kind of
+diagram in use; another kind needs its own `useMaxWidth`.
+
 ## Validation
 
 On 2026-10-19 the following ran locally from `docs/` for the base paths `/excel/` and `/`:
