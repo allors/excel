@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { parseHTML } from 'linkedom';
 import TurndownService from 'turndown';
 import { gfm } from 'turndown-plugin-gfm';
-import { title, description } from '../site.mjs';
+import { title, description, audiences as order } from '../site.mjs';
 
 const metadataFields = ['title', 'description', 'audience', 'kind', 'status', 'version', 'slug'];
 
@@ -146,7 +146,6 @@ function createIndex(pages, root, converter) {
     'The links below point to Markdown exports. Audience, kind and status describe each page independently. This index follows the llms.txt discovery proposal; repository instructions remain in AGENTS.md.',
   ];
   const audiences = [...new Set(pages.map(({ metadata }) => metadata.audience))];
-  const order = ['Users and maintainers', 'Users', 'Maintainers'];
   audiences.sort((a, b) => (order.includes(a) ? order.indexOf(a) : order.length) - (order.includes(b) ? order.indexOf(b) : order.length) || a.localeCompare(b));
   for (const audience of audiences) {
     lines.push('', `## ${audience}`, '');

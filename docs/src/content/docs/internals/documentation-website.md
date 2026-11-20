@@ -74,6 +74,16 @@ which the content schema also holds; moving the audiences into `site.mjs` would 
 identical. Extracting the set is a decision for the Allors documentation home; until then, keep the
 copies identical where the table says so, and port fixes between the repositories.
 
+Since [#35](https://github.com/allors/excel/pull/35) the values that differed between the copies
+of the tooling are in `site.mjs`: the audiences, which the content schema and `exports.mjs` read,
+the root of the repository, which `source-links.mjs` reads, and the base path, from which
+`check-links.mjs` takes its default. The link checker leaves two kinds of link to the build that
+publishes their target: the link to the documentation home, and links into the documentation
+areas, which the copy of the home needs. With the same change in the other four copies, ten files
+are the same, byte for byte, in all five: the four integrations, the link checker, the content
+schema, the page title component, the stylesheet and the Playwright and TypeScript configuration.
+A copy differs in `site.mjs`, `astro.config.mjs`, its tests, its workflow and its content.
+
 ## Validation
 
 On 2026-10-19 the following ran locally from `docs/` for the base paths `/excel/` and `/`:
