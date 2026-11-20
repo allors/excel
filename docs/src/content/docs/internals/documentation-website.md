@@ -56,12 +56,13 @@ changes:
 | `astro.config.mjs` | Sidebar entries; the title and description are read from `site.mjs`. |
 | `site.mjs` | Title, description, repository, the version label built from `version.json` and the default base path `/excel/`. |
 | `integrations/exports.mjs` | The agent index heading and description are read from `site.mjs`, so the file contains no project text; the audience order is that of Immersive. Immersive read the title only and Allors Documents wrote both into the file; port this form to both. |
-| `integrations/source-links.mjs`, `integrations/scrollable-content.mjs`, `integrations/focusable-code-blocks.mjs` | Unchanged. |
+| `integrations/source-links.mjs` | Unchanged at the adoption. It wrote a link to a page in a subfolder with a backslash on Windows; since [#32](https://github.com/allors/excel/pull/32) it gives the path forward slashes on every platform. The fix comes from Allors3 and is in every copy of the tooling. |
+| `integrations/scrollable-content.mjs`, `integrations/focusable-code-blocks.mjs` | Unchanged. |
 | `scripts/check-links.mjs` | The default base path. |
 | `src/content.config.ts` | The audience names of Immersive: `Users`, `Maintainers` and `Users and maintainers`. |
 | `src/components/PageTitle.astro`, `src/styles/documentation.css`, `public/favicon.ico`, `tsconfig.json`, `playwright.config.ts`, `.gitignore` | Unchanged; the favicon is the one of Allors3 and Immersive. |
 | `package.json`, `package-lock.json` | The package name; the pinned dependency versions are identical. |
-| `tests/exports.test.mjs`, `tests/links.test.mjs`, `tests/source-links.test.mjs`, `tests/fixtures/anchors.md` | Base paths, repository paths, version strings and the audience names. |
+| `tests/exports.test.mjs`, `tests/links.test.mjs`, `tests/source-links.test.mjs`, `tests/fixtures/anchors.md` | Base paths, repository paths, version strings and the audience names. Since #32, `source-links.test.mjs` also checks a link to a page in a subfolder. |
 | `tests/browser/documentation.spec.ts` | The page names, the diagram and the table it exercises. |
 | `.github/workflows/documentation.yml` | The base path matrix and `version.json` as a trigger path, because the version label depends on it. The `CI` workflow gained `paths-ignore` for `docs/`, the documentation workflow and `AGENTS.md`, as Immersive's has, because its two legs install Office and take a quarter of an hour. |
 
